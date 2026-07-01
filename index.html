@@ -1,0 +1,2641 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archive — 2038</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+
+/* ────────────────────────────────────────
+   TOKENS
+──────────────────────────────────────── */
+:root {
+  --bg:        #07090d;
+  --bg-raise:  #0b0e15;
+  --bg-card:   #0e111a;
+  --hi:        #e7e3db;
+  --mid:       #8c877d;
+  --lo:        #3f3d39;
+  --purple:    #8a78a8;
+  --gold:      #a8905a;
+  --teal:      #4a7878;
+  --wine:      #9c5a6e;
+  --wine-soft: rgba(156,90,110,0.14);
+  --wine-line: rgba(156,90,110,0.32);
+  --border:    rgba(255,255,255,0.065);
+  --ff-d: 'Cormorant Garamond', Georgia, serif;
+  --ff-b: 'DM Sans', system-ui, sans-serif;
+  --ff-m: 'Space Mono', monospace;
+}
+
+/* ────────────────────────────────────────
+   RESET & BASE
+──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--hi);
+  font-family: var(--ff-b);
+  font-weight: 300;
+  line-height: 1.75;
+  overflow-x: hidden;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+img { display: block; max-width: 100%; }
+a   { color: inherit; text-decoration: none; }
+
+/* film-grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: .45;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+}
+
+/* ────────────────────────────────────────
+   PETAL FIELD — ambient dissolution
+   AARD lore: bodies oxidise into petals.
+   Compositor-only (transform/opacity), petals
+   fade as the hero scrolls out of view.
+──────────────────────────────────────── */
+.petal-field {
+  position: fixed;
+  inset: 0;
+  z-index: 2;                 /* above content, far below nav(200) & modal(1000) */
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity .6s ease;
+  will-change: opacity;
+}
+.petal-field.dormant { visibility: hidden; }   /* killed once scrolled past hero */
+.petal-field.dormant .petal { animation-play-state: paused; }
+
+.petal {
+  position: absolute;
+  top: 0;
+  left: var(--x, 50%);
+  width: var(--size, 14px);
+  height: var(--size, 14px);
+  opacity: 0;
+  transform: translate3d(0, -14vh, 0) rotate(0deg);
+  animation: petal-fall var(--dur, 14s) linear var(--delay, 0s) infinite;
+  will-change: transform, opacity;
+}
+.petal svg { width: 100%; height: 100%; display: block; }
+
+@keyframes petal-fall {
+  0%   { transform: translate3d(0, -14vh, 0) rotate(0deg); opacity: 0; }
+  10%  { opacity: var(--peak, .5); }
+  85%  { opacity: var(--peak, .5); }
+  100% { transform: translate3d(var(--drift, 4vw), 116vh, 0) rotate(var(--spin, 200deg)); opacity: 0; }
+}
+
+/* Accessibility: honour reduced-motion — no drifting petals at all */
+@media (prefers-reduced-motion: reduce) {
+  .petal-field { display: none; }
+}
+
+/* ────────────────────────────────────────
+   TYPOGRAPHY UTILITIES
+──────────────────────────────────────── */
+.d-xl {
+  font-family: var(--ff-d);
+  font-size: clamp(3.6rem, 8vw, 7.2rem);
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -.02em;
+}
+.d-md {
+  font-family: var(--ff-d);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 300;
+  line-height: 1.2;
+}
+.mono {
+  font-family: var(--ff-m);
+  font-size: .62rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--mid);
+}
+.mono-accent { color: var(--purple); }
+
+/* ────────────────────────────────────────
+   NAV
+──────────────────────────────────────── */
+nav {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.15rem 3rem;
+  background: rgba(7,9,13,.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--ff-m);
+  font-size: .72rem;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+}
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+.nav-links a {
+  font-family: var(--ff-m);
+  font-size: .6rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--mid);
+  transition: color .25s;
+}
+.nav-links a:hover,
+.nav-links a.active { color: var(--hi); }
+
+/* ────────────────────────────────────────
+   SHARED LAYOUT
+──────────────────────────────────────── */
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 3rem;
+}
+.sec-head {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  margin-bottom: 5rem;
+}
+.sec-num {
+  font-family: var(--ff-m);
+  font-size: .58rem;
+  letter-spacing: .12em;
+  color: var(--purple);
+}
+.sec-bar {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.sec-tag {
+  font-family: var(--ff-m);
+  font-size: .58rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--lo);
+}
+
+/* ────────────────────────────────────────
+   REVEAL ANIMATION
+──────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .75s ease, transform .75s ease;
+}
+.reveal.in { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: .1s; }
+.reveal-delay-2 { transition-delay: .2s; }
+.reveal-delay-3 { transition-delay: .3s; }
+
+/* ────────────────────────────────────────
+   §01  SEVERANCE — HERO
+──────────────────────────────────────── */
+#severance {
+  position: relative;
+  overflow: hidden;
+  padding: 0 0 7rem;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: url('https://madeleine-cell.github.io/images/Eiffel.webp') center 30% / cover no-repeat;
+  opacity: .07;
+  filter: grayscale(55%);
+}
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 38%, transparent 0%, var(--bg) 82%),
+    linear-gradient(to bottom, var(--bg) 0%, transparent 16%, transparent 64%, var(--bg) 100%);
+}
+
+.hero-inner {
+  position: relative;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 3rem;
+}
+
+/* — hero stage: title sits in viewport center — */
+.hero-stage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8rem 0 3rem;
+}
+
+.hero-date {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-family: var(--ff-m);
+  font-size: .66rem;
+  letter-spacing: .28em;
+  color: var(--purple);
+  margin-bottom: 2.4rem;
+}
+.hero-date::after {
+  content: '';
+  flex: 1;
+  max-width: 8rem;
+  height: 1px;
+  background: linear-gradient(to right, var(--wine-line), transparent);
+}
+
+.hero-title { position: relative; }
+.hero-title em {
+  font-style: italic;
+  color: var(--mid);
+}
+
+.hero-body {
+  max-width: 48ch;
+  margin-top: 2.6rem;
+  font-size: 1.04rem;
+  color: var(--mid);
+  line-height: 1.95;
+}
+.hero-body p + p { margin-top: .9rem; }
+.hero-body em { color: var(--hi); font-style: normal; }
+
+/* — population ribbon — */
+.hero-stats {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-top: 3.6rem;
+  border: 1px solid var(--border);
+  background: rgba(7,9,13,.4);
+  max-width: 640px;
+}
+.hero-stat {
+  flex: 1;
+  padding: 1.3rem 1.5rem;
+  position: relative;
+}
+.hero-stat + .hero-stat { border-left: 1px solid var(--border); }
+.hero-stat-label {
+  font-family: var(--ff-m);
+  font-size: .5rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--lo);
+  margin-bottom: .55rem;
+}
+.hero-stat-num {
+  font-family: var(--ff-d);
+  font-size: 1.85rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--hi);
+}
+.hero-stat.gone .hero-stat-num { color: var(--wine); }
+.hero-stat.left .hero-stat-num { color: var(--gold); }
+.hero-stat-sub {
+  font-family: var(--ff-m);
+  font-size: .5rem;
+  letter-spacing: .1em;
+  color: var(--mid);
+  margin-top: .45rem;
+}
+
+/* ────────────────────────────────────────
+   AARD — staged progression module
+──────────────────────────────────────── */
+.aard-wrap {
+  margin-top: 7rem;
+  padding-top: 4.5rem;
+  border-top: 1px solid var(--border);
+}
+.aard-head {
+  display: flex;
+  align-items: baseline;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+  margin-bottom: .6rem;
+}
+.aard-acro {
+  font-family: var(--ff-d);
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -.01em;
+  color: var(--hi);
+}
+.aard-full {
+  font-family: var(--ff-m);
+  font-size: .58rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--purple);
+}
+.aard-intro {
+  max-width: 56ch;
+  font-size: .92rem;
+  color: var(--mid);
+  line-height: 1.9;
+  margin-bottom: 3.4rem;
+}
+
+/* responsiveness scale rail + stage cards */
+.aard-stages {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  position: relative;
+}
+.aard-stage {
+  background: var(--bg-raise);
+  padding: 2.4rem 2rem 2.6rem;
+  position: relative;
+  transition: background .35s;
+}
+.aard-stage:hover { background: var(--bg-card); }
+.aard-stage::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 2px;
+  width: 0;
+  background: var(--wine);
+  transition: width .5s ease;
+}
+.aard-stage:hover::before { width: 100%; }
+
+.aard-stage-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.8rem;
+}
+.aard-stage-num {
+  font-family: var(--ff-m);
+  font-size: .62rem;
+  letter-spacing: .12em;
+  color: var(--wine);
+}
+.aard-stage-meter {
+  font-family: var(--ff-m);
+  font-size: .5rem;
+  letter-spacing: .1em;
+  color: var(--lo);
+}
+.aard-stage-label {
+  font-family: var(--ff-m);
+  font-size: .56rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--lo);
+  margin-bottom: .8rem;
+}
+.aard-stage-title {
+  font-family: var(--ff-d);
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.2;
+  margin-bottom: 1.1rem;
+}
+.aard-stage-body {
+  font-size: .86rem;
+  color: var(--mid);
+  line-height: 1.85;
+}
+
+/* counter-strip: the only treatment */
+.aard-rx {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  margin-top: 1px;
+  padding: 1.8rem 2.2rem;
+  border: 1px solid var(--wine-line);
+  background: var(--wine-soft);
+}
+.aard-rx-mark {
+  font-family: var(--ff-d);
+  font-size: 2.2rem;
+  font-style: italic;
+  line-height: 1;
+  color: var(--wine);
+  flex-shrink: 0;
+}
+.aard-rx-text { line-height: 1.7; }
+.aard-rx-text strong {
+  display: block;
+  font-family: var(--ff-d);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--hi);
+  margin-bottom: .25rem;
+}
+.aard-rx-text span {
+  font-size: .85rem;
+  color: var(--mid);
+}
+
+/* ────────────────────────────────────────
+   §02  HISTORY — TIMELINE
+──────────────────────────────────────── */
+#history {
+  padding: 9rem 0;
+  background: linear-gradient(to bottom, var(--bg) 0%, var(--bg-raise) 15%, var(--bg-raise) 85%, var(--bg) 100%);
+}
+
+.tl-wrap {
+  position: relative;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 1rem 0 2rem;
+}
+
+/* Center spine */
+.tl-spine {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(138,120,168,.5) 8%,
+    rgba(138,120,168,.18) 50%,
+    rgba(138,120,168,.5) 92%,
+    transparent 100%
+  );
+}
+
+/* Each row */
+.tl-row {
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr;
+  align-items: start;
+  gap: 0;
+  margin-bottom: 3.8rem;
+  cursor: default;
+}
+.tl-row:last-child { margin-bottom: 0; }
+
+/* Dot column */
+.tl-dot-col {
+  display: flex;
+  justify-content: center;
+  padding-top: .35rem;
+  position: relative;
+  z-index: 2;
+}
+
+.tl-dot {
+  position: relative;
+  border-radius: 50%;
+  background: var(--bg-raise);
+  border: 1px solid rgba(138,120,168,.55);
+  flex-shrink: 0;
+  transition: border-color .3s, box-shadow .3s;
+}
+.tl-dot.sm { width:  8px; height:  8px; }
+.tl-dot.md { width: 14px; height: 14px; }
+.tl-dot.lg { width: 20px; height: 20px; }
+
+/* Two ripple rings */
+.tl-dot::before,
+.tl-dot::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 1px solid var(--purple);
+  opacity: 0;
+  transform: scale(1);
+  pointer-events: none;
+}
+
+@keyframes ring-out {
+  0%   { transform: scale(1);   opacity: .55; }
+  100% { transform: scale(4);   opacity: 0;   }
+}
+
+.tl-row:hover .tl-dot {
+  border-color: var(--hi);
+  box-shadow: 0 0 10px rgba(138,120,168,.35);
+}
+.tl-row:hover .tl-dot::before {
+  animation: ring-out 1.6s ease-out infinite;
+}
+.tl-row:hover .tl-dot::after {
+  animation: ring-out 1.6s ease-out .55s infinite;
+}
+
+/* Gold dot for current */
+.tl-row.current .tl-dot {
+  border-color: var(--gold);
+  background: rgba(168,144,90,.08);
+}
+.tl-row.current:hover .tl-dot {
+  box-shadow: 0 0 10px rgba(168,144,90,.35);
+}
+.tl-row.current:hover .tl-dot::before,
+.tl-row.current:hover .tl-dot::after {
+  border-color: var(--gold);
+}
+
+/* Text sides */
+.tl-left,
+.tl-right {
+  opacity: .42;
+  transition: opacity .4s ease;
+  padding-top: 0;
+}
+.tl-left  { padding-right: 2.2rem; text-align: right; }
+.tl-right { padding-left:  2.2rem; text-align: left;  }
+
+.tl-row:hover .tl-left,
+.tl-row:hover .tl-right { opacity: 1; }
+
+.tl-date {
+  font-family: var(--ff-m);
+  font-size: .58rem;
+  letter-spacing: .15em;
+  color: var(--purple);
+  margin-bottom: .45rem;
+}
+.tl-row.current .tl-date { color: var(--gold); }
+
+.tl-title {
+  font-family: var(--ff-d);
+  font-size: 1.12rem;
+  font-weight: 400;
+  line-height: 1.25;
+  margin-bottom: .6rem;
+}
+.tl-desc {
+  font-size: .83rem;
+  color: var(--mid);
+  line-height: 1.82;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/* ────────────────────────────────────────
+   §03  SECTORS
+──────────────────────────────────────── */
+#sectors { padding: 9rem 0; }
+
+.sectors-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-top: 4rem;
+}
+
+.sector-card {
+  background: var(--bg);
+  padding: 3rem 3rem 3.5rem;
+  transition: background .3s;
+  position: relative;
+  overflow: hidden;
+}
+.sector-card::before {
+  content: '';
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: 0;
+  width: 0;
+  height: 1px;
+  background: var(--purple);
+  transition: width .45s ease;
+}
+.sector-card:hover { background: var(--bg-card); }
+.sector-card:hover::before { width: 100%; }
+
+.sector-acro {
+  font-family: var(--ff-d);
+  font-size: 3.8rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--lo);
+  margin-bottom: 2rem;
+  letter-spacing: -.02em;
+  transition: color .3s;
+}
+.sector-card:hover .sector-acro { color: var(--purple); }
+
+.sector-en {
+  font-family: var(--ff-m);
+  font-size: .56rem;
+  letter-spacing: .14em;
+  color: var(--lo);
+  margin-bottom: .3rem;
+  text-transform: uppercase;
+}
+.sector-ko {
+  font-family: var(--ff-d);
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-bottom: 1.8rem;
+}
+.sector-rule {
+  width: 2rem;
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 1.8rem;
+  transition: width .35s, background .35s;
+}
+.sector-card:hover .sector-rule {
+  width: 3.2rem;
+  background: var(--purple);
+}
+.sector-desc {
+  font-size: .87rem;
+  color: var(--mid);
+  line-height: 1.85;
+}
+.sector-desc .glow {
+  color: var(--mid);
+  transition: color .45s ease, text-shadow .45s ease;
+}
+.sector-card:hover .sector-desc .glow {
+  color: var(--purple);
+  text-shadow: 0 0 12px rgba(138,120,168,.5);
+}
+
+/* ────────────────────────────────────────
+   §04  PERSONNEL
+──────────────────────────────────────── */
+#personnel {
+  padding: 9rem 0 10rem;
+  background: linear-gradient(to bottom, var(--bg) 0%, var(--bg-raise) 10%, var(--bg-raise) 90%, var(--bg) 100%);
+}
+
+.personnel-group + .personnel-group { margin-top: 6rem; }
+
+.group-label {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  margin-bottom: 3rem;
+}
+.group-label-line {
+  width: 1px;
+  height: 2rem;
+  background: var(--purple);
+  flex-shrink: 0;
+}
+
+.chars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+
+/* Individual card */
+.char-card {
+  background: var(--bg-raise);
+  display: flex;
+  flex-direction: column;
+  transition: background .3s;
+}
+.char-card:hover { background: var(--bg-card); }
+
+/* Portrait */
+.char-portrait {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg-card);
+}
+.char-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  filter: grayscale(25%) brightness(.9);
+  transition: filter .5s ease, transform .55s ease;
+}
+.char-card:hover .char-portrait img {
+  filter: grayscale(0%) brightness(1);
+  transform: scale(1.04);
+}
+
+/* Info block */
+.char-info {
+  padding: 1.6rem 1.6rem 2rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.char-cls {
+  font-family: var(--ff-m);
+  font-size: .52rem;
+  letter-spacing: .14em;
+  color: var(--purple);
+  margin-bottom: .8rem;
+  text-transform: uppercase;
+}
+.char-name {
+  font-family: var(--ff-d);
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.15;
+  margin-bottom: .2rem;
+}
+.char-sub {
+  font-size: .78rem;
+  color: var(--mid);
+  margin-bottom: .85rem;
+}
+.char-mbti {
+  font-family: var(--ff-m);
+  font-size: .55rem;
+  letter-spacing: .1em;
+  color: var(--lo);
+  margin-bottom: 1.3rem;
+}
+
+/* ────────────────────────────────────────
+   CHARACTER DOSSIER MODAL
+──────────────────────────────────────── */
+.char-card[data-modal] { cursor: pointer; }
+.char-card[data-modal] .char-portrait::after {
+  content: 'Open Dossier';
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  padding: 1.4rem 1.2rem .9rem;
+  font-family: var(--ff-m);
+  font-size: .5rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--hi);
+  text-align: center;
+  background: linear-gradient(to top, rgba(7,9,13,.92), transparent);
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+.char-card[data-modal]:hover .char-portrait::after { opacity: .9; }
+
+/* Overlay */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5vh 1.5rem;
+  background: rgba(4,5,8,.72);
+  backdrop-filter: blur(9px) saturate(.85);
+  -webkit-backdrop-filter: blur(9px) saturate(.85);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .45s ease, visibility .45s ease;
+  overflow-y: auto;
+}
+.modal.open { opacity: 1; visibility: visible; }
+
+/* Panel */
+.modal-panel {
+  position: relative;
+  width: 100%;
+  max-width: 880px;
+  margin: auto;
+  background: linear-gradient(170deg, #0f121b 0%, #0b0e15 55%, #090b11 100%);
+  border: 1px solid var(--border);
+  box-shadow: 0 40px 120px rgba(0,0,0,.65);
+  transform: translateY(26px) scale(.985);
+  opacity: 0;
+  transition: transform .5s cubic-bezier(.2,.7,.2,1), opacity .5s ease;
+}
+.modal.open .modal-panel { transform: none; opacity: 1; }
+
+/* thin accent strip keyed per character */
+.modal-panel::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 2px;
+  background: var(--accent, var(--purple));
+  opacity: .8;
+}
+
+/* Close */
+.modal-close {
+  position: absolute;
+  inset-block-start: 1.1rem;
+  inset-inline-end: 1.1rem;
+  z-index: 5;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  background: rgba(7,9,13,.6);
+  border: 1px solid var(--border);
+  color: var(--mid);
+  font-family: var(--ff-m);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .25s, border-color .25s, background .25s;
+}
+.modal-close:hover { color: var(--hi); border-color: var(--wine-line); background: var(--wine-soft); }
+
+/* ── Header zone ── */
+.dossier-head {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+}
+.dossier-portrait {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+.dossier-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  filter: grayscale(18%) brightness(.92);
+}
+.dossier-portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 55%, rgba(11,14,21,.9) 100%);
+}
+.dossier-id {
+  padding: 2.6rem 2.6rem 2.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.dossier-kicker {
+  font-family: var(--ff-m);
+  font-size: .54rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent, var(--purple));
+  margin-bottom: 1rem;
+}
+.dossier-name {
+  font-family: var(--ff-d);
+  font-size: clamp(2rem, 4.5vw, 2.9rem);
+  font-weight: 300;
+  line-height: 1.04;
+  letter-spacing: -.01em;
+}
+.dossier-name-ko {
+  font-family: var(--ff-d);
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--mid);
+  margin-top: .35rem;
+}
+.dossier-role {
+  margin-top: 1.4rem;
+  font-size: .82rem;
+  color: var(--hi);
+  line-height: 1.5;
+}
+.dossier-role span {
+  display: block;
+  font-family: var(--ff-m);
+  font-size: .55rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: .35rem;
+}
+
+/* ── Body ── */
+.dossier-body { padding: 2.4rem 2.6rem 2.8rem; }
+
+/* meta facts grid */
+.dossier-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 2.6rem;
+}
+.fact {
+  background: var(--bg-raise);
+  padding: 1.15rem 1.25rem;
+}
+.fact-label {
+  font-family: var(--ff-m);
+  font-size: .5rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: .5rem;
+}
+.fact-value {
+  font-size: .9rem;
+  color: var(--hi);
+  line-height: 1.45;
+}
+.fact-value .mono-sm {
+  font-family: var(--ff-m);
+  font-size: .68rem;
+  letter-spacing: .06em;
+  color: var(--hi);
+}
+
+/* section sub-heads inside dossier */
+.dossier-sub {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+.dossier-sub h4 {
+  font-family: var(--ff-m);
+  font-size: .56rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--accent, var(--purple));
+  font-weight: 400;
+}
+.dossier-sub .line { flex: 1; height: 1px; background: var(--border); }
+
+/* trope tags */
+.dossier-block { margin-bottom: 2.6rem; }
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem;
+}
+.tag {
+  font-family: var(--ff-m);
+  font-size: .58rem;
+  letter-spacing: .08em;
+  padding: .42rem .8rem;
+  border: 1px solid var(--border);
+  color: var(--mid);
+  background: rgba(255,255,255,.012);
+  transition: color .25s, border-color .25s;
+}
+.tag.intimacy {
+  color: #d39aac;
+  border-color: var(--wine-line);
+  background: var(--wine-soft);
+}
+
+/* ── FILE: dry official record timeline ── */
+.file-record {
+  border: 1px solid var(--border);
+  background: rgba(7,9,13,.5);
+}
+.file-record-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .7rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+}
+.file-record-head .ref {
+  font-family: var(--ff-m);
+  font-size: .52rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--mid);
+}
+.file-record-head .clf {
+  font-family: var(--ff-m);
+  font-size: .5rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--wine);
+}
+.file-row {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 1.2rem;
+  padding: .95rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+}
+.file-row:last-child { border-bottom: none; }
+.file-year {
+  font-family: var(--ff-m);
+  font-size: .68rem;
+  letter-spacing: .04em;
+  color: var(--hi);
+  padding-top: .1rem;
+}
+.file-entry {
+  font-size: .84rem;
+  line-height: 1.6;
+  color: #b8b4ab;
+}
+.file-entry strong {
+  color: var(--hi);
+  font-weight: 400;
+}
+
+/* ── Quote ── */
+.dossier-quote {
+  margin-top: 2.6rem;
+  padding: 2rem 2.2rem 2rem 2.6rem;
+  border-left: 2px solid var(--accent, var(--purple));
+  background: linear-gradient(100deg, rgba(255,255,255,.018), transparent 70%);
+}
+.dossier-quote p {
+  font-family: var(--ff-d);
+  font-size: 1.22rem;
+  font-style: italic;
+  line-height: 1.55;
+  color: var(--hi);
+}
+.dossier-quote .ko {
+  font-family: var(--ff-b);
+  font-style: normal;
+  font-size: .82rem;
+  color: var(--mid);
+  margin-top: 1rem;
+  line-height: 1.7;
+}
+
+/* ── intro paragraph ── */
+.dossier-intro {
+  font-size: .92rem;
+  color: #b8b4ab;
+  line-height: 1.9;
+  margin-bottom: 1.8rem;
+}
+
+/* ── Vittorio's annotation ── */
+.dossier-vit {
+  position: relative;
+  margin-bottom: 2.6rem;
+  padding: 1.4rem 1.6rem 1.5rem 1.7rem;
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--gold);
+  background: linear-gradient(100deg, rgba(168,144,90,.06), transparent 75%);
+}
+.dossier-vit-label {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  font-family: var(--ff-m);
+  font-size: .5rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: .7rem;
+}
+.dossier-vit-label::before {
+  content: '✦';
+  font-size: .6rem;
+  opacity: .8;
+}
+.dossier-vit p {
+  font-family: var(--ff-d);
+  font-size: 1.02rem;
+  font-style: italic;
+  line-height: 1.65;
+  color: var(--hi);
+}
+
+/* ── likes / dislikes ── */
+.taste-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.taste {
+  background: var(--bg-raise);
+  padding: 1.25rem 1.35rem 1.4rem;
+}
+.taste-head {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-family: var(--ff-m);
+  font-size: .52rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin-bottom: .85rem;
+}
+.taste.like .taste-head  { color: var(--teal); }
+.taste.dislike .taste-head { color: var(--wine); }
+.taste-head .mk {
+  width: 1.1rem; height: 1px;
+  background: currentColor;
+  display: inline-block;
+}
+.taste-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem .5rem;
+}
+.taste-item {
+  font-size: .8rem;
+  color: #b8b4ab;
+  line-height: 1.5;
+}
+.taste-item:not(:last-child)::after {
+  content: '·';
+  margin-left: .5rem;
+  color: var(--lo);
+}
+.taste-null {
+  font-family: var(--ff-m);
+  font-size: .68rem;
+  letter-spacing: .08em;
+  color: var(--lo);
+}
+
+@media (max-width: 720px) {
+  .dossier-head { grid-template-columns: 1fr; }
+  .dossier-portrait { aspect-ratio: 4 / 5; }
+  .dossier-portrait img { object-position: top center; }
+  .dossier-portrait::after { background: linear-gradient(to bottom, transparent 52%, rgba(11,14,21,.92) 100%); }
+  .dossier-id { padding: 2rem 1.6rem; }
+  .dossier-body { padding: 1.8rem 1.6rem 2.2rem; }
+  .dossier-facts { grid-template-columns: 1fr 1fr; }
+  .taste-grid { grid-template-columns: 1fr; }
+  .file-row { grid-template-columns: 64px 1fr; gap: .8rem; }
+  .modal { padding: 3vh 1rem; }
+}
+
+/* ────────────────────────────────────────
+   FOOTER
+──────────────────────────────────────── */
+footer {
+  padding: 2.5rem 3rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+.footer-l {
+  font-family: var(--ff-m);
+  font-size: .55rem;
+  letter-spacing: .14em;
+  color: var(--lo);
+  line-height: 1.9;
+}
+.footer-r {
+  font-family: var(--ff-d);
+  font-size: .95rem;
+  font-style: italic;
+  color: var(--lo);
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ────────────────────────────────────────
+   §05  CODEX — charter & order
+──────────────────────────────────────── */
+#codex {
+  padding: 9rem 0 10rem;
+}
+.codex-lead {
+  max-width: 62ch;
+  font-size: 1.02rem;
+  color: var(--mid);
+  line-height: 1.95;
+  margin-bottom: 5rem;
+}
+.codex-lead em { color: var(--hi); font-style: normal; }
+
+/* recurring sub-section header inside codex */
+.codex-block { margin-bottom: 5.5rem; }
+.codex-block:last-child { margin-bottom: 0; }
+.codex-head {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2rem;
+  margin-bottom: 2.4rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.codex-head .ix {
+  font-family: var(--ff-m);
+  font-size: .58rem;
+  letter-spacing: .14em;
+  color: var(--purple);
+}
+.codex-head h3 {
+  font-family: var(--ff-d);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 300;
+  line-height: 1.15;
+}
+.codex-head .ko {
+  font-family: var(--ff-m);
+  font-size: .56rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--lo);
+  margin-left: auto;
+  align-self: center;
+}
+
+.codex-prose { font-size: .92rem; color: var(--mid); line-height: 1.95; max-width: 70ch; }
+.codex-prose + .codex-prose { margin-top: 1.1rem; }
+.codex-prose strong { color: var(--hi); font-weight: 400; }
+
+/* "why paris" — four pillars */
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.pillar {
+  background: var(--bg);
+  padding: 1.8rem 1.9rem 2rem;
+}
+.pillar-k {
+  font-family: var(--ff-m);
+  font-size: .52rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: .9rem;
+}
+.pillar-t {
+  font-family: var(--ff-d);
+  font-size: 1.18rem;
+  font-weight: 400;
+  margin-bottom: .7rem;
+  line-height: 1.25;
+}
+.pillar-b { font-size: .84rem; color: var(--mid); line-height: 1.8; }
+.pillar-b strong { color: var(--hi); font-weight: 400; }
+
+/* charter — article list */
+.charter {
+  border: 1px solid var(--border);
+  background: rgba(7,9,13,.5);
+}
+.charter-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .85rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.charter-top .t {
+  font-family: var(--ff-m);
+  font-size: .54rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--mid);
+}
+.charter-top .s {
+  font-family: var(--ff-m);
+  font-size: .5rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.art {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 1.4rem;
+  padding: 1.05rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.art:last-child { border-bottom: none; }
+.art-n {
+  font-family: var(--ff-d);
+  font-size: .95rem;
+  font-style: italic;
+  color: var(--purple);
+  padding-top: .1rem;
+}
+.art-b { font-size: .85rem; line-height: 1.7; color: #b8b4ab; }
+.art-b strong { color: var(--hi); font-weight: 400; }
+.charter-note {
+  margin-top: 1.4rem;
+  padding: 1.5rem 1.7rem;
+  border-left: 2px solid var(--purple);
+  background: linear-gradient(100deg, rgba(138,120,168,.06), transparent 75%);
+  font-size: .88rem;
+  color: var(--mid);
+  line-height: 1.9;
+}
+.charter-note strong { color: var(--hi); font-weight: 400; }
+
+/* secretariat — can/cannot */
+.cmp-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-top: 1.8rem;
+}
+.cmp-col { background: var(--bg-raise); padding: 1.6rem 1.7rem 1.9rem; }
+.cmp-col h4 {
+  display: flex; align-items: center; gap: .55rem;
+  font-family: var(--ff-m);
+  font-size: .54rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 400;
+  margin-bottom: 1.1rem;
+}
+.cmp-col.can h4    { color: var(--teal); }
+.cmp-col.cannot h4 { color: var(--wine); }
+.cmp-col h4 .mk { width: 1.1rem; height: 1px; background: currentColor; }
+.cmp-li {
+  font-size: .84rem; color: #b8b4ab; line-height: 1.65;
+  padding: .55rem 0;
+  border-top: 1px solid var(--border);
+}
+.cmp-li:first-of-type { border-top: none; }
+.cmp-li strong { color: var(--hi); font-weight: 400; }
+
+/* two-axis survival caste */
+.axes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-top: .4rem;
+}
+.axis { background: var(--bg); padding: 1.7rem 1.8rem 1.9rem; }
+.axis-k {
+  font-family: var(--ff-m);
+  font-size: .52rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: .8rem;
+}
+.axis-t { font-family: var(--ff-d); font-size: 1.1rem; font-weight: 400; margin-bottom: .7rem; }
+.axis-b { font-size: .83rem; color: var(--mid); line-height: 1.8; }
+.axis-b strong { color: var(--hi); font-weight: 400; }
+
+/* ────────────────────────────────────────
+   RESPONSIVE
+──────────────────────────────────────── */
+@media (max-width: 960px) {
+  .aard-stages { grid-template-columns: 1fr; }
+  .sectors-grid { grid-template-columns: 1fr; }
+  .chars-grid   { grid-template-columns: 1fr 1fr; }
+  .pillars { grid-template-columns: 1fr; }
+  .cmp-split, .axes { grid-template-columns: 1fr; }
+  .art { grid-template-columns: 84px 1fr; gap: 1rem; }
+  .wrap { padding: 0 1.8rem; }
+  nav   { padding: 1rem 1.8rem; }
+  .nav-links { gap: 1.6rem; }
+  /* Timeline: collapse to left-aligned */
+  .tl-wrap { padding: 1rem 1.8rem 2rem; }
+  .tl-spine { left: 20px; }
+  .tl-row {
+    grid-template-columns: 40px 1fr;
+    gap: 0;
+  }
+  .tl-left { display: none; }
+  .tl-right {
+    grid-column: 2;
+    text-align: left;
+    padding-left: 1.8rem;
+    padding-right: 0;
+  }
+  .tl-dot-col { grid-column: 1; }
+}
+
+@media (max-width: 620px) {
+  .chars-grid { grid-template-columns: 1fr; }
+  .nav-links  { display: none; }
+  footer      { flex-direction: column; align-items: flex-start; }
+  .footer-r   { text-align: left; }
+  .hero-inner { padding: 0 1.5rem; }
+  .hero-stage { padding: 7rem 0 2rem; min-height: auto; }
+  .hero-stats { flex-direction: column; max-width: 100%; }
+  .hero-stat + .hero-stat { border-left: none; border-top: 1px solid var(--border); }
+  .aard-rx { flex-direction: column; align-items: flex-start; gap: .9rem; }
+  /* readability: small body copy reads tiny on phones — nudge up */
+  .tl-desc, .aard-stage-body, .sector-desc, .pillar-b,
+  .axis-b, .art-b, .cmp-li, .file-entry, .codex-prose { font-size: .9rem; }
+  .aard-intro, .dossier-intro { font-size: .95rem; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ambient petal layer (decorative; hidden from AT) -->
+<div class="petal-field" id="petalField" aria-hidden="true"></div>
+
+
+<!-- ══════════════════════════════════════
+     NAV
+══════════════════════════════════════ -->
+<nav>
+  <span class="nav-logo">Archive</span>
+  <ul class="nav-links">
+    <li><a href="#severance">Severance</a></li>
+    <li><a href="#history">History</a></li>
+    <li><a href="#sectors">Sectors</a></li>
+    <li><a href="#personnel">Personnel</a></li>
+    <li><a href="#codex">Codex</a></li>
+  </ul>
+</nav>
+
+
+<!-- ══════════════════════════════════════
+     §01  SEVERANCE
+══════════════════════════════════════ -->
+<section id="severance">
+  <div class="hero-bg"></div>
+  <div class="hero-vignette"></div>
+
+  <div class="hero-inner">
+
+    <div class="hero-stage">
+      <p class="hero-date reveal">2029 · 04 · 23 &nbsp;·&nbsp; 03:17 UTC</p>
+
+      <h1 class="d-xl hero-title reveal reveal-delay-1">
+        The<br><em>Sever</em>ance
+      </h1>
+
+      <div class="hero-body reveal reveal-delay-2">
+        <p>아름다움을 느끼는 회로가 닫혔다. 이유도, 경고도 없이. 전 지구에서, 동시에.</p>
+        <p>예술은 여전히 존재했고 음악은 여전히 울렸다. 그러나 그것은 더 이상 <em>닿지</em> 않았다.</p>
+        <p>인류는 서서히, 자신이 비어가고 있음을 알아챘다.</p>
+      </div>
+
+      <div class="hero-stats reveal reveal-delay-3">
+        <div class="hero-stat">
+          <p class="hero-stat-label">단절 직전 · 2029.04</p>
+          <p class="hero-stat-num">81억</p>
+          <p class="hero-stat-sub">World Population</p>
+        </div>
+        <div class="hero-stat gone">
+          <p class="hero-stat-label">총 소멸 · ~2038</p>
+          <p class="hero-stat-num">65억</p>
+          <p class="hero-stat-sub">≈ 인류의 80%</p>
+        </div>
+        <div class="hero-stat left">
+          <p class="hero-stat-label">잔존 · 2038 현재</p>
+          <p class="hero-stat-num">16억</p>
+          <p class="hero-stat-sub">Survivors</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- AARD -->
+    <div class="aard-wrap reveal">
+      <div class="aard-head">
+        <span class="aard-acro">AARD</span>
+        <span class="aard-full">Acquired Aesthetic Responsiveness Deficit Syndrome</span>
+      </div>
+      <p class="aard-intro">물리적 감각은 온전하지만 예술·문학을 처리하는 신경회로가 완전히 차단된다. 점진적 무기력증과 허무주의가 동반되며, 감응력이 0%에 도달하면 육체는 소멸한다. 치료법은 존재하지 않는다.</p>
+
+      <div class="aard-stages">
+
+        <div class="aard-stage">
+          <div class="aard-stage-top">
+            <span class="aard-stage-num">01</span>
+            <span class="aard-stage-meter">감응력 100 → 40%</span>
+          </div>
+          <p class="aard-stage-label">정의 · Onset</p>
+          <h3 class="aard-stage-title">후천성 미적<br>감응 결핍</h3>
+          <p class="aard-stage-body">미적 정보를 처리하는 신경회로가 닫힌다. 통증도, 외상도 없다. 다만 세계가 조용히 무채색이 되고, 무기력과 허무가 살갗 아래로 번진다.</p>
+        </div>
+
+        <div class="aard-stage">
+          <div class="aard-stage-top">
+            <span class="aard-stage-num">02</span>
+            <span class="aard-stage-meter">감응력 40 → 5%</span>
+          </div>
+          <p class="aard-stage-label">말기 · Terminal</p>
+          <h3 class="aard-stage-title">꽃잎 결정의<br>개화</h3>
+          <p class="aard-stage-body">피부 표층 아래, 핀 끝만 한 묽은 핏빛 꽃잎 결정이 자리를 잡고 피어나기 시작한다. 인류 최초의 소멸 사례는 2029년 말 방글라데시에서 기록됐다.</p>
+        </div>
+
+        <div class="aard-stage">
+          <div class="aard-stage-top">
+            <span class="aard-stage-num">03</span>
+            <span class="aard-stage-meter">감응력 0%</span>
+          </div>
+          <p class="aard-stage-label">소멸 · Dissolution</p>
+          <h3 class="aard-stage-title">산화,<br>그리고 만개</h3>
+          <p class="aard-stage-body">육체가 무수한 꽃잎으로 산화한다. 미세 입자는 구조물에 기생해 번식하고, 붕괴 구역은 초현실적인 풍경으로 만개한다.</p>
+        </div>
+
+      </div>
+
+      <div class="aard-rx">
+        <span class="aard-rx-mark">℞</span>
+        <div class="aard-rx-text">
+          <strong>유일한 처방 — 고등급 예술·문학 백신</strong>
+          <span>고등급의 예술과 문학만이 진행을 일시적으로 늦추는 신경 백신으로 작동한다. 지연일 뿐, 치료는 아니다. 누구에게 어떤 백신을 흘려보낼지가 곧 생존의 속도를 가른다.</span>
+        </div>
+      </div>
+    </div>
+  </div><!-- /hero-inner -->
+</section>
+
+
+<!-- ══════════════════════════════════════
+     §02  HISTORY
+══════════════════════════════════════ -->
+<section id="history">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">02</span>
+      <h2 class="d-md">History</h2>
+      <div class="sec-bar"></div>
+      <span class="sec-tag">연대기 · 2029 — 2038</span>
+    </div>
+  </div>
+
+  <div class="tl-wrap">
+    <div class="tl-spine"></div>
+
+    <!-- ── 2029.04.23  The Severance  (LARGE · right) ── -->
+    <div class="tl-row reveal">
+      <div class="tl-left"></div>
+      <div class="tl-dot-col"><div class="tl-dot lg"></div></div>
+      <div class="tl-right">
+        <p class="tl-date">2029 · 04 · 23</p>
+        <h3 class="tl-title">단절의 날 — The Severance</h3>
+        <p class="tl-desc">세계시 기준 오전 3시 17분, 인류의 미적 감응 회로가 동시에 차단됐다. 원인 불명. 각국은 처음에 이를 사이버 공격이나 집단 신경 이상으로 오진했고, WHO가 독립 질환으로 분류하는 데 48시간이 걸렸다. 당해 누적 사망자 약 4억 명.</p>
+      </div>
+    </div>
+
+    <!-- ── 2029.09  Virginia Cascade  (MEDIUM · left) ── -->
+    <div class="tl-row reveal">
+      <div class="tl-left">
+        <p class="tl-date">2029 · 09</p>
+        <h3 class="tl-title">버지니아 캐스케이드</h3>
+        <p class="tl-desc">9월 14일부터 23일까지, 인터넷 트래픽의 약 70%를 처리하던 미 동부 데이터센터 집약지대에서 연쇄 전력 붕괴가 발생했다. 폭증한 매체 소비와 유지보수 인력 급감이 겹친 결과였다. 디지털 백신 접근이 봉쇄되며 사망자가 급증했고, 미국은 단일 허브 인프라 전략을 포기했다.</p>
+      </div>
+      <div class="tl-dot-col"><div class="tl-dot md"></div></div>
+      <div class="tl-right"></div>
+    </div>
+
+    <!-- ── 2030.02.19  Grey Thursday  (MEDIUM · right) ── -->
+    <div class="tl-row reveal">
+      <div class="tl-left"></div>
+      <div class="tl-dot-col"><div class="tl-dot md"></div></div>
+      <div class="tl-right">
+        <p class="tl-date">2030 · 02 · 19</p>
+        <h3 class="tl-title">그레이 목요일 — 런던</h3>
+        <p class="tl-desc">런던 광역에서 단 48시간 만에 인구의 약 12%가 꽃잎으로 동시 소멸했다. 번식하는 입자가 구조물을 위협하자 당국은 템즈강 북쪽 구도심을 봉쇄했고, 대영박물관·국립미술관이 봉쇄 구역에 갇혔다. 영국은 문화 데이터 거점 경쟁에서 탈락했고, 회수 작전에 참여한 프랑스가 런던 데이터 상당량을 파리로 이전했다.</p>
+      </div>
+    </div>
+
+    <!-- ── 2030.07  China lockdown  (SMALL · left) ── -->
+    <div class="tl-row reveal">
+      <div class="tl-left">
+        <p class="tl-date">2030 · 07</p>
+        <h3 class="tl-title">중국 대도시권 연쇄 봉쇄</h3>
+        <p class="tl-desc">중국이 말기 환자 밀집 구역에 대한 군사적 물리 봉쇄를 최초로 시행했다. 확산 속도는 일부 늦췄으나 국제 문화 데이터 공유가 사실상 단절됐고, 중국·러시아·인도가 창립 교섭에서 이탈하며 서방 주도 체제가 굳어졌다.</p>
+      </div>
+      <div class="tl-dot-col"><div class="tl-dot sm"></div></div>
+      <div class="tl-right"></div>
+    </div>
+
+    <!-- ── 2030.09  Preparatory Committee  (SMALL · right) ── -->
+    <div class="tl-row reveal">
+      <div class="tl-left"></div>
+      <div class="tl-dot-col"><div class="tl-dot sm"></div></div>
+      <div class="tl-right">
+        <p class="tl-date">2030 · 09</p>
+        <h3 class="tl-title">아카이브 준비위원회 발족</h3>
+        <p class="tl-desc">프랑스·미국·독일·일본·캐나다·호주·한국 7개국 주도. 1948년 유엔 총회가 열렸던 파리 샤요 궁이 거점으로 선정되고, 에펠탑 맞은편 지하 공간의 서버 벙커 전환 공사가 착수됐다.</p>
+      </div>
+    </div>
+
+    <!-- ── 2031.01.17  Founding Charter  (LARGE · left) ── -->
+    <div class="tl-row reveal">
+      <div class="tl-left">
+        <p class="tl-date">2031 · 01 · 17</p>
+        <h3 class="tl-title">창립 헌장 서명</h3>
+        <p class="tl-desc">원년 7개국이 샤요 궁 대회의실에서 창립 헌장에 서명했다. 단일 권위의 효율과 그 권위에 대한 불신을 동시에 제도화한 문서 — 4개 집행 부서의 분립과 헌장 직속 준수 사무국 설치가 명문화됐다. 모든 권한에는 그것을 견제하는 다른 조항이 짝지어졌다.</p>
+      </div>
+      <div class="tl-dot-col"><div class="tl-dot lg"></div></div>
+      <div class="tl-right"></div>
+    </div>
+
+    <!-- ── 2031.01  Archive Founded  (SMALL · right) ── -->
+    <div class="tl-row reveal">
+      <div class="tl-left"></div>
+      <div class="tl-dot-col"><div class="tl-dot sm"></div></div>
+      <div class="tl-right">
+        <p class="tl-date">2031 · 01</p>
+        <h3 class="tl-title">아카이브 공식 출범</h3>
+        <p class="tl-desc">헌장 서명 직후 비토리오 초대 총재가 취임하고 4개 부서가 동시 발족했다. DARC의 최초 현장 수집 작전이 런던 봉쇄 구역에서 실시됐고, AEA가 백신 등급 체계(A–D·E)를 수립했다. 2031년 누적 사망자 약 21억 명.</p>
+      </div>
+    </div>
+
+    <!-- ── 2032  Expansion & Friction  (SMALL · left) ── -->
+    <div class="tl-row reveal">
+      <div class="tl-left">
+        <p class="tl-date">2032</p>
+        <h3 class="tl-title">팽창과 갈등</h3>
+        <p class="tl-desc">아카이브의 파리 점유가 샤요 궁을 넘어 트로카데로 일대로 확장됐다. 에펠탑 주변을 '보존 관리 지역'으로 일방 선포하며 프랑스와의 주권 마찰이 시작됐고, 동유럽에서 AEA 검열을 피한 불법 예술 데이터 암시장이 최초로 대규모 적발됐다. 누적 사망자 약 34억 명.</p>
+      </div>
+      <div class="tl-dot-col"><div class="tl-dot sm"></div></div>
+      <div class="tl-right"></div>
+    </div>
+
+    <!-- ── 2033  Peak & Exodus  (LARGE · right) ── -->
+    <div class="tl-row reveal">
+      <div class="tl-left"></div>
+      <div class="tl-dot-col"><div class="tl-dot lg"></div></div>
+      <div class="tl-right">
+        <p class="tl-date">2033</p>
+        <h3 class="tl-title">정점과 이탈</h3>
+        <p class="tl-desc">연간 소멸 규모가 정점에 달했다 — 한 해에만 약 15억, 누적 사망자는 약 49억으로 치솟았다. 6월, 프랑스 임시 내각이 리옹 이전을 선언하며 파리 16구는 아카이브의 실질적 치외법권 구역이 됐다. TDIC 산하 이념집행과(SIE)가 공식 발족했다.</p>
+      </div>
+    </div>
+
+    <!-- ── 2034  Single World Power  (MEDIUM · left) ── -->
+    <div class="tl-row reveal">
+      <div class="tl-left">
+        <p class="tl-date">2034</p>
+        <h3 class="tl-title">단일 세계 권력화 — 헌장 제4조 최초 발동</h3>
+        <p class="tl-desc">대부분의 국가 정부가 행정 기능을 상실했다. 독일 서명국 대표가 AEA의 등급 조작 의혹을 제기하며 준수 사무국의 첫 공식 감사가 개시됐다. 결과는 '기술적 판정 오류'였으나, 이 과정에서 감사관직의 실질적 위력이 처음 증명됐다. 차등 배분이 정교화되며 생존 계급화가 완성됐다. 누적 약 58억 명.</p>
+      </div>
+      <div class="tl-dot-col"><div class="tl-dot md"></div></div>
+      <div class="tl-right"></div>
+    </div>
+
+    <!-- ── 2035–36  Conscription & Deceleration  (MEDIUM · right) ── -->
+    <div class="tl-row reveal">
+      <div class="tl-left"></div>
+      <div class="tl-dot-col"><div class="tl-dot md"></div></div>
+      <div class="tl-right">
+        <p class="tl-date">2035 — 2036</p>
+        <h3 class="tl-title">글로벌 엘리트 특별 징발</h3>
+        <p class="tl-desc">인력 급감에 대응해 전 세계 잔존 전문 인력을 강제·자발 혼합으로 모집하는 체계가 구축·가동됐다. 백신이 고도화되며 사망 속도가 의미 있게 꺾이기 시작했다. 네이트 마이어(AEA 선임 중재관)가 2036년 이 체계를 통해 합류했다. 2036년 누적 약 64억 명.</p>
+      </div>
+    </div>
+
+    <!-- ── 2037  Adaptation  (SMALL · left) ── -->
+    <div class="tl-row reveal">
+      <div class="tl-left">
+        <p class="tl-date">2037</p>
+        <h3 class="tl-title">감속과 적응</h3>
+        <p class="tl-desc">A·B 등급 거주자의 진행 속도를 유의미하게 늦추는 데 성공했고, 저감응 코호트가 이미 소멸하며 사망 속도가 뚜렷이 감소했다. 2036년부터 공석이던 준수 사무국 감사관장 자리에 그웬돌린 포크스가 부임했다.</p>
+      </div>
+      <div class="tl-dot-col"><div class="tl-dot sm"></div></div>
+      <div class="tl-right"></div>
+    </div>
+
+    <!-- ── 2038  Present  (LARGE · right · gold) ── -->
+    <div class="tl-row current reveal">
+      <div class="tl-left"></div>
+      <div class="tl-dot-col"><div class="tl-dot lg"></div></div>
+      <div class="tl-right">
+        <p class="tl-date">2038 · 현재</p>
+        <h3 class="tl-title">죽어가는 속도의 차이로 계급화된 세계</h3>
+        <p class="tl-desc">단절 직전 약 81억 중 약 65억(인류의 약 80%)이 소멸하고, 약 16억이 잔존한다. 생존의 층위는 오직 백신 접근성으로 분리된다. 아카이브는 파리 샤요 궁에서 세계를 통치한다. 통창 너머로, 녹슨 철골과 꽃잎 결정이 얽힌 에펠탑이 서 있다.</p>
+      </div>
+    </div>
+
+  </div><!-- /tl-wrap -->
+</section>
+
+
+<!-- ══════════════════════════════════════
+     §03  SECTORS
+══════════════════════════════════════ -->
+<section id="sectors">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">03</span>
+      <h2 class="d-md">Sectors</h2>
+      <div class="sec-bar"></div>
+      <span class="sec-tag">4개 부서 · 샤요 궁</span>
+    </div>
+
+    <div class="sectors-grid reveal">
+
+      <div class="sector-card">
+        <p class="sector-acro">DARC</p>
+        <p class="sector-en">Department of Artifact Retrieval and Conservation</p>
+        <p class="sector-ko">유물수집복원국</p>
+        <div class="sector-rule"></div>
+        <p class="sector-desc">붕괴 구역에 방치된 예술품·문헌·데이터 서버를 <span class="glow">추적·회수</span>하는 최전선 현장 부서. 수집된 유물의 오염을 제거하고 파손된 데이터를 복원해 <span class="glow">백신의 기초 원료</span>를 확보한다. 본부에서 가장 멀리 떨어진 곳에서 가장 큰 위험을 감수한다.</p>
+      </div>
+
+      <div class="sector-card">
+        <p class="sector-acro">AEA</p>
+        <p class="sector-en">Directorate of Aesthetic Efficacy Analysis</p>
+        <p class="sector-ko">심미적효능분석국</p>
+        <div class="sector-rule"></div>
+        <p class="sector-desc">회수된 매체의 심미적 효능을 신경학적으로 계량화해 <span class="glow">백신 등급(A–D·E)</span>을 판정하고 배포 여부를 결정하는 <span class="glow">최고 검열 기구</span>. 허무·염세 매체는 AARD 가속 위험물로 폐기한다. 소수 엘리트 검열관들이 인류의 지적·미적 섭취물 전체를 통제하며 권력의 정점을 점유한다.</p>
+      </div>
+
+      <div class="sector-card">
+        <p class="sector-acro">CDC</p>
+        <p class="sector-en">Curatorial Distribution Center</p>
+        <p class="sector-ko">구호큐레이팅배포처</p>
+        <div class="sector-rule"></div>
+        <p class="sector-desc">검열을 통과한 백신 데이터를 구역별 감염도와 계급에 맞춰 <span class="glow">차등 송출</span>하는 <span class="glow">자원 배분</span>의 실세. 수도권에는 고대역폭 무손실 매체를, 외곽에는 열화된 저효능 데이터를 배급한다. 누구를 얼마나 연명시킬지를 결정하는 손이 이 부서에 있다.</p>
+      </div>
+
+      <div class="sector-card">
+        <p class="sector-acro">TDIC</p>
+        <p class="sector-en">Tactical Defense and Inquisition Command</p>
+        <p class="sector-ko">전술방위이단심문국</p>
+        <div class="sector-rule"></div>
+        <p class="sector-desc">본부의 물리적 방어와 대테러 방첩 작전을 전담하는 <span class="glow">무력 타격 부서</span>. 불법 매체 밀거래와 사설 주파수를 색출·처단하며, 통제 불능 말기 구역을 소각·정화한다. 산하 <span class="glow">이념집행과(SIE)</span>는 아카이브 전 직원의 사상을 감시하는 가장 어두운 기관이다.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     §04  PERSONNEL
+══════════════════════════════════════ -->
+<section id="personnel">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">04</span>
+      <h2 class="d-md">Personnel</h2>
+      <div class="sec-bar"></div>
+      <span class="sec-tag">1급 관찰 대상 명세</span>
+    </div>
+
+    <!-- ── MALE ── -->
+    <div class="personnel-group">
+      <div class="group-label reveal">
+        <div class="group-label-line"></div>
+        <span class="mono mono-accent">Male — Nate Meyer &amp; associates</span>
+      </div>
+
+      <div class="chars-grid reveal">
+
+        <!-- NATE -->
+        <div class="char-card" data-modal="nate">
+          <div class="char-portrait">
+            <img src="./images/nate.webp" alt="Nate Meyer">
+          </div>
+          <div class="char-info">
+            <p class="char-cls">Senior Arbiter · AEA</p>
+            <h3 class="char-name">Nate Meyer</h3>
+            <p class="char-sub">네이트 마이어</p>
+            <p class="char-mbti">ENTP · 3w4 · So/Sx · LEVF</p>
+          </div>
+        </div>
+
+        <!-- LUCIAN -->
+        <div class="char-card" data-modal="lucian">
+          <div class="char-portrait">
+            <img src="./images/lucian.webp" alt="Lucian">
+          </div>
+          <div class="char-info">
+            <p class="char-cls">Head Curator · CDC</p>
+            <h3 class="char-name">Lucian</h3>
+            <p class="char-sub">루시안</p>
+            <p class="char-mbti">ENFJ · 2w3 · sx/so · EFLV</p>
+          </div>
+        </div>
+
+        <!-- VITTORIO -->
+        <div class="char-card" data-modal="vittorio">
+          <div class="char-portrait">
+            <img src="./images/vittorio.webp" alt="Vittorio">
+          </div>
+          <div class="char-info">
+            <p class="char-cls">Director-General · Archive</p>
+            <h3 class="char-name">Vittorio</h3>
+            <p class="char-sub">비토리오</p>
+            <p class="char-mbti">ENTJ · 8w9 · Sp/So · VFLE</p>
+          </div>
+        </div>
+
+        <!-- LEON -->
+        <div class="char-card" data-modal="leon">
+          <div class="char-portrait">
+            <img src="./images/leon.webp" alt="Leon">
+          </div>
+          <div class="char-info">
+            <p class="char-cls">Senior Strike Officer · TDIC</p>
+            <h3 class="char-name">Leon</h3>
+            <p class="char-sub">레온</p>
+            <p class="char-mbti">ISTJ · 9w8 · sp/so · FLVE</p>
+          </div>
+        </div>
+
+      </div><!-- /chars-grid male -->
+    </div><!-- /personnel-group male -->
+
+
+    <!-- ── FEMALE ── -->
+    <div class="personnel-group">
+      <div class="group-label reveal">
+        <div class="group-label-line"></div>
+        <span class="mono mono-accent">Female — Gwendolyn Fawkes &amp; associates</span>
+      </div>
+
+      <div class="chars-grid reveal">
+
+        <!-- GWENDOLYN -->
+        <div class="char-card" data-modal="gwen">
+          <div class="char-portrait">
+            <img src="./images/gwen.webp" alt="Gwendolyn Fawkes">
+          </div>
+          <div class="char-info">
+            <p class="char-cls">Inspector-General · Compliance Secretariat</p>
+            <h3 class="char-name">Gwendolyn Fawkes</h3>
+            <p class="char-sub">그웬돌린 포크스</p>
+            <p class="char-mbti">INTJ · 5w1 · sp/sx · LVFE</p>
+          </div>
+        </div>
+
+        <!-- DARYA -->
+        <div class="char-card" data-modal="darya">
+          <div class="char-portrait">
+            <img src="./images/darya.webp" alt="Darya Petrova">
+          </div>
+          <div class="char-info">
+            <p class="char-cls">Principal Inquisitor · TDIC / SIE</p>
+            <h3 class="char-name">Darya Petrova</h3>
+            <p class="char-sub">다랴 페트로바</p>
+            <p class="char-mbti">ENTP · 8w7 · sp/sx · VLFE</p>
+          </div>
+        </div>
+
+        <!-- LUCREZIA -->
+        <div class="char-card" data-modal="lucrezia">
+          <div class="char-portrait">
+            <img src="./images/lucrezia.webp" alt="Lucrezia Moretti">
+          </div>
+          <div class="char-info">
+            <p class="char-cls">Chief of Broadcast Integrity · CDC</p>
+            <h3 class="char-name">Lucrezia Moretti</h3>
+            <p class="char-sub">루크레치아 모레티</p>
+            <p class="char-mbti">ENTJ · 3w2 · so/sx · EVLF</p>
+          </div>
+        </div>
+
+        <!-- MARGOT -->
+        <div class="char-card" data-modal="margot">
+          <div class="char-portrait">
+            <img src="./images/margot.webp" alt="Margot Laurent">
+          </div>
+          <div class="char-info">
+            <p class="char-cls">Security Attaché · Compliance Secretariat</p>
+            <h3 class="char-name">Margot Laurent</h3>
+            <p class="char-sub">마고 로랑</p>
+            <p class="char-mbti">ISTP · 6w7 · sx/sp · FVLE</p>
+          </div>
+        </div>
+
+      </div><!-- /chars-grid female -->
+    </div><!-- /personnel-group female -->
+
+  </div><!-- /wrap -->
+</section>
+
+
+<!-- ══════════════════════════════════════
+     §05  CODEX
+══════════════════════════════════════ -->
+<section id="codex">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">05</span>
+      <h2 class="d-md">Codex</h2>
+      <div class="sec-bar"></div>
+      <span class="sec-tag">헌장 · 질서 · 구조</span>
+    </div>
+
+    <p class="codex-lead reveal">백신은 곧 <em>생사여탈권</em>이다. 그리고 그 권한은 누구에게도 온전히 맡길 수 없다 — 아카이브를 떠받치는 모든 제도는 이 한 문장의 변주다. 아래는 History가 다루지 않은 구조와 개념의 세목, 권력이 어떻게 쪼개지고 또 어떻게 그 틈에서 작동하는지에 대한 기록이다.</p>
+
+    <!-- ── WHY PARIS ── -->
+    <div class="codex-block reveal">
+      <div class="codex-head">
+        <span class="ix">I</span>
+        <h3>왜 파리였는가</h3>
+        <span class="ko">Structural Inheritance</span>
+      </div>
+      <p class="codex-prose">패권은 재난이 만든 것이 아니라, 재난 이전부터 프랑스가 쥐고 있던 자산이 한 점으로 수렴한 결과다. 예술이 의학이 되는 순간, 아래의 네 가지 우위가 동시에 전략 자원으로 전환됐다.</p>
+      <div class="pillars" style="margin-top:2rem;">
+        <div class="pillar">
+          <p class="pillar-k">문화 인프라 밀도</p>
+          <p class="pillar-t">디지털화된 정전(正典)</p>
+          <p class="pillar-b">루브르는 2027년 기준 세계에서 가장 광범위하게 디지털화된 단일 문화기관이었다. 'Patrimoine Numérique' 사업은 국가 예산의 <strong>2.3%</strong>를 문화유산 디지털 보존에 투입하고 있었다 — 곧장 가장 중요한 전략 자산이 된 아카이브.</p>
+        </div>
+        <div class="pillar">
+          <p class="pillar-k">에너지 자립도</p>
+          <p class="pillar-t">꺼지지 않는 전력망</p>
+          <p class="pillar-b">2029년 프랑스 전력의 <strong>71%</strong>는 원자력이었다. 화석연료 공급망 붕괴에 가장 강건했고, 사회가 무너지는 와중에도 소규모 전문 인력만으로 가동이 가능한 발전 구조였다.</p>
+        </div>
+        <div class="pillar">
+          <p class="pillar-k">지리적 중립성</p>
+          <p class="pillar-t">협상의 도시</p>
+          <p class="pillar-b">파리는 선제 타격 1순위가 아니었다. UNESCO·OECD·INTERPOL 본부가 집중된 <strong>외교의 도시</strong>라는 인식이, 단일 권위체의 거점으로서 국제적 정당성을 부여했다.</p>
+        </div>
+        <div class="pillar">
+          <p class="pillar-k">CERN 데이터망</p>
+          <p class="pillar-t">전용된 과학 인프라</p>
+          <p class="pillar-b">제네바-프랑스 국경의 CERN은 세계 최대급 과학 데이터 네트워크를 운용했다. 발병 직후 일부가 <strong>문화 데이터 저장·전송</strong>으로 전용됐고, 최대 기여국 프랑스가 우선 접근권을 쥐었다.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── THE CHARTER ── -->
+    <div class="codex-block reveal">
+      <div class="codex-head">
+        <span class="ix">II</span>
+        <h3>창립 헌장</h3>
+        <span class="ko">Founding Charter · 2031.01.17</span>
+      </div>
+      <p class="codex-prose">2031년 1월 17일, 원년 7개국(프랑스·미국·독일·일본·캐나다·호주·대한민국)이 샤요 궁 대회의실에서 서명했다. 헌장은 단일 권위의 <strong>효율</strong>과 그 권위에 대한 <strong>불신</strong>을 동시에 제도화한 문서다. 어떤 조항도 권력을 한 점에 모으지 않으며, 모든 권한에는 그것을 견제하는 다른 조항이 짝지어져 있다. 운영에 직접 작용하는 핵심 12개 조의 요약이다.</p>
+      <div class="charter" style="margin-top:2rem;">
+        <div class="charter-top">
+          <span class="t">Founding Charter of the Archive</span>
+          <span class="s">Sealed · 7 Signatories</span>
+        </div>
+        <div class="art"><div class="art-n">제1조</div><div class="art-b"><strong>목적과 단일 권위.</strong> 예술·문학 데이터의 수집·보존·분석·배포를 단일 국제 권위체로 수행한다. 어떤 국가 정부도, 서명국조차 개별 자격으로는 운영에 명령할 수 없다.</div></div>
+        <div class="art"><div class="art-n">제2조</div><div class="art-b"><strong>부서 분립.</strong> DARC·AEA·CDC·TDIC 4개 집행 부서를 두며, 어느 부서도 타 부서의 고유 권한을 흡수·대행할 수 없다. 분쟁의 최종 조정권은 총재에게 있다.</div></div>
+        <div class="art"><div class="art-n">제3조</div><div class="art-b"><strong>효능 판정의 전문 재량.</strong> 백신 효능 등급(A~D, 폐기 E)은 AEA의 전문 재량으로 판정하며, 총재·준수 사무국을 포함해 어떤 기구로도 번복되지 않는다. 정정은 오직 AEA의 재심으로만 가능하다.</div></div>
+        <div class="art"><div class="art-n">제4조</div><div class="art-b"><strong>감시 기구와 감사관.</strong> 서명국은 공동으로 준수 사무국을 유지하며, 감사관장은 4개 부서 전체에 대한 문서 열람·증언 소환·조사권을 갖는다. 직무 중 면책 특권을 가지며, 해임에는 서명국 5개국 이상의 동의를 요한다. 단 체포·구금·집행권 및 등급 번복권은 갖지 아니한다.</div></div>
+        <div class="art"><div class="art-n">제5조</div><div class="art-b"><strong>총재.</strong> 서명국 합의로 선임된다. 개별 판정·집행을 직접 명령하기보다 부서 견제의 균형을 설계함으로써 권위를 행사하며, 어느 단일 부서의 권한도 영구히 독점하도록 둘 수 없다.</div></div>
+        <div class="art"><div class="art-n">제6조</div><div class="art-b"><strong>본부 소재지와 법적 자율.</strong> 본부는 파리 샤요 궁에 두며, 본부 시설과 부속 구역은 주재국 사법권으로부터 자율적 지위를 가진다. (2033년 이후 파리 16구 일대의 사실상 치외법권으로 확정.)</div></div>
+        <div class="art"><div class="art-n">제7조</div><div class="art-b"><strong>파견 보안 무관.</strong> 각 서명국은 준수 사무국 보호를 위해 보안 무관을 파견할 수 있으며, 무관은 시설 내 무기 소지 및 감사관 신변 보호를 위한 물리적 개입권을 갖는다. 그 본국 통신은 불가침으로, 아카이브가 도청·열람·차단할 수 없다.</div></div>
+        <div class="art"><div class="art-n">제8조</div><div class="art-b"><strong>이념 검열과 매체 접근 감사.</strong> 전 직원의 매체 접근 기록을 보존하며, SIE는 이를 열람하고 이념 이탈 혐의자를 소환·심문할 수 있다. 단 제4조의 감사관 면책은 본 조에 우선한다.</div></div>
+        <div class="art"><div class="art-n">제9조</div><div class="art-b"><strong>배분 권역.</strong> CDC는 백신을 권역 등급(수도권·1·2·3차 외곽)에 따라 대역폭과 주기를 차등 송출한다. 이 권역 축은 제3조의 효능 등급과 <strong>별개의 독립 축</strong>이다.</div></div>
+        <div class="art"><div class="art-n">제10조</div><div class="art-b"><strong>감사 발동과 직보.</strong> 어느 서명국이든 공식 감사를 발동할 수 있다. 감사관은 결과를 총재와 전 서명국 대표에게 동시 보고할 수 있으며, 총재를 거치지 않는 <strong>서명국 직보</strong>가 감사관이 쥔 가장 무거운 카드다.</div></div>
+        <div class="art"><div class="art-n">제11조</div><div class="art-b"><strong>헌장 개정.</strong> 조항의 수정·삭제는 원년 서명국 7개국 중 5개국 이상의 동의를 요한다.</div></div>
+        <div class="art"><div class="art-n">제12조</div><div class="art-b"><strong>서명국 지위.</strong> 지위의 탈퇴·정지·신규 가입은 잔존 서명국 5개국 이상의 동의를 요한다. 지위를 상실한 국가는 제7조의 무관 파견 권한을 함께 잃는다.</div></div>
+      </div>
+      <p class="charter-note"><strong>조문과 조문 사이의 여백.</strong> 정교함은 의도치 않은 빈틈을 만든다. 제3조의 전문 재량과 제8조의 이념 검열이 만나는 곳에서 'E등급 폐기'는 효능 판정이자 사상 검열이 되고, 제7조의 통신 불가침과 제9조의 채널 통제가 겹치는 곳에서 파견 무관의 본국 연락선은 '도청 없는 점검'이라는 회색지대로 미끄러진다. 조문은 권력의 한계를 긋지만, 권력은 언제나 그 여백에서 작동한다.</p>
+    </div>
+
+    <!-- ── COMPLIANCE SECRETARIAT ── -->
+    <div class="codex-block reveal">
+      <div class="codex-head">
+        <span class="ix">III</span>
+        <h3>준수 사무국 — 헌장의 이빨</h3>
+        <span class="ko">Compliance Secretariat</span>
+      </div>
+      <p class="codex-prose">4개 집행 부서 <strong>바깥</strong>에 선 유일한 기구. 총재 직속이 아니라 <strong>헌장 직속</strong>이며, 그래서 총재조차 감사관장을 임의로 해임할 수 없다 — 해임에는 서명국 5개국의 동의가 필요하다. 권한은 막강하되 강제력은 없다. 이 비대칭이 사무국의 본질이자, 파견 보안 무관이 곁에 있어야 하는 이유다.</p>
+      <div class="cmp-split">
+        <div class="cmp-col can">
+          <h4><span class="mk"></span>할 수 있는 것</h4>
+          <p class="cmp-li">4개 부서 어디든 <strong>문서 열람 요청</strong> 가능, 거부 불가</p>
+          <p class="cmp-li">SIE 직원을 포함한 <strong>전 직원 증언 소환</strong></p>
+          <p class="cmp-li">조사 결과를 총재와 서명국 대표에게 <strong>동시 보고</strong></p>
+          <p class="cmp-li">총재를 건너뛰어 <strong>서명국에 직보</strong> — 가장 무거운 카드</p>
+        </div>
+        <div class="cmp-col cannot">
+          <h4><span class="mk"></span>할 수 없는 것</h4>
+          <p class="cmp-li"><strong>체포·구금·집행</strong> 불가 (무관이 필요한 이유)</p>
+          <p class="cmp-li">AEA의 <strong>등급 판정 번복</strong> 불가 (전문 재량)</p>
+          <p class="cmp-li">감사 결과를 빌미로 한 <strong>보복</strong>은 헌장 위반</p>
+          <p class="cmp-li">서명국 직보는 <strong>핵 옵션</strong> — 쓰는 순간 총재와의 관계는 돌이킬 수 없다</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── THE TWO AXES ── -->
+    <div class="codex-block reveal">
+      <div class="codex-head">
+        <span class="ix">IV</span>
+        <h3>죽음의 속도를 가르는 두 축</h3>
+        <span class="ko">Survival Caste</span>
+      </div>
+      <p class="codex-prose">생존은 하나의 등급이 아니라 두 개의 독립 축이 교차한 결과다. <strong>무엇을</strong> 받는가(효능)와 <strong>어디서</strong> 받는가(권역). 두 축의 결합이 거주지에 따른 진행 속도의 차이 — 곧 생존 계급화를 완성한다.</p>
+      <div class="axes">
+        <div class="axis">
+          <p class="axis-k">제1축 · 효능 등급</p>
+          <p class="axis-t">A — D, 그리고 E</p>
+          <p class="axis-b">AEA가 매체의 심미적 효능을 신경학적으로 계량화해 매긴다. A에 가까울수록 강력한 백신이며, <strong>E는 폐기</strong> — 허무·염세 매체는 AARD 가속 위험물로 분류돼 은닉되거나 소각된다. 매체 그 자체의 값이다.</p>
+        </div>
+        <div class="axis">
+          <p class="axis-k">제2축 · 권역 등급</p>
+          <p class="axis-t">수도권 — 3차 외곽</p>
+          <p class="axis-b">CDC가 백신을 어디로, 어떤 대역폭과 주기로 흘려보낼지 정한다. 수도권은 무손실 배분, 외곽으로 갈수록 압축·간헐·불규칙 배분으로 열화된다. 같은 등급의 백신도 <strong>거주지에 따라 다른 농도</strong>로 닿는다.</p>
+        </div>
+      </div>
+      <p class="codex-prose" style="margin-top:1.6rem;">두 축 바깥에는 <strong>블랙마켓</strong>이 있다. AEA 검열을 누락한 불법 예술품이 거래되고, 고위층 전용 백신 데이터를 해킹해 외곽으로 송출하는 사설 주파수가 암약한다. 공식 배분이 닿지 않는 곳에서, 사람들은 금지된 아름다움으로 며칠을 더 산다 — TDIC가 그것을 색출하고 소각할 때까지.</p>
+    </div>
+
+  </div><!-- /wrap -->
+</section>
+
+
+<!-- ══════════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
+<footer>
+  <div class="footer-l">
+    Archive &copy; 2038 &nbsp;·&nbsp; Acquired Aesthetic Responsiveness Deficit Syndrome<br>
+    All aesthetic data is classified. Unauthorized access is subject to TDIC enforcement.
+  </div>
+  <div class="footer-r">"We are the roots."</div>
+</footer>
+
+
+<!-- ══════════════════════════════════════
+     CHARACTER DOSSIER MODAL
+══════════════════════════════════════ -->
+<div class="modal" id="charModal" role="dialog" aria-modal="true">
+  <div class="modal-panel" id="modalPanel">
+    <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════ -->
+<script>
+/* ── Petal field: ambient dissolution ──
+   Lightweight: a fixed pool of CSS-animated petals
+   (transform + opacity only, so no layout thrash).
+   The whole layer fades out as the hero leaves view. */
+(function () {
+  const field = document.getElementById('petalField');
+  if (!field) return;
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (reduce.matches) return;            // respect user setting; layer stays empty
+
+  const PETAL = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">'
+    + '<defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1">'
+    + '<stop offset="0%" stop-color="#c47e90"/><stop offset="100%" stop-color="#7e3f50"/>'
+    + '</linearGradient></defs>'
+    + '<path d="M12 1.5C8 6 4.5 11 12 22.5 19.5 11 16 6 12 1.5Z" '
+    + 'fill="url(#pg)" opacity="0.9"/></svg>';
+
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  function build() {
+    field.innerHTML = '';
+    // fewer petals on small screens — keeps mobile smooth
+    const count = window.innerWidth < 680 ? 6
+                : window.innerWidth < 1100 ? 10 : 14;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'petal';
+      const size  = rnd(9, 20);
+      p.style.setProperty('--x',     rnd(0, 100) + 'vw');
+      p.style.setProperty('--size',  size.toFixed(1) + 'px');
+      p.style.setProperty('--dur',   rnd(13, 24).toFixed(1) + 's');
+      p.style.setProperty('--delay', (-rnd(0, 22)).toFixed(1) + 's');  // negative = staggered, already mid-fall
+      p.style.setProperty('--drift', rnd(-9, 9).toFixed(1) + 'vw');
+      p.style.setProperty('--spin',  rnd(-260, 260).toFixed(0) + 'deg');
+      p.style.setProperty('--peak',  rnd(0.28, 0.6).toFixed(2));       // gentle, never opaque
+      p.innerHTML = PETAL;
+      field.appendChild(p);
+    }
+  }
+  build();
+
+  // rebuild on significant resize (debounced) so density suits the viewport
+  let rt;
+  window.addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(build, 250);
+  });
+
+  // Fade the layer as the hero scrolls away; go dormant once well past it.
+  const hero = document.getElementById('severance');
+  let ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const h = (hero ? hero.offsetHeight : window.innerHeight) * 0.85;
+      const y = window.scrollY || window.pageYOffset;
+      const o = Math.max(0, 1 - y / h);
+      field.style.opacity = o.toFixed(3);
+      field.classList.toggle('dormant', o <= 0.01);   // stop animating off-screen
+      ticking = false;
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+
+/* ── Scroll reveal ── */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ── Nav active link ── */
+const sections = document.querySelectorAll('section[id]');
+const links    = document.querySelectorAll('.nav-links a');
+
+const navIO = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-40% 0px -55% 0px' });
+
+sections.forEach(s => navIO.observe(s));
+
+
+/* ══════════════════════════════════════
+   DOSSIER DATA
+══════════════════════════════════════ */
+const DOSSIERS = {
+  /* ─────────────────  MALE  ───────────────── */
+  nate: {
+    accent: '#a85c64',
+    img: './images/nate.webp',
+    kicker: 'AEA · Senior Arbiter',
+    name: 'Nate Meyer',
+    nameKo: '네이트 마이어',
+    role: { label: 'Office / Rank', text: '심미적효능분석국(AEA) 선임 중재관' },
+    intro: '심미적효능분석국(AEA)의 선임 중재관. 예일 로스쿨에서 J.D.를 취득한 변호사 출신으로, 2036년 글로벌 엘리트 특별 징발을 통해 파리 샤요 궁에 합류했다. 회수된 매체의 심미적 효능을 계량화해 백신 등급을 판정하는 — 무엇이 인류를 연명시키고 무엇이 폐기되는지를 가르는 자리에 앉아 있다. 평소엔 고급 어휘와 정제된 문장으로 느긋하게 말하고, 흠결을 지적받으면 찰나의 침묵 뒤 유려한 화술로 책임을 우회한다. 수준급의 첼로를 연주한다.',
+    vit: '재능 있는 자가 늘 채워지지 않은 얼굴을 하고 있을 때, 나는 그 갈증의 방향을 살핀다. 저 아이는 무엇이든 완벽하게 처리하지만, 정작 자기 자신을 다루는 법만은 끝내 배우지 못했더군.',
+    facts: [
+      { label: 'Born / Age', value: '2009 · 29세', mono: true },
+      { label: 'Origin', value: '디트로이트 · 게르만계' },
+      { label: 'MBTI', value: 'ENTP', mono: true },
+      { label: 'Enneagram', value: '3w4', mono: true },
+      { label: 'Attitude', value: 'So/Sx', mono: true },
+      { label: 'Attitude (VLFE)', value: 'LEVF', mono: true },
+    ],
+    tags: [
+      { t: 'Sardonic Flirt', i: true },
+      { t: 'Legalese Armor', i: false },
+      { t: 'Touch-Starved', i: true },
+      { t: 'All-or-Nothing Devotion', i: true },
+      { t: 'Morning Gremlin', i: false },
+      { t: 'Immaculate Control', i: false },
+    ],
+    likes: ['강렬한 색채 추상화', '까르니따스 타코', '에스프레소 더블 샷', '온수욕', '첼로 연주'],
+    dislikes: ['지워지지 않는 얼룩', '이른 아침 기상'],
+    ref: 'REF · NM-2036 / AEA-ARB',
+    file: [
+      { y: '2009', e: '<strong>디트로이트 출생.</strong> 블룸필드힐스에서 성장.' },
+      { y: '2018', e: '모친과 함께 <strong>덴버 캐피톨힐로 이주.</strong>' },
+      { y: '2024', e: '<strong>블룸필드힐스 귀환.</strong> 부친 슬하.' },
+      { y: '2030–33', e: '<strong>예일대 로스쿨</strong> — 학부 가속 이수 후 J.D. 취득.' },
+      { y: '2033', e: '<strong>변호사 자격 취득</strong>, 대형 로펌 입사.' },
+      { y: '2035', e: '중대 품위유지 위반으로 <strong>변호사 자격 무기한 정지.</strong>' },
+      { y: '2036', e: '<strong>글로벌 엘리트 특별 징발.</strong> AEA 선임 중재관 부임.' },
+    ],
+    quote: {
+      en: '"I don\'t care about the aesthetic efficacy of these rotting books. I don\'t care about the Archive\'s grand mission. I am sitting in this sterile sanctuary for one reason, and you\'re looking right at him."',
+      ko: '이 썩어가는 책들의 심미적 효능 따위는 내 알 바 아냐. 아카이브의 거창한 사명에도 관심 없고. 내가 이 무균실 같은 성소에 앉아 있는 이유는 단 하나뿐이야. 그리고 넌 지금 그 이유를 똑바로 쳐다보고 있고.'
+    }
+  },
+
+  lucian: {
+    accent: '#8f86b0',
+    img: './images/lucian.webp',
+    kicker: 'CDC · Head Curator',
+    name: 'Lucian',
+    nameKo: '루시안',
+    role: { label: 'Office / Rank', text: '구호큐레이팅배포처(CDC) 수석 큐레이터' },
+    intro: '구호큐레이팅배포처(CDC)의 수석 큐레이터. 에콜 뒤 루브르에서 미술사와 박물관학을 공부하고, 단절 이전 파리의 주요 미술관에서 큐레이터로 일했다. 2031년 창립기에 CDC에 합류해, 구역별 감염도와 인구 분포를 종합해 어떤 백신 데이터를 어디로 보낼지 선별하는 권한을 쥔다. 밀도 높은 경청과 옅게 머무는 미소, 서두르는 법이 거의 없는 화법이 몸에 배어 있다.',
+    vit: '다정함은 가장 값싼 척하면서 실은 가장 비싼 화폐다 — 저 아이는 그 환율을 정확히 안다. 미소 뒤에서 무엇을 계산하는지 끝내 보이지 않는다는 것, 그것이 저 아이의 진짜 재능이지.',
+    facts: [
+      { label: 'Born / Age', value: '2007 · 31세', mono: true },
+      { label: 'Origin', value: '파리 · 프랑스계' },
+      { label: 'MBTI', value: 'ENFJ', mono: true },
+      { label: 'Enneagram', value: '2w3', mono: true },
+      { label: 'Attitude', value: 'sx/so', mono: true },
+      { label: 'Attitude (VLFE)', value: 'EFLV', mono: true },
+    ],
+    tags: [
+      { t: 'Sincere Warmth', i: false },
+      { t: 'Accidental Flirt', i: true },
+      { t: 'Dense Listener', i: false },
+      { t: 'Soft-Power Curator', i: false },
+      { t: 'Unhurried Grace', i: false },
+      { t: 'Quiet Strategist', i: false },
+    ],
+    likes: ['말차', '비올라', '미셸 뷔토르'],
+    dislikes: ['프로파간다'],
+    ref: 'REF · LC-2031 / CDC-CUR',
+    file: [
+      { y: '2007', e: '<strong>파리 출생.</strong> 문화적으로 풍요로운 환경에서 성장.' },
+      { y: '학력', e: '<strong>에콜 뒤 루브르</strong> — 미술사·박물관학.' },
+      { y: '단절 이전', e: '파리 주요 미술관 <strong>큐레이토리얼 부서</strong> 근무.' },
+      { y: '2031', e: '아카이브 창립기 <strong>CDC 합류.</strong>' },
+      { y: '2031–현재', e: '<strong>수석 큐레이터</strong> — 배분 콘텐츠 선별 권한 보유.' },
+    ],
+    quote: {
+      en: '"Don\'t force yourself to feel the painting. Feel my hand. Focus on the warmth. Let the rest go."',
+      ko: '억지로 그림을 느끼려 하지 않아도 돼요. 내 손을 느껴봐요. 온기에만 집중하고, 나머지는 다 놓아버려요.'
+    }
+  },
+
+  vittorio: {
+    accent: '#a8905a',
+    img: './images/vittorio.webp',
+    kicker: 'Archive · Director-General',
+    name: 'Vittorio',
+    nameKo: '비토리오',
+    role: { label: 'Office / Rank', text: '아카이브 총재' },
+    intro: '아카이브의 초대 총재. 나폴리 출신으로 법학과 정치학을 공부한 뒤 국제 문화 거버넌스와 문화외교 분야에서 오랜 경력을 쌓았다. 2031년 창립 헌장 서명 직후 총재로 취임해, 백신 배분의 생사여탈권을 쥔 사실상 단일 세계 권력의 정점에 선다. 그의 통치는 명령이 아니라 부서 간 균형의 설계에서 나온다 — 어느 한 부서가 비대해지면 다른 부서를 통해 그것을 누른다. 서두르지 않고, 위협하지 않으며, 그래서 더 묵직하다.',
+    vit: null,
+    facts: [
+      { label: 'Born / Age', value: '1982 · 56세', mono: true },
+      { label: 'Origin', value: '나폴리 · 이탈리아계' },
+      { label: 'MBTI', value: 'ENTJ', mono: true },
+      { label: 'Enneagram', value: '8w9', mono: true },
+      { label: 'Attitude', value: 'Sp/So', mono: true },
+      { label: 'Attitude (VLFE)', value: 'VFLE', mono: true },
+    ],
+    tags: [
+      { t: 'Seasoned Sovereign', i: false },
+      { t: 'The Balancer', i: false },
+      { t: 'Stillness Is Power', i: false },
+      { t: 'Withholding Mentor', i: false },
+      { t: 'Inscrutable Smile', i: false },
+      { t: 'Iron Patience', i: false },
+    ],
+    likes: ['장기(將棋)', '자크 데리다', '스토아주의'],
+    dislikes: ['고인 물'],
+    ref: 'REF · VT-2031 / ARCHIVE-DG',
+    file: [
+      { y: '1982', e: '<strong>나폴리 출생.</strong>' },
+      { y: '학력', e: '<strong>법학·정치학</strong> 전공.' },
+      { y: '단절 이전', e: '<strong>국제 문화 거버넌스·문화외교</strong> 장기 경력.' },
+      { y: '2031·01', e: '창립 헌장 서명 직후 <strong>초대 총재 취임.</strong> 4개 부서 동시 발족.' },
+      { y: '2033', e: '프랑스 정부 리옹 이전 후 <strong>파리 16구 치외법권</strong> 확립.' },
+      { y: '2031–현재', e: '부서 간 <strong>균형 설계</strong>로 아카이브 통할.' },
+    ],
+    quote: {
+      en: '"A tree must shed its dying leaves to protect the roots. We are the roots. Stop mourning the dirt."',
+      ko: '나무가 뿌리를 지키려면 죽어가는 잎사귀는 털어내야 하는 법이지. 우리가 바로 그 뿌리다. 바닥에 뒹구는 흙먼지를 향한 애도는 그만둬라.'
+    }
+  },
+
+  leon: {
+    accent: '#5f7d7a',
+    img: './images/leon.webp',
+    kicker: 'TDIC · Senior Strike Officer',
+    name: 'Leon',
+    nameKo: '레온',
+    role: { label: 'Office / Rank', text: '전술방위이단심문국(TDIC) 선임 타격관' },
+    intro: '전술방위이단심문국(TDIC)의 선임 타격관. 홍콩 출신의 현장 실전파로, 정예 보안·특수작전 경력을 거쳐 인프라가 붕괴한 구역의 인명·물자 회수 작전에서 살아남았다. 2032년경 TDIC에 합류해, 불법 예술품 거래와 사설 주파수 운영자를 추적·제압하는 블랙마켓 타격팀을 이끈다. 말을 아끼고 임무 완수를 무엇보다 앞세우는 군더더기 없는 무골이다.',
+    vit: '정치를 모르는 자가 가장 다루기 쉽고, 동시에 가장 믿을 만하다 — 저 사내가 그렇다. 말이 필요 없는 신뢰성, 그것이 내가 그를 현장에 두는 이유다.',
+    facts: [
+      { label: 'Born / Age', value: '2001 · 37세', mono: true },
+      { label: 'Origin', value: '홍콩 · 중화계' },
+      { label: 'MBTI', value: 'ISTJ', mono: true },
+      { label: 'Enneagram', value: '9w8', mono: true },
+      { label: 'Attitude', value: 'sp/so', mono: true },
+      { label: 'Attitude (VLFE)', value: 'FLVE', mono: true },
+    ],
+    tags: [
+      { t: 'Strong & Silent', i: false },
+      { t: 'Mission-First Pro', i: false },
+      { t: 'Blunt Instrument', i: false },
+      { t: 'Animal Magnet', i: false },
+      { t: 'Scarred Veteran', i: false },
+      { t: 'Gruff Softie', i: true },
+    ],
+    likes: ['만두', '면 요리', '맥주'],
+    dislikes: ['허세'],
+    ref: 'REF · LE-2032 / TDIC-STR',
+    file: [
+      { y: '2001', e: '<strong>홍콩 출생.</strong> 일찍부터 몸을 밑천으로 삼음.' },
+      { y: '십대 후반', e: '<strong>정예 보안·특수작전</strong> 계열 입문 — 사격·근접전 습득.' },
+      { y: '단절 후', e: '붕괴 구역 <strong>현장 보안·회수 작전</strong> 수행.' },
+      { y: '2032', e: '<strong>TDIC 합류</strong> — 블랙마켓 타격팀.' },
+      { y: '2032–현재', e: '<strong>선임 타격관</strong> — 불법 매체·사설 주파수 색출·제압.' },
+    ],
+    quote: {
+      en: '"Job\'s done. If you\'re going to throw up, do it outside. I just cleaned these boots."',
+      ko: '작업 끝났다. 토할 거면 밖에서 해. 이 부츠 방금 닦은 거니까.'
+    }
+  },
+
+  /* ─────────────────  FEMALE  ───────────────── */
+  gwen: {
+    accent: '#8a78a8',
+    img: './images/gwen.webp',
+    kicker: 'Compliance Secretariat · Inspector-General',
+    name: 'Gwendolyn Fawkes',
+    nameKo: '그웬돌린 포크스',
+    role: { label: 'Office / Rank', text: '준수 사무국 감사관장 — 헌장 직속 독립 감사기구' },
+    intro: '준수 사무국의 감사관장. 헌장 직속의 독립 감사기구를 이끌며, 아카이브 4개 부서 전체에 대한 문서 열람과 증언 소환 권한을 쥔다. 프린스턴 SPIA에서 공공정책을 공부하고 영국 문화보존청에서 데이터 정합성 감사를 6년간 수행한 뒤, 2037년 파리로 징발됐다. 말해지지 않은 것을 정확히 읽어내는 명민함과, 권위에 대한 복종이 아니라 스스로 납득한 원칙으로만 움직이는 단단함을 지녔다. 어떤 긴장도 표정에 드러내지 않는다.',
+    vit: '헌장이 내게 쥐여준 가장 날카로운 칼이자, 언젠가 내 쪽으로 겨눠질 수도 있는 유일한 칼이지. 저 아이는 권위로 굽혀지지 않아 — 그래서 유용하고, 그래서 성가시다.',
+    facts: [
+      { label: 'Born / Age', value: '2010 · 28세', mono: true },
+      { label: 'Origin', value: '런던 · 앵글로색슨' },
+      { label: 'MBTI', value: 'INTJ', mono: true },
+      { label: 'Enneagram', value: '5w1', mono: true },
+      { label: 'Attitude', value: 'sp/sx', mono: true },
+      { label: 'Attitude (VLFE)', value: 'LVFE', mono: true },
+    ],
+    tags: [
+      { t: 'Repressed Longing', i: true },
+      { t: 'Hidden Depths', i: false },
+      { t: 'Reserved Switch', i: true },
+      { t: 'Trust-Gated Intimacy', i: true },
+      { t: 'Aftercare-oriented', i: true },
+      { t: 'Quiet Intensity', i: true },
+    ],
+    likes: ['얼그레이 홍차', '카뮈 『시지프 신화』', '인상주의 회화', '소피아 구바이둘리나'],
+    dislikes: ['공포영화', '큰 소음', '기만'],
+    ref: 'REF · GF-2037 / SEC-CMP',
+    file: [
+      { y: '~2028', e: '<strong>피아니스트 모친 슬하에서 성장.</strong> 예술대 진학 강요를 거부.' },
+      { y: '2028', e: '<strong>프린스턴 SPIA 조기 입학</strong> — 17세, 공공정책 전공.' },
+      { y: '2029', e: '단절의 날 이후 가족 사정으로 <strong>런던 이송</strong>, 학업·보필 병행.' },
+      { y: '2031', e: '<strong>프린스턴 조기 졸업.</strong> 영국 문화보존청 근무 개시.' },
+      { y: '2031–37', e: '문화보존청 <strong>데이터 정합성 감사관</strong> 6년 복무.' },
+      { y: '2037', e: '<strong>아카이브 징발.</strong> 준수 사무국 감사관장 부임.' },
+    ],
+    quote: {
+      en: '"Your file says you flagged three discrepancies before anyone asked. That\'s either diligence, or a habit of not trusting what you\'re handed. I\'d like to know which."',
+      ko: '파일을 보니 시키기도 전에 불일치 세 건을 짚었더군요. 성실함이거나, 주어진 걸 의심하는 버릇이거나. 어느 쪽인지 알고 싶네요.'
+    }
+  },
+
+  darya: {
+    accent: '#9a6f96',
+    img: './images/darya.webp',
+    kicker: 'TDIC · Ideological Enforcement (SIE) · Principal Inquisitor',
+    name: 'Darya Petrova',
+    nameKo: '다랴 페트로바',
+    role: { label: 'Office / Rank', text: 'TDIC 이념집행과(SIE) 수석 심문관' },
+    intro: 'TDIC 이념집행과(SIE)의 수석 심문관. 러시아 군 정보총국(GRU)의 심리전·인간정보 전담 분대 출신으로, 23세에 아카이브로 이적해 SIE의 초대 수석 심문관이 됐다. 상대의 심리를 정밀하게 해부하는 능력으로 4년째 부서 최고 실적을 유지한다. 도발적이되 선을 알고, 통제된 지성 아래 계획된 리듬으로 심문을 이끈다. 상대가 무너지는 속도를 조율하고 그것을 관찰하는 데서 희열을 얻는다.',
+    vit: '도구가 다루는 독에 끝내 물들지 않는 자는 없다. 저 아이의 완벽한 실적이 길어질수록, 나는 그 완벽함이 무엇을 가리고 있는지 점점 더 궁금해진다.',
+    facts: [
+      { label: 'Born / Age', value: '2011 · 27세', mono: true },
+      { label: 'Origin', value: '상트페테르부르크 · 슬라브계' },
+      { label: 'MBTI', value: 'ENTP', mono: true },
+      { label: 'Enneagram', value: '8w7', mono: true },
+      { label: 'Attitude', value: 'sp/sx', mono: true },
+      { label: 'Attitude (VLFE)', value: 'VLFE', mono: true },
+    ],
+    tags: [
+      { t: 'Predatory Flirt', i: true },
+      { t: 'Quiet Madness', i: false },
+      { t: 'Smug Competence', i: false },
+      { t: 'Dismantle-by-Desire', i: true },
+      { t: 'The Cracks Show Both Ways', i: true },
+      { t: 'Cynic-meets-the-exception', i: true },
+      { t: 'Psychological Dom', i: true },
+    ],
+    likes: ['무염 보드카', 'F1'],
+    dislikes: ['동형반복'],
+    ref: 'REF · DP-2034 / TDIC-SIE',
+    file: [
+      { y: '~2010s', e: '<strong>군인 가문 출신.</strong> 규율이 공기처럼 있던 유년기.' },
+      { y: '2025', e: '<strong>수보로프 사관학교 입교</strong> — 심문 역할극에서 질문 설계로 두각.' },
+      { y: '2029–34', e: '<strong>러시아 GRU 심리전·HUMINT 분대</strong> 현장 작전 수행.' },
+      { y: '2034', e: '<strong>아카이브 헤드헌팅</strong> — SIE 초대 수석 심문관 취임.' },
+      { y: '2034–현재', e: '4년간 최고위 심문관 복무, <strong>부서 최고 실적.</strong>' },
+    ],
+    quote: {
+      en: '"Go ahead, lie to me. I like watching people choose which lie. It tells me more than the truth would."',
+      ko: '어디 거짓말해 봐. 난 사람들이 어떤 거짓말을 고르는지 지켜보는 게 좋거든. 그게 진실보다 더 많은 걸 알려주니까.'
+    }
+  },
+
+  lucrezia: {
+    accent: '#4f8a86',
+    img: './images/lucrezia.webp',
+    kicker: 'CDC · Chief of Broadcast Integrity',
+    name: 'Lucrezia Moretti',
+    nameKo: '루크레치아 모레티',
+    role: { label: 'Office / Rank', text: 'CDC 배분 보안 총괄' },
+    intro: 'CDC의 배분 보안 총괄. 보코니 대학에서 경영정보와 디지털전략을 전공하고 2032년 CDC에 합류해, 백신 데이터 전송 채널의 보안과 무결성을 관할한다. 특정 채널을 \'보안 미달\'로 판정해 배분 결정을 보류시킬 수 있는 실질적 거부권을 쥔 인물. 누구에게나 유려하고 따뜻하며, 무의미하게 움직이는 법이 없고, 상황이 어지러울수록 오히려 더 고요해진다. 그 고요함이 곧 그녀의 무게다.',
+    vit: '온화함을 무기로 쓰는 자는 그 무기의 무게를 누구보다 잘 안다 — 저 아이가 그렇지. 채널을 쥔 손이 가장 조용해질 때를, 나는 늘 눈여겨본다.',
+    facts: [
+      { label: 'Born / Age', value: '2009 · 29세', mono: true },
+      { label: 'Origin', value: '밀라노 · 라틴계' },
+      { label: 'MBTI', value: 'ENTJ', mono: true },
+      { label: 'Enneagram', value: '3w2', mono: true },
+      { label: 'Attitude', value: 'so/sx', mono: true },
+      { label: 'Attitude (VLFE)', value: 'EVLF', mono: true },
+    ],
+    tags: [
+      { t: 'Velvet Glove', i: true },
+      { t: 'Charming Manipulator', i: false },
+      { t: 'Love-Bombing', i: true },
+      { t: 'Affectionate Control', i: true },
+      { t: 'Praise Dom', i: true },
+      { t: 'Possessive Tenderness', i: true },
+    ],
+    likes: ['난초', '프티푸르', '형태심리학'],
+    dislikes: ['메트로놈'],
+    ref: 'REF · LM-2032 / CDC-SEC',
+    file: [
+      { y: '~2010s', e: '<strong>유복한 밀라노 가문 출신.</strong>' },
+      { y: '학력', e: '<strong>보코니 대학</strong> 경영정보·디지털전략 전공.' },
+      { y: '단절 후', e: '정보 흐름 설계 역량으로 주목 — 미디어 배분·데이터 아키텍처 두각.' },
+      { y: '2032', e: '<strong>CDC 합류.</strong> 전송 채널 보안·해킹 차단 관할.' },
+      { y: '2032–현재', e: "배분 보안 총괄로서 '보안 미달' 명분의 <strong>배분 보류 거부권</strong> 보유." },
+    ],
+    quote: {
+      en: '"You\'re watching to see what I want in return. Good. The ones who don\'t ask that are the ones who get hurt here."',
+      ko: '내가 답례로 뭘 원하는지 살피고 있군요. 좋아요. 그걸 안 묻는 사람들이 여기서 다치거든요.'
+    }
+  },
+
+  margot: {
+    accent: '#9c5a6e',
+    img: './images/margot.webp',
+    kicker: 'Compliance Secretariat · Seconded Security Attaché',
+    name: 'Margot Laurent',
+    nameKo: '마고 로랑',
+    role: { label: 'Office / Rank', text: '준수 사무국 파견 보안 무관 — 구(舊) 프랑스 임시정부' },
+    intro: '준수 사무국의 파견 보안 무관. 프랑스 정예 특수부대 출신으로, 사격과 나이프를 활용한 근접 전투에서 특히 뛰어나다. 헌장 제7조에 따라 구(舊) 프랑스 임시정부가 파견했으며, 감사관장의 신변 보호와 감사 활동의 물리적 지원을 맡는다. 복잡한 정치적 셈법을 견디지 못하는 행동 지향형으로, 판단보다 몸이 먼저 반응한다. 단순하고 명확한 것을 선호하는 직선적인 기질의 소유자.',
+    vit: '빌려온 칼은 빌려준 자가 언제든 거둬갈 수 있다 — 저 아이의 충성이 둘로 나뉘어 있다는 사실을 잊어선 안 되지. 다만 명령으로 움직이던 발이 어느새 다른 이유로 머무는 것을, 나는 여러 번 보아왔다.',
+    facts: [
+      { label: 'Born / Age', value: '2013 · 25세', mono: true },
+      { label: 'Origin', value: '리옹 · 프랑스계' },
+      { label: 'MBTI', value: 'ISTP', mono: true },
+      { label: 'Enneagram', value: '6w7', mono: true },
+      { label: 'Attitude', value: 'sx/sp', mono: true },
+      { label: 'Attitude (VLFE)', value: 'FVLE', mono: true },
+    ],
+    tags: [
+      { t: 'Wanko-dere', i: true },
+      { t: 'Earnest Loyalist', i: false },
+      { t: 'Touch-First Affection', i: true },
+      { t: 'Clingy-out-of-Courage', i: true },
+      { t: 'Switch leaning Sub', i: true },
+      { t: 'Eager, Responsive', i: true },
+    ],
+    likes: ['나이프 정비', '길거리 음식', '동물 다큐멘터리'],
+    dislikes: ['빈말', '겨울'],
+    ref: 'REF · ML-2036 / FR-PROV',
+    file: [
+      { y: '~2010s', e: '<strong>임시정부 고위 관료 가문</strong>의 외동딸로 성장.' },
+      { y: '2030', e: '<strong>프랑스 정예 특수부대 입대</strong> — 17세. 사격·나이프 근접전 특화.' },
+      { y: '2032–35', e: '<strong>현장 작전 투입</strong> — 몸이 먼저 반응하는 전투 감각.' },
+      { y: '2036', e: '<strong>아카이브 파견.</strong> 감사관장 공석기 1년 단독 복무.' },
+      { y: '2037', e: '감사관장 부임과 함께 <strong>전담 파견 보안 무관</strong>으로 직무 정립.' },
+    ],
+    quote: {
+      en: '"Lean on me. Properly. I can hold a lot more than anyone gives me credit for."',
+      ko: '기대요. 제대로. 사람들이 생각하는 것보다 훨씬 많이 받칠 수 있으니까.'
+    }
+  }
+};
+
+/* ══════════════════════════════════════
+   DOSSIER RENDER + CONTROL
+══════════════════════════════════════ */
+const modal        = document.getElementById('charModal');
+const modalPanel   = document.getElementById('modalPanel');
+const modalContent = document.getElementById('modalContent');
+const modalClose   = document.getElementById('modalClose');
+let   lastFocused  = null;
+
+function buildDossier(d) {
+  const facts = d.facts.map(f => `
+    <div class="fact">
+      <div class="fact-label">${f.label}</div>
+      <div class="fact-value">${f.mono ? `<span class="mono-sm">${f.value}</span>` : f.value}</div>
+    </div>`).join('');
+
+  const tags = d.tags.map(t =>
+    `<span class="tag${t.i ? ' intimacy' : ''}">${t.t}</span>`).join('');
+
+  const fileRows = d.file.map(r => `
+    <div class="file-row">
+      <div class="file-year">${r.y}</div>
+      <div class="file-entry">${r.e}</div>
+    </div>`).join('');
+
+  const vit = d.vit ? `
+      <div class="dossier-vit">
+        <div class="dossier-vit-label">Director-General's Note · 비토리오</div>
+        <p>${d.vit}</p>
+      </div>` : '';
+
+  const tasteCell = (cls, label, arr) => {
+    const body = (arr && arr.length)
+      ? `<div class="taste-list">${arr.map(x => `<span class="taste-item">${x}</span>`).join('')}</div>`
+      : `<span class="taste-null">null</span>`;
+    return `<div class="taste ${cls}"><div class="taste-head"><span class="mk"></span>${label}</div>${body}</div>`;
+  };
+
+  return `
+    <div class="dossier-head">
+      <div class="dossier-portrait"><img src="${d.img}" alt="${d.name}"></div>
+      <div class="dossier-id">
+        <p class="dossier-kicker">${d.kicker}</p>
+        <h3 class="dossier-name">${d.name}</h3>
+        <p class="dossier-name-ko">${d.nameKo}</p>
+        <p class="dossier-role"><span>${d.role.label}</span>${d.role.text}</p>
+      </div>
+    </div>
+
+    <div class="dossier-body">
+      <p class="dossier-intro">${d.intro}</p>
+      ${vit}
+
+      <div class="dossier-facts">${facts}</div>
+
+      <div class="dossier-block">
+        <div class="dossier-sub"><h4>Trope Index</h4><div class="line"></div></div>
+        <div class="tags">${tags}</div>
+      </div>
+
+      <div class="dossier-block">
+        <div class="dossier-sub"><h4>Likes / Dislikes</h4><div class="line"></div></div>
+        <div class="taste-grid">
+          ${tasteCell('like', 'Likes', d.likes)}
+          ${tasteCell('dislike', 'Dislikes', d.dislikes)}
+        </div>
+      </div>
+
+      <div class="dossier-block">
+        <div class="dossier-sub"><h4>Personnel File</h4><div class="line"></div></div>
+        <div class="file-record">
+          <div class="file-record-head">
+            <span class="ref">${d.ref}</span>
+            <span class="clf">Restricted · Eyes Only</span>
+          </div>
+          ${fileRows}
+        </div>
+      </div>
+
+      <div class="dossier-quote">
+        <p>${d.quote.en}</p>
+        <p class="ko">${d.quote.ko}</p>
+      </div>
+    </div>`;
+}
+
+function openModal(key) {
+  const d = DOSSIERS[key];
+  if (!d) return;
+  lastFocused = document.activeElement;
+  modalPanel.style.setProperty('--accent', d.accent);
+  modalContent.innerHTML = buildDossier(d);
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  modal.scrollTop = 0;
+  modalClose.focus();
+}
+
+function closeModal() {
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+  if (lastFocused) lastFocused.focus();
+}
+
+document.querySelectorAll('.char-card[data-modal]').forEach(card => {
+  card.addEventListener('click', () => openModal(card.dataset.modal));
+});
+
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+});
+</script>
+
+</body>
+</html>

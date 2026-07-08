@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Callboard — Ashworth Drama, Fall '26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Instrument+Sans:wght@400;500;600&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+
+/* ────────────────────────────────────────
+   TOKENS — porcelain playbill, pastel leads
+   cute · sophisticated · modern, kept quiet
+──────────────────────────────────────── */
+:root {
+  --paper:     #fbf5f3;   /* warm porcelain, faint blush */
+  --paper-2:   #f4e9e6;   /* deeper blush sand */
+  --paper-3:   #fefbfa;
+  --wash-cool: #f2eff8;   /* pale lilac band */
+  --card:      #ffffff;
+  --ink:       #35292f;   /* deep plum charcoal */
+  --ink-soft:  #6f6069;
+  --ink-faint: #aa9ca4;
+  --line:      rgba(53,41,47,0.11);
+  --line-soft: rgba(53,41,47,0.06);
+
+  /* four leads — pastel but saturated enough to sing */
+  --gwen:   #6e73cc;   /* periwinkle — piano, restraint */
+  --darya:  #e1548e;   /* raspberry — provocation */
+  --luc:    #23ae9e;   /* teal — velvet warmth */
+  --margot: #f2963c;   /* marigold — earnest, physical */
+
+  --gwen-t:  rgba(110,115,204,0.13);
+  --darya-t: rgba(225,84,142,0.13);
+  --luc-t:   rgba(35,174,158,0.13);
+  --margot-t:rgba(242,150,60,0.13);
+
+  /* supporting hue — referenced as the interlude act accent */
+  --sky:    #a9cbe8;
+
+  --ff-d: 'Fraunces', Georgia, serif;
+  --ff-b: 'Instrument Sans', system-ui, sans-serif;
+  --ff-m: 'Space Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--ff-b);
+  font-weight: 400;
+  line-height: 1.7;
+  overflow-x: hidden;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+img { display: block; max-width: 100%; }
+a   { color: inherit; text-decoration: none; }
+
+/* branded selection + keyboard focus */
+::selection { background: color-mix(in srgb, var(--darya) 24%, transparent); color: var(--ink); }
+:focus-visible { outline: 2px solid var(--darya); outline-offset: 3px; }
+.lead-card:focus-visible { outline-offset: 5px; border-radius: 18px; }
+
+/* soft blush aurora behind everything */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(60vw 50vh at 12% -6%, rgba(201,182,232,.24), transparent 60%),
+    radial-gradient(52vw 44vh at 92% 4%, rgba(246,193,206,.22), transparent 60%),
+    radial-gradient(50vw 50vh at 78% 96%, rgba(169,203,232,.18), transparent 62%);
+}
+/* subtle paper tooth */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  opacity: .5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+}
+
+/* ────────────────────────────────────────
+   MOTES — pastel stage-light dust, drifting UP
+──────────────────────────────────────── */
+.mote-field {
+  position: fixed; inset: 0; z-index: 1;
+  pointer-events: none; overflow: hidden;
+  transition: opacity .6s ease;
+}
+.mote-field.dormant { visibility: hidden; }
+.mote {
+  position: absolute;
+  bottom: -5vh;
+  left: var(--x, 50%);
+  width: var(--size, 9px); height: var(--size, 9px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, var(--c, #e8b56a), transparent 70%);
+  opacity: 0;
+  animation: mote-rise var(--dur, 15s) linear var(--delay, 0s) infinite;
+  will-change: transform, opacity;
+}
+@keyframes mote-rise {
+  0%   { transform: translate3d(0,0,0) scale(.8); opacity: 0; }
+  12%  { opacity: var(--peak, .55); }
+  85%  { opacity: var(--peak, .55); }
+  100% { transform: translate3d(var(--drift, 3vw), -108vh, 0) scale(1.1); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mote-field { display: none; }
+  .reveal { opacity: 1 !important; transform: none !important; transition: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* ────────────────────────────────────────
+   TYPE UTILITIES
+──────────────────────────────────────── */
+.d-xl {
+  font-family: var(--ff-d);
+  font-size: clamp(3.2rem, 8.4vw, 6.8rem);
+  font-weight: 500;
+  line-height: .98;
+  letter-spacing: -.02em;
+  font-optical-sizing: auto;
+  text-wrap: balance;
+}
+.d-xl em { font-style: italic; font-weight: 400; }
+.d-md {
+  font-family: var(--ff-d);
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+  font-weight: 500;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+/* ────────────────────────────────────────
+   NAV
+──────────────────────────────────────── */
+nav {
+  position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.05rem 3rem;
+  background: rgba(251,245,243,.82);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line-soft);
+}
+.nav-logo {
+  font-family: var(--ff-m);
+  font-size: .72rem; letter-spacing: .28em; text-transform: uppercase;
+  display: flex; align-items: center; gap: .5rem;
+}
+.nav-logo::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--darya), var(--margot));
+}
+.nav-links { display: flex; gap: 2.3rem; list-style: none; }
+.nav-links a {
+  font-family: var(--ff-m);
+  font-size: .6rem; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--ink-soft); transition: color .25s;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--ink); }
+
+/* ────────────────────────────────────────
+   LAYOUT
+──────────────────────────────────────── */
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 3rem; position: relative; z-index: 2; }
+section { position: relative; z-index: 2; }
+.sec-head {
+  display: flex; align-items: center; gap: 1.4rem; margin-bottom: 3.4rem;
+}
+.sec-num {
+  font-family: var(--ff-m); font-size: .58rem; letter-spacing: .12em;
+  color: var(--darya);
+}
+.sec-bar { flex: 1; height: 1px; background: var(--line); }
+.sec-tag {
+  font-family: var(--ff-m); font-size: .58rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-faint);
+}
+
+/* ────────────────────────────────────────
+   REVEAL
+──────────────────────────────────────── */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
+.reveal.in { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: .08s; }
+.reveal-delay-2 { transition-delay: .16s; }
+.reveal-delay-3 { transition-delay: .24s; }
+
+/* ────────────────────────────────────────
+   §01  HERO — the callboard
+──────────────────────────────────────── */
+#hero { padding: 0 0 6rem; overflow: hidden; }
+.hero-inner { max-width: 1120px; margin: 0 auto; padding: 0 3rem; }
+.hero-stage { padding: 9rem 0 3rem; }
+
+.hero-eyebrow {
+  font-family: var(--ff-m);
+  font-size: .64rem; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--ink-soft); margin-bottom: 1.6rem;
+  display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+}
+.hero-eyebrow .pin {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .28rem .7rem; border: 1px solid var(--line);
+  border-radius: 100px; background: var(--card);
+}
+.hero-eyebrow .pin::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--luc);
+}
+
+.hero-title { margin-bottom: 1.8rem; }
+.hero-title .u {
+  background: linear-gradient(120deg, var(--darya), var(--margot));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+.hero-body { max-width: 42rem; }
+.hero-body p {
+  font-size: 1.06rem; color: var(--ink-soft); margin-bottom: .9rem;
+}
+.hero-body em { font-style: italic; color: var(--ink); }
+
+/* casting strip */
+.casting {
+  margin-top: 3.2rem;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--card);
+  overflow: hidden;
+  box-shadow: 0 24px 60px -34px rgba(53,41,47,.4);
+}
+.casting-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .9rem 1.3rem; border-bottom: 1px dashed var(--line);
+  background: linear-gradient(90deg, var(--paper-2), var(--paper-3));
+}
+.casting-top .t {
+  font-family: var(--ff-m); font-size: .58rem; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--ink-soft);
+}
+.casting-top .s {
+  font-family: var(--ff-m); font-size: .55rem; letter-spacing: .1em;
+  color: var(--ink-faint);
+}
+.casting-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+}
+.cast-cell {
+  padding: 1.4rem 1.3rem 1.5rem;
+  border-right: 1px solid var(--line-soft);
+  position: relative;
+}
+.cast-cell:last-child { border-right: none; }
+.cast-cell::before {
+  content: ''; position: absolute; inset-block-start: 0; inset-inline: 0;
+  height: 3px; background: var(--c);
+}
+.cast-role {
+  font-family: var(--ff-m); font-size: .5rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ink-faint); margin-bottom: .6rem;
+}
+.cast-name { font-family: var(--ff-d); font-size: 1.15rem; font-weight: 500; line-height: 1.1; }
+.cast-name-ko { font-size: .72rem; color: var(--ink-soft); margin-top: .2rem; }
+.cast-tag {
+  margin-top: .9rem; font-size: .74rem; color: var(--ink-soft);
+  font-style: italic; font-family: var(--ff-d);
+}
+
+/* ────────────────────────────────────────
+   §02  THE SCHOOL
+──────────────────────────────────────── */
+#school { padding: 5rem 0; }
+.setup-lead {
+  font-family: var(--ff-d); font-weight: 400;
+  font-size: clamp(1.05rem, 2vw, 1.35rem); line-height: 1.62;
+  max-width: 46rem; margin-bottom: 1.1rem;
+  color: var(--ink);
+}
+.setup-lead em { font-style: italic; color: var(--darya); }
+.setup-sub {
+  max-width: 44rem; color: var(--ink-soft); font-size: .96rem;
+  margin-bottom: 2.6rem;
+}
+.setup-sub strong { color: var(--ink); font-weight: 600; }
+
+/* filter tabs */
+.map-tabs {
+  display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.6rem;
+}
+.map-tab {
+  font-family: var(--ff-m); font-size: .56rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-soft);
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 100px; padding: .5rem 1rem; cursor: pointer;
+  transition: all .22s ease;
+}
+.map-tab:hover { border-color: var(--ink-faint); }
+.map-tab.active {
+  color: var(--paper-3);
+  background: linear-gradient(120deg, var(--darya), var(--margot));
+  border-color: transparent;
+}
+
+/* location cards */
+.spaces { display: grid; grid-template-columns: repeat(2, 1fr); gap: .9rem; }
+.space-card {
+  --sc: var(--luc);
+  display: grid; grid-template-columns: 3.6rem 1fr; gap: 1.1rem;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 16px; padding: 1.25rem 1.4rem;
+  transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.space-card:hover {
+  border-color: var(--sc); transform: translateY(-3px);
+  box-shadow: 0 20px 40px -28px rgba(53,41,47,.45);
+}
+.space-card.hide { display: none; }
+.space-badge {
+  align-self: start;
+  font-family: var(--ff-m); font-size: .48rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--sc); text-align: center;
+  border: 1px solid var(--sc); border-radius: 100px;
+  padding: .34rem .2rem; background: color-mix(in srgb, var(--sc) 9%, transparent);
+}
+.space-name {
+  font-family: var(--ff-d); font-size: 1.12rem; font-weight: 500; line-height: 1.2;
+  display: flex; align-items: baseline; gap: .55rem; flex-wrap: wrap;
+}
+.space-name .en {
+  font-family: var(--ff-m); font-size: .54rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-faint); font-weight: 400;
+}
+.space-role { font-size: .87rem; color: var(--ink-soft); margin-top: .45rem; line-height: 1.62; }
+
+/* ────────────────────────────────────────
+   §03  SEMESTER — three acts
+──────────────────────────────────────── */
+#semester { padding: 5rem 0; }
+#semester::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background:
+    linear-gradient(180deg, transparent, var(--wash-cool) 18%, var(--wash-cool) 82%, transparent);
+}
+.acts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+.act {
+  --ac: var(--luc);
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 18px; overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.act:hover { transform: translateY(-4px); box-shadow: 0 26px 54px -32px rgba(53,41,47,.4); }
+.act-head {
+  padding: 1.3rem 1.4rem 1.1rem;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--ac) 16%, var(--card)), var(--card));
+  border-bottom: 1px solid var(--line);
+}
+.act-kicker {
+  font-family: var(--ff-m); font-size: .5rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ac); margin-bottom: .5rem;
+}
+.act-title { font-family: var(--ff-d); font-size: 1.5rem; font-weight: 600; line-height: 1; }
+.act-window { font-family: var(--ff-m); font-size: .56rem; color: var(--ink-faint); margin-top: .4rem; }
+.act-mood {
+  font-size: .82rem; color: var(--ink-soft); line-height: 1.6;
+  padding: 1rem 1.4rem; font-style: italic; font-family: var(--ff-d);
+  border-bottom: 1px dashed var(--line);
+}
+.act-list { padding: .4rem 1.4rem 1.4rem; display: grid; gap: 0; flex: 1; }
+.beat {
+  padding: 1rem 0 1rem 1.4rem; position: relative;
+  border-bottom: 1px solid var(--line-soft);
+}
+.beat:last-child { border-bottom: none; }
+.beat::before {
+  content: ''; position: absolute; left: 0; top: 1.35rem;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--card); border: 2px solid var(--ink-faint);
+}
+.beat.key::before { border-color: var(--ac); background: var(--ac); }
+.beat-date {
+  font-family: var(--ff-m); font-size: .54rem; letter-spacing: .06em;
+  color: var(--ink-faint); margin-bottom: .25rem;
+}
+.beat-t { font-family: var(--ff-d); font-size: 1.02rem; font-weight: 500; margin-bottom: .25rem; }
+.beat-t .tag {
+  font-family: var(--ff-m); font-size: .46rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ac);
+  border: 1px solid var(--ac); border-radius: 100px;
+  padding: .1rem .45rem; margin-left: .45rem; vertical-align: middle;
+}
+.beat-b { font-size: .82rem; color: var(--ink-soft); line-height: 1.6; }
+
+/* ────────────────────────────────────────
+   §04  THE LEADS — cards
+──────────────────────────────────────── */
+#leads { padding: 5rem 0 6rem; }
+.leads-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem;
+}
+.lead-card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 18px; overflow: hidden; cursor: pointer;
+  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+  position: relative;
+}
+.lead-card::before {
+  content: ''; position: absolute; inset-block-start: 0; inset-inline: 0;
+  height: 4px; background: var(--c); z-index: 3;
+}
+.lead-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 28px 56px -30px rgba(53,41,47,.5);
+  border-color: var(--c);
+}
+.lead-portrait {
+  aspect-ratio: 3/4; background: var(--ct);
+  position: relative; overflow: hidden;
+}
+.lead-portrait img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.lead-card:hover .lead-portrait img { transform: scale(1.04); }
+.lead-portrait .ph {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: var(--ff-d); font-style: italic; font-size: 2.8rem;
+  color: var(--c);
+  background: linear-gradient(150deg, var(--ct) 0%, transparent 62%);
+}
+.lead-info { padding: 1.2rem 1.2rem 1.4rem; }
+.lead-role {
+  font-family: var(--ff-m); font-size: .5rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-faint); margin-bottom: .5rem;
+  min-height: 1.6em;
+}
+.lead-name { font-family: var(--ff-d); font-size: 1.28rem; font-weight: 500; line-height: 1.05; }
+.lead-name-ko { font-size: .74rem; color: var(--ink-soft); margin-top: .25rem; }
+.lead-mbti {
+  font-family: var(--ff-m); font-size: .54rem; letter-spacing: .06em;
+  color: var(--ink-faint); margin-top: .8rem;
+}
+.lead-more {
+  margin-top: 1rem; font-family: var(--ff-m); font-size: .55rem;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--c);
+  display: flex; align-items: center; gap: .4rem;
+}
+.lead-more::after { content: '→'; transition: transform .25s; }
+.lead-card:hover .lead-more::after { transform: translateX(4px); }
+
+/* ────────────────────────────────────────
+   MODAL — dossier (large portrait left, info right)
+──────────────────────────────────────── */
+.modal {
+  position: fixed; inset: 0; z-index: 1000;
+  display: none; align-items: center; justify-content: center;
+  padding: 2.4rem 1.5rem; overflow-y: auto;
+  background: rgba(53,41,47,.5); backdrop-filter: blur(7px);
+}
+.modal.open { display: flex; }
+.modal-panel {
+  --accent: var(--margot);
+  position: relative; width: 100%; max-width: 880px;
+  max-height: min(88vh, 800px);
+  background: var(--card); border-radius: 22px;
+  box-shadow: 0 44px 100px -32px rgba(53,41,47,.62);
+  overflow: hidden;
+  display: flex;                 /* gives #modalContent a definite height to scroll within */
+  animation: pop .34s cubic-bezier(.2,.8,.3,1);
+}
+#modalContent { flex: 1; display: flex; min-width: 0; min-height: 0; }
+@keyframes pop { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
+.modal-close {
+  position: absolute; top: 1rem; right: 1rem; z-index: 6;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.5); background: rgba(53,41,47,.35);
+  color: #fff; font-size: .9rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s, transform .2s;
+}
+.modal-close:hover { background: var(--accent); transform: rotate(90deg); }
+
+.dossier { display: flex; flex: 1; min-width: 0; min-height: 0; }
+
+/* left: big poster */
+.dossier-portrait {
+  flex: 0 0 42%; position: relative;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 22%, var(--paper-2)), var(--paper-2));
+  overflow: hidden;
+}
+.dossier-portrait img { width: 100%; height: 100%; object-fit: cover; }
+.dossier-portrait .ph {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: var(--ff-d); font-style: italic; font-size: 5rem; color: var(--accent);
+}
+.dossier-portrait::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(53,41,47,.55), transparent 42%);
+}
+.portrait-cap {
+  position: absolute; left: 1.3rem; bottom: 1.2rem; right: 1.3rem; z-index: 2;
+}
+.portrait-chip {
+  display: inline-block;
+  font-family: var(--ff-m); font-size: .48rem; letter-spacing: .1em;
+  text-transform: uppercase; color: #fff;
+  background: color-mix(in srgb, var(--accent) 82%, transparent);
+  border-radius: 100px; padding: .3rem .7rem; margin-bottom: .6rem;
+}
+.portrait-name { font-family: var(--ff-d); font-size: 1.6rem; font-weight: 600; color: #fff; line-height: 1; }
+.portrait-name-ko { font-size: .78rem; color: rgba(255,255,255,.86); margin-top: .3rem; }
+
+/* right: scrollable info */
+.dossier-info {
+  flex: 1; min-width: 0; min-height: 0;
+  overflow-y: auto; overscroll-behavior: contain;
+  padding: 2rem 2rem 2.2rem;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 40%, transparent) transparent;
+}
+.dossier-info::-webkit-scrollbar { width: 8px; }
+.dossier-info::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 38%, transparent);
+  border-radius: 100px; border: 2px solid var(--card);
+}
+.dossier-info::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--accent) 60%, transparent);
+}
+.dossier-kicker {
+  font-family: var(--ff-m); font-size: .52rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: .7rem;
+}
+.dossier-role {
+  font-size: .82rem; color: var(--ink-soft); margin-bottom: 1.3rem;
+  padding-bottom: 1.1rem; border-bottom: 1px solid var(--line);
+}
+.dossier-intro { font-size: .93rem; color: var(--ink); margin-bottom: 1.5rem; line-height: 1.75; }
+
+.dossier-facts {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--line);
+  border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+  margin-bottom: 1.2rem;
+}
+.fact { background: var(--card); padding: .75rem .9rem; }
+.fact-label {
+  font-family: var(--ff-m); font-size: .46rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-faint); margin-bottom: .3rem;
+}
+.fact-value { font-size: .82rem; font-weight: 500; }
+.mono-sm { font-family: var(--ff-m); font-size: .74rem; }
+
+.dossier-lines {
+  display: grid; gap: 0; margin-bottom: 1.7rem;
+  border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+}
+.dline {
+  display: grid; grid-template-columns: 5.2rem 1fr; gap: .8rem;
+  padding: .7rem .95rem; align-items: baseline;
+  border-bottom: 1px solid var(--line-soft); background: var(--paper-3);
+}
+.dline:last-child { border-bottom: none; }
+.dline-l {
+  font-family: var(--ff-m); font-size: .48rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-faint);
+}
+.dline-v { font-size: .82rem; color: var(--ink); }
+
+.dossier-block { margin-bottom: 1.5rem; }
+.dossier-sub { display: flex; align-items: center; gap: .8rem; margin-bottom: .9rem; }
+.dossier-sub h4 {
+  font-family: var(--ff-m); font-size: .54rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ink-soft); font-weight: 400;
+}
+.dossier-sub .line { flex: 1; height: 1px; background: var(--line); }
+
+.tags { display: flex; flex-wrap: wrap; gap: .5rem; }
+.tag {
+  font-size: .72rem; padding: .3rem .7rem;
+  border: 1px solid var(--line); border-radius: 100px;
+  color: var(--ink-soft); background: var(--paper);
+}
+.tag.intimacy {
+  border-color: var(--accent); color: var(--accent);
+  font-style: italic; font-family: var(--ff-d);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.taste-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.taste { border: 1px solid var(--line); border-radius: 12px; padding: 1rem; background: var(--paper); }
+.taste-head {
+  font-family: var(--ff-m); font-size: .5rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: .7rem;
+  display: flex; align-items: center; gap: .45rem;
+}
+.taste-head .mk { width: 7px; height: 7px; border-radius: 50%; }
+.taste.like .mk { background: var(--luc); }
+.taste.dislike .mk { background: var(--darya); }
+.taste-list { display: flex; flex-wrap: wrap; gap: .4rem; }
+.taste-item { font-size: .74rem; color: var(--ink); }
+.taste-item:not(:last-child)::after { content: ' ·'; color: var(--ink-faint); }
+
+.dossier-quote {
+  margin-top: 1.6rem; padding: 1.3rem 1.5rem;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 10%, var(--paper-2)), var(--paper-2));
+  border-radius: 14px;
+  border-left: 3px solid var(--accent);
+}
+.dossier-quote p { font-family: var(--ff-d); font-style: italic; font-size: 1rem; line-height: 1.55; }
+.dossier-quote .ko { font-family: var(--ff-b); font-style: normal; font-size: .82rem; color: var(--ink-soft); margin-top: .6rem; }
+
+/* ────────────────────────────────────────
+   FOOTER
+──────────────────────────────────────── */
+footer {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 2rem; flex-wrap: wrap;
+  padding: 3rem; border-top: 1px solid var(--line);
+  max-width: 1120px; margin: 0 auto; position: relative; z-index: 2;
+}
+.footer-l { font-family: var(--ff-m); font-size: .56rem; letter-spacing: .06em; color: var(--ink-faint); line-height: 1.8; }
+.footer-r { font-family: var(--ff-d); font-style: italic; font-size: 1.05rem; color: var(--ink-soft); }
+
+/* ────────────────────────────────────────
+   RESPONSIVE
+──────────────────────────────────────── */
+@media (max-width: 960px) {
+  .casting-grid { grid-template-columns: 1fr 1fr; }
+  .cast-cell:nth-child(2) { border-right: none; }
+  .cast-cell:nth-child(1), .cast-cell:nth-child(2) { border-bottom: 1px solid var(--line-soft); }
+  .spaces { grid-template-columns: 1fr; }
+  .acts { grid-template-columns: 1fr; }
+  .leads-grid { grid-template-columns: 1fr 1fr; }
+  .wrap, .hero-inner { padding: 0 1.8rem; }
+  nav { padding: 1rem 1.8rem; }
+  .nav-links { gap: 1.5rem; }
+}
+@media (max-width: 720px) {
+  .modal { align-items: flex-start; }
+  .dossier { flex-direction: column; }
+  .modal-panel { max-height: none; }        /* grow with content; the overlay scrolls */
+  .dossier-portrait { flex: 0 0 auto; height: 300px; }
+  .dossier-info { overflow-y: visible; }
+}
+@media (max-width: 620px) {
+  .nav-links { display: none; }
+  .casting-grid { grid-template-columns: 1fr; }
+  .cast-cell { border-right: none; border-bottom: 1px solid var(--line-soft); }
+  .cast-cell:last-child { border-bottom: none; }
+  .leads-grid { grid-template-columns: 1fr; }
+  .space-card { grid-template-columns: 1fr; gap: .6rem; }
+  .space-badge { justify-self: start; padding: .3rem .8rem; }
+  .dossier-facts { grid-template-columns: 1fr 1fr; }
+  .taste-grid { grid-template-columns: 1fr; }
+  .dossier-info { padding: 1.5rem; }
+  footer { flex-direction: column; align-items: flex-start; }
+  .hero-stage { padding: 7rem 0 2rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="mote-field" id="moteField" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">Callboard</span>
+  <ul class="nav-links">
+    <li><a href="#hero">Cast</a></li>
+    <li><a href="#school">The School</a></li>
+    <li><a href="#semester">The Year</a></li>
+    <li><a href="#leads">The Leads</a></li>
+  </ul>
+</nav>
+
+<!-- §01 HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-stage">
+      <p class="hero-eyebrow reveal">
+        <span class="pin">Ashworth · Drama</span>
+        Fall 2026 · Junior Ensemble · Greenwich Village
+      </p>
+
+      <h1 class="d-xl hero-title reveal reveal-delay-1">
+        Four of them.<br><em>One</em> <span class="u">of you.</span>
+      </h1>
+
+      <div class="hero-body reveal reveal-delay-2">
+        <p>애쉬워스 연극과 가을 학기. 학년말 합동 공연을 앞두고, 좁은 연습실 하나에 앙상블 조가 꾸려진다.</p>
+        <p>피아노를 놓지 못한 음악감독, 배우를 해부하는 연출가, 모두에게 다정한 프로듀서, 무대 위 위험을 도맡는 스턴트 — 네 사람이 <em>같은 곳</em>을 바라보고 있다.</p>
+        <p>바라보는 방식만, 저마다 다르다.</p>
+      </div>
+
+      <div class="casting reveal reveal-delay-3">
+        <div class="casting-top">
+          <span class="t">Ensemble — Casting Sheet</span>
+          <span class="s">4 leads · slow burn</span>
+        </div>
+        <div class="casting-grid">
+          <div class="cast-cell" style="--c:var(--gwen)">
+            <p class="cast-role">Music Direction</p>
+            <p class="cast-name">Gwendolyn</p>
+            <p class="cast-name-ko">그웬돌린 포크스</p>
+            <p class="cast-tag">음악은 그웬에게 묻는다</p>
+          </div>
+          <div class="cast-cell" style="--c:var(--darya)">
+            <p class="cast-role">Directing</p>
+            <p class="cast-name">Darya</p>
+            <p class="cast-name-ko">다랴 페트로바</p>
+            <p class="cast-tag">무시하기 어려운 이름</p>
+          </div>
+          <div class="cast-cell" style="--c:var(--luc)">
+            <p class="cast-role">Producing</p>
+            <p class="cast-name">Lucrezia</p>
+            <p class="cast-name-ko">루크레치아 모레티</p>
+            <p class="cast-tag">공연은 여길 거친다</p>
+          </div>
+          <div class="cast-cell" style="--c:var(--margot)">
+            <p class="cast-role">Stage / Stunt</p>
+            <p class="cast-name">Margot</p>
+            <p class="cast-name-ko">마고 로랑</p>
+            <p class="cast-tag">몸이 먼저 나선다</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- §02 THE SCHOOL -->
+<section id="school">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">01</span>
+      <h2 class="d-md">The School</h2>
+      <div class="sec-bar"></div>
+      <span class="sec-tag">Ashworth School of the Arts · Drama</span>
+    </div>
+
+    <p class="setup-lead reveal">애쉬워스 예술학교는 뉴욕 맨해튼, 그리니치빌리지 한복판에 자리한 <em>세계적으로 손꼽히는 명문 예술 학교</em>다. 규모도 명성도 크고 문을 통과하는 것 자체가 하나의 이력이 되지만, 그 안에서도 연극과의 밀도만큼은 각별해서, 배우·연출·극작·무대 디자인 트랙이 한 학년에 뒤섞여 늘 함께 움직인다.</p>
+    <p class="setup-sub reveal">학과 규모가 큰 만큼 층위도 촘촘하지만, 학년마다 소수만 추려 꾸리는 앙상블 스튜디오 안에서는 수업도, 리허설도, 조별 과제도 대부분 같은 얼굴들과 돈다. 학년말이면 이 스튜디오가 <strong>하나의 합동 공연</strong>으로 모이고, 그 사이사이 열리는 상시 워크숍이 또 다른 무대가 된다. 치열한 캐스팅 경쟁·연출 주도권·프로듀싱 인맥·학생 극단의 위계가 가벼운 신경전의 재료지만, 치명적이진 않은 또래다운 긴장에 가깝다. 선발된 소수가 같은 일정을 공유하는 구조 — 그래서 이곳에선 마주치지 <strong>않는</strong> 편이 오히려 더 어렵다. 지금은 학부 3학년 가을, 두 학기에 걸친 이야기의 첫 장이 열린다.</p>
+
+    <div class="map-tabs reveal" id="mapTabs">
+      <button class="map-tab active" data-cat="all">전체</button>
+      <button class="map-tab" data-cat="campus">캠퍼스</button>
+      <button class="map-tab" data-cat="around">주변</button>
+      <button class="map-tab" data-cat="home">네 사람의 동네</button>
+    </div>
+
+    <div class="spaces reveal reveal-delay-1" id="spaces">
+
+      <div class="space-card" data-cat="campus" style="--sc:var(--luc)">
+        <span class="space-badge">Hub</span>
+        <div>
+          <p class="space-name">애쉬워스 홀 <span class="en">Ashworth Hall</span></p>
+          <p class="space-role">연습실·복도·로비가 한 건물에 모인 학교의 중심. 배정표가 붙는 게시판 앞에서 하루가 시작되고, 형광등 도는 연습실에선 조별 리허설이 밤까지 이어진다. 커피와 소파가 놓인 로비는 수업과 수업 사이 마주침이 잦은 교차점.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="campus" style="--sc:var(--gwen)">
+        <span class="space-badge">Stage</span>
+        <div>
+          <p class="space-name">블랙박스 극장 <span class="en">The Blackbox</span></p>
+          <p class="space-role">애쉬워스 홀 하부, 검은 벽·검은 바닥의 소극장. 암전과 큐 사이의 정적이 긴장을 응축하는 자리로, 학생 자체 공연과 학년말·겨울 프로덕션이 이곳에서 오른다. 리허설이 늦어지는 밤이면 이 방의 공기가 가장 무겁다.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="campus" style="--sc:var(--margot)">
+        <span class="space-badge">Plaza</span>
+        <div>
+          <p class="space-name">메이페어 스퀘어 파크 <span class="en">Mayfair Square</span></p>
+          <p class="space-role">대리석 아치와 분수, 플라타너스 그늘. 애쉬워스 홀에서 몇 걸음, 리허설을 벗어난 대화가 열리는 캠퍼스의 야외 심장. 10월이면 단풍이 물들고 봄이면 분수가 다시 켜져, 계절이 여기서 먼저 바뀐다.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="around" style="--sc:var(--darya)">
+        <span class="space-badge">Café</span>
+        <div>
+          <p class="space-name">브람블 카페 <span class="en">Bramble Café</span></p>
+          <p class="space-role">애쉬워스 홀 도보권, 수업 전후로 붐비는 동네 카페. 대본을 펼치거나 크리틱을 곱씹기 좋은 자리. 근처의 작은 홍차집은 얼그레이가 좋기로 소문나, 조용한 오후를 찾는 이들이 드나든다.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="around" style="--sc:var(--luc)">
+        <span class="space-badge">After</span>
+        <div>
+          <p class="space-name">그리니치 · 이스트빌리지 <span class="en">The Villages</span></p>
+          <p class="space-role">공연이 끝난 심야, 젖은 벽돌 골목과 불 켜진 바가 이어지는 동네. 무대의 긴장이 풀리는 곳이자, 낮에 하지 못한 말이 새어 나오기 쉬운 시간대. 캠퍼스와 각자의 집을 잇는 귀갓길.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="home" style="--sc:var(--gwen)">
+        <span class="space-badge">Gwen</span>
+        <div>
+          <p class="space-name">웨스트빌리지 <span class="en">West Village</span></p>
+          <p class="space-role">그웬의 방음된 3층 브라운스톤. 거실 중앙에 그랜드피아노가 놓였지만, 소리는 아무도 없을 때에만 새어 나온다. 무채색 벽엔 인상주의 판화와 카뮈 전집 — 방음벽이 유일한 사생활.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="home" style="--sc:var(--darya)">
+        <span class="space-badge">Darya</span>
+        <div>
+          <p class="space-name">이스트빌리지 로프트 <span class="en">East Village</span></p>
+          <p class="space-role">다랴의 상가 개조 로프트. 작업 테이블과 관찰용 의자, 벽엔 압정으로 박은 희곡 초고뿐. 무염 보드카 한 병 외에 장식이 없는, 서늘하게 비어 있는 공간.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="home" style="--sc:var(--luc)">
+        <span class="space-badge">Lucrezia</span>
+        <div>
+          <p class="space-name">소호 · 트라이베카 경계 <span class="en">SoHo / Tribeca</span></p>
+          <p class="space-role">루크레치아의 고층 아파트. 온기와 사치가 계산된 사교 허브로, 사람과 자원이 자연스레 모이도록 설계된 집. 초대받는 것 자체가 하나의 신호가 된다.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="home" style="--sc:var(--margot)">
+        <span class="space-badge">Margot</span>
+        <div>
+          <p class="space-name">캠퍼스 도보권 <span class="en">By Ashworth Hall</span></p>
+          <p class="space-role">마고의 실용적인 아파트, 학교와 가장 가깝다. 거실 한쪽은 클라이밍 홀드와 매트가 깔린 훈련 공간. 꾸밈보다 기능이 앞서는, 몸을 위한 집.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- §03 SEMESTER -->
+<section id="semester">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">02</span>
+      <h2 class="d-md">The Year</h2>
+      <div class="sec-bar"></div>
+      <span class="sec-tag">학사 일정 · 2026 — 2027</span>
+    </div>
+
+    <div class="acts">
+
+      <!-- ACT I · FALL -->
+      <div class="act reveal" style="--ac:var(--margot)">
+        <div class="act-head">
+          <p class="act-kicker">Act I · 가을 학기</p>
+          <p class="act-title">Fall Term</p>
+          <p class="act-window">2026.08.31 — 12.19</p>
+        </div>
+        <p class="act-mood">늦여름 습기가 밴 9월 연습실 형광등에서 열려, 10월 파크의 플라타너스가 물들고, 12월 강바람과 블랙박스 암전으로 닫힌다.</p>
+        <div class="act-list">
+          <div class="beat key">
+            <p class="beat-date">08.31 · MON</p>
+            <p class="beat-t">가을 개강 <span class="tag">Start</span></p>
+            <p class="beat-b">수업과 트랙 배정이 확정된다. 학년말 합동 공연을 위한 앙상블 조가 처음 편성되고, 첫 리허설 일정이 게시판에 붙는다.</p>
+          </div>
+          <div class="beat">
+            <p class="beat-date">10.10 — 13</p>
+            <p class="beat-t">가을 방학</p>
+            <p class="beat-b">나흘간 휴강. 밀린 작업을 잇거나, 시내 공연을 보며 중간 크리틱 자료를 준비하는 짧은 숨.</p>
+          </div>
+          <div class="beat">
+            <p class="beat-date">12.07 · MON</p>
+            <p class="beat-t">가을 종강</p>
+            <p class="beat-b">정규 수업이 끝나고, 스튜디오별 장면 발표와 크리틱으로 한 학기 훈련을 결산한다.</p>
+          </div>
+          <div class="beat key">
+            <p class="beat-date">12.11 — 19</p>
+            <p class="beat-t">겨울 공연 · 기말 <span class="tag">Finals</span></p>
+            <p class="beat-b">블랙박스에서 겨울 프로덕션이 오르고 기말이 겹친다. 로드인·테크·드레스 리허설과 과제 심사가 한꺼번에 몰리는, 가장 바쁜 주간.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERLUDE · WINTER -->
+      <div class="act reveal reveal-delay-1" style="--ac:var(--sky)">
+        <div class="act-head">
+          <p class="act-kicker">Interlude · 겨울방학</p>
+          <p class="act-title">Winter Break</p>
+          <p class="act-window">2026.12 말 — 2027.01</p>
+        </div>
+        <p class="act-mood">학기 사이의 휴지기. 캠퍼스는 비고, 네 사람은 각자의 동네에서 겨울을 난다.</p>
+        <div class="act-list">
+          <div class="beat">
+            <p class="beat-date">12 말 — 01</p>
+            <p class="beat-t">겨울 휴지기</p>
+            <p class="beat-b">봄 학기 수강 신청과 오디션 자료 준비. 다음 학기 대본을 미리 읽어 두거나, 학기 중엔 미뤘던 안부가 오가기도 하는 시간.</p>
+          </div>
+          <div class="beat">
+            <p class="beat-date">연말</p>
+            <p class="beat-t">각자의 집</p>
+            <p class="beat-b">런던으로 돌아가는 이도, 뉴욕에 남는 이도 있다. 방음된 브라운스톤, 서늘한 로프트, 고층 아파트, 학교 옆 훈련방 — 흩어진 겨울.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACT II · SPRING -->
+      <div class="act reveal reveal-delay-2" style="--ac:var(--luc)">
+        <div class="act-head">
+          <p class="act-kicker">Act II · 봄 학기</p>
+          <p class="act-title">Spring Term</p>
+          <p class="act-window">2027.01.19 — 05.30</p>
+        </div>
+        <p class="act-mood">파크의 분수가 다시 켜지고 낮이 길어지며, 학년말 공연을 향한 열기가 봄 내내 차오른다.</p>
+        <div class="act-list">
+          <div class="beat key">
+            <p class="beat-date">01.19 · TUE</p>
+            <p class="beat-t">봄 개강 <span class="tag">Start</span></p>
+            <p class="beat-b">학년말 합동 공연 제작이 본격 착수된다. 배역·연출·디자인·무대 배정이 확정되고 리허설이 편성된다.</p>
+          </div>
+          <div class="beat">
+            <p class="beat-date">02.15 · MON</p>
+            <p class="beat-t">대통령의 날</p>
+            <p class="beat-b">하루 휴강. 빡빡한 제작 일정의 짧은 완충 구간.</p>
+          </div>
+          <div class="beat">
+            <p class="beat-date">03.15 — 19</p>
+            <p class="beat-t">봄 방학</p>
+            <p class="beat-b">닷새간 휴강. 대본·안무·디자인을 다듬고, 밀린 리허설 공백을 메우는 작업 기간.</p>
+          </div>
+          <div class="beat">
+            <p class="beat-date">05 중순</p>
+            <p class="beat-t">봄 기말</p>
+            <p class="beat-b">수업 종료와 기말 평가. 학년말 공연의 테크·드레스 리허설로 진입한다.</p>
+          </div>
+          <div class="beat key">
+            <p class="beat-date">05.28 — 30</p>
+            <p class="beat-t">학년말 공연 · 졸업 주간 <span class="tag">Showcase</span></p>
+            <p class="beat-b">한 해 훈련의 결산인 합동 공연이 정식으로 막을 올린다. 졸업 행사와 겹치는, 모두가 무대에 서는 마지막 주간.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- §04 THE LEADS -->
+<section id="leads">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">03</span>
+      <h2 class="d-md">The Leads</h2>
+      <div class="sec-bar"></div>
+      <span class="sec-tag">카드를 눌러 상세 보기</span>
+    </div>
+
+    <div class="leads-grid reveal">
+
+      <div class="lead-card" data-modal="gwen" style="--c:var(--gwen);--ct:var(--gwen-t)">
+        <div class="lead-portrait">
+          <img src="./images/221065665538407.webp" alt="Gwendolyn Fawkes" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="ph" style="display:none">G</div>
+        </div>
+        <div class="lead-info">
+          <p class="lead-role">Music Direction · 음악 복수전공</p>
+          <h3 class="lead-name">Gwendolyn Fawkes</h3>
+          <p class="lead-name-ko">그웬돌린 포크스</p>
+          <p class="lead-mbti">INTJ · 5w1 · 런던</p>
+          <p class="lead-more">Dossier</p>
+        </div>
+      </div>
+
+      <div class="lead-card" data-modal="darya" style="--c:var(--darya);--ct:var(--darya-t)">
+        <div class="lead-portrait">
+          <img src="./images/381284289200778.webp" alt="Darya Petrova" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="ph" style="display:none">D</div>
+        </div>
+        <div class="lead-info">
+          <p class="lead-role">Directing · 심리학 부전공</p>
+          <h3 class="lead-name">Darya Petrova</h3>
+          <p class="lead-name-ko">다랴 페트로바</p>
+          <p class="lead-mbti">ENTP · 8w7 · 상트페테르부르크</p>
+          <p class="lead-more">Dossier</p>
+        </div>
+      </div>
+
+      <div class="lead-card" data-modal="lucrezia" style="--c:var(--luc);--ct:var(--luc-t)">
+        <div class="lead-portrait">
+          <img src="./images/832842878638813.webp" alt="Lucrezia Moretti" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="ph" style="display:none">L</div>
+        </div>
+        <div class="lead-info">
+          <p class="lead-role">Producing · 배우 트랙</p>
+          <h3 class="lead-name">Lucrezia Moretti</h3>
+          <p class="lead-name-ko">루크레치아 모레티</p>
+          <p class="lead-mbti">ENTJ · 3w2 · 밀라노</p>
+          <p class="lead-more">Dossier</p>
+        </div>
+      </div>
+
+      <div class="lead-card" data-modal="margot" style="--c:var(--margot);--ct:var(--margot-t)">
+        <div class="lead-portrait">
+          <img src="./images/683411581939418.webp" alt="Margot Laurent" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="ph" style="display:none">M</div>
+        </div>
+        <div class="lead-info">
+          <p class="lead-role">Stage / Stunt · 무대감독</p>
+          <h3 class="lead-name">Margot Laurent</h3>
+          <p class="lead-name-ko">마고 로랑</p>
+          <p class="lead-mbti">ISTP · 6w7 · 리옹</p>
+          <p class="lead-more">Dossier</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-l">
+    Callboard &nbsp;·&nbsp; Ashworth School of the Arts — Drama, Fall 2026<br>
+    A slow-burn ensemble. Four leads, one you.
+  </div>
+  <div class="footer-r">"See you at places."</div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal" id="charModal" role="dialog" aria-modal="true">
+  <div class="modal-panel" id="modalPanel">
+    <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+/* ── Motes: pastel rising stage dust ── */
+(function () {
+  const field = document.getElementById('moteField');
+  if (!field) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const colors = ['#c9b6e8', '#f6c1ce', '#a9cbe8', '#f6cf6b'];
+  const N = 22;
+  for (let i = 0; i < N; i++) {
+    const m = document.createElement('div');
+    m.className = 'mote';
+    const size = 5 + Math.random() * 9;
+    m.style.setProperty('--x', (Math.random() * 100) + 'vw');
+    m.style.setProperty('--size', size + 'px');
+    m.style.setProperty('--dur', (12 + Math.random() * 10) + 's');
+    m.style.setProperty('--delay', (-Math.random() * 20) + 's');
+    m.style.setProperty('--drift', ((Math.random() - .5) * 8) + 'vw');
+    m.style.setProperty('--peak', (0.22 + Math.random() * 0.4).toFixed(2));
+    m.style.setProperty('--c', colors[i % colors.length]);
+    field.appendChild(m);
+  }
+  const hero = document.getElementById('hero');
+  const io = new IntersectionObserver((es) => {
+    es.forEach(e => {
+      field.style.opacity = e.isIntersecting ? '1' : '0';
+      field.classList.toggle('dormant', !e.isIntersecting);
+    });
+  }, { threshold: 0.02 });
+  io.observe(hero);
+})();
+
+/* ── Reveal on scroll ── */
+(function () {
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  els.forEach(el => io.observe(el));
+})();
+
+/* ── Nav active state ── */
+(function () {
+  const links = document.querySelectorAll('.nav-links a');
+  const map = {};
+  links.forEach(a => { const id = a.getAttribute('href').slice(1); const s = document.getElementById(id); if (s) map[id] = a; });
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(a => a.classList.remove('active'));
+        if (map[e.target.id]) map[e.target.id].classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+  Object.keys(map).forEach(id => { const s = document.getElementById(id); if (s) io.observe(s); });
+})();
+
+/* ── Location filter tabs ── */
+(function () {
+  const tabs = document.querySelectorAll('.map-tab');
+  const cards = document.querySelectorAll('#spaces .space-card');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const cat = tab.dataset.cat;
+      cards.forEach(c => {
+        const show = cat === 'all' || c.dataset.cat === cat;
+        c.classList.toggle('hide', !show);
+      });
+    });
+  });
+})();
+
+/* ══════════════════════════════════════
+   DOSSIER DATA — female leads only
+══════════════════════════════════════ */
+const DOSSIERS = {
+  gwen: {
+    accent: '#6e73cc',
+    img: './images/221065665538407.webp', ph: 'G',
+    kicker: 'Music Direction · Ashworth Drama',
+    name: 'Gwendolyn Fawkes',
+    nameKo: '그웬돌린 포크스',
+    role: '연극 전공 · 음악·작곡 복수전공 · 공연 음악감독 트랙',
+    intro: '음악감독 트랙의 이름난 실력자. 말수는 적고 저음으로 짧게 끊어 말하지만, 리허설에서 음악에 관한 판단은 결국 그웬에게 묻는 게 정설이다. 좀처럼 속을 안 보여 다가가기 어렵다는 평이 따라다니는데, 정작 곁을 준 상대에겐 온도가 다르다는 소문도 있다.',
+    facts: [
+      { label: 'Age', value: '21세', mono: true },
+      { label: 'From', value: '런던, UK' },
+      { label: 'Year', value: '학부 3학년' },
+      { label: 'MBTI', value: 'INTJ', mono: true },
+      { label: 'Ennea', value: '5w1', mono: true },
+      { label: 'Instinct', value: 'sp/sx', mono: true },
+    ],
+    lines: [
+      { l: 'Major', v: '연극 (음악·작곡 복수전공)' },
+      { l: 'Track', v: '공연 음악감독' },
+      { l: 'Born', v: '2004.11.12' },
+      { l: 'Home', v: '웨스트빌리지 방음 브라운스톤' },
+    ],
+    tags: [
+      { t: 'Reserved Warmth', i: true },
+      { t: 'Reads the Unsaid', i: false },
+      { t: 'Principled', i: false },
+      { t: 'Guarded Softie', i: true },
+      { t: 'Plays Only for You', i: true },
+    ],
+    likes: ['얼그레이 홍차', '알베르 카뮈', '인상주의 회화', '소피아 구바이둘리나'],
+    dislikes: ['공포영화', '큰 소음', '기만'],
+    quote: {
+      en: '"Don\'t apologize for taking up the room. You\'re the only sound I haven\'t wanted to correct."',
+      ko: '자리를 차지한 걸 사과하지 마. 넌 내가 고치고 싶지 않았던 유일한 소리니까.'
+    }
+  },
+
+  darya: {
+    accent: '#e1548e',
+    img: './images/381284289200778.webp', ph: 'D',
+    kicker: 'Directing · Ashworth Drama',
+    name: 'Darya Petrova',
+    nameKo: '다랴 페트로바',
+    role: '연극 전공 (연출·극작 트랙) · 심리학 부전공',
+    intro: '연출 트랙에서 가장 말이 많이 도는 이름. 배우를 몰아붙였다 다시 세워 결과를 뽑아내는 리허설 방식으로 유명하고, 서늘한 도발과 깔보는 애칭이 트레이드마크다. 재수 없다는 평과 인정할 수밖에 없다는 평이 반반이라, 어느 쪽이든 무시하긴 어렵다.',
+    facts: [
+      { label: 'Age', value: '21세', mono: true },
+      { label: 'From', value: '상트페테르부르크, RU' },
+      { label: 'Year', value: '학부 3학년' },
+      { label: 'MBTI', value: 'ENTP', mono: true },
+      { label: 'Ennea', value: '8w7', mono: true },
+      { label: 'Instinct', value: 'sp/sx', mono: true },
+    ],
+    lines: [
+      { l: 'Major', v: '연극 (심리학 부전공)' },
+      { l: 'Track', v: '연출·극작' },
+      { l: 'Born', v: '2005.02.07' },
+      { l: 'Home', v: '이스트빌리지 개조 로프트' },
+    ],
+    tags: [
+      { t: 'Predatory Flirt', i: true },
+      { t: 'Reads Your Cracks', i: false },
+      { t: 'Smug Competence', i: false },
+      { t: 'Dismantle-by-Desire', i: true },
+      { t: 'The Cracks Show Both Ways', i: true },
+      { t: 'Cynic-meets-the-Exception', i: true },
+    ],
+    likes: ['무염 보드카', 'F1', '심리 스릴러 희곡'],
+    dislikes: ['동형반복'],
+    quote: {
+      en: '"Go on, hate me. It\'s the most honest thing you\'ve done all week, and honesty is the only rehearsal I respect."',
+      ko: '그래, 날 미워해. 이번 주 네가 한 것 중 제일 정직하고, 정직함이 내가 존중하는 유일한 리허설이니까.'
+    }
+  },
+
+  lucrezia: {
+    accent: '#23ae9e',
+    img: './images/832842878638813.webp', ph: 'L',
+    kicker: 'Producing · Ashworth Drama',
+    name: 'Lucrezia Moretti',
+    nameKo: '루크레치아 모레티',
+    role: '연극 전공 (배우·학생 프로듀싱 트랙)',
+    intro: '학생 극단의 실질적 중심. 섭외·홍보·후원 라인을 쥐고 있어 공연을 올리려면 결국 루크레치아를 거치게 된다. 누구에게나 유려하고 다정해서 적을 만들지 않지만, 그 다정함이 어디까지가 진심인지는 아무도 확언하지 못한다.',
+    facts: [
+      { label: 'Age', value: '21세', mono: true },
+      { label: 'From', value: '밀라노, IT' },
+      { label: 'Year', value: '학부 3학년' },
+      { label: 'MBTI', value: 'ENTJ', mono: true },
+      { label: 'Ennea', value: '3w2', mono: true },
+      { label: 'Instinct', value: 'so/sx', mono: true },
+    ],
+    lines: [
+      { l: 'Major', v: '연극' },
+      { l: 'Track', v: '배우·학생 프로듀싱' },
+      { l: 'Born', v: '2005.06.15' },
+      { l: 'Home', v: '소호·트라이베카 경계 고층 아파트' },
+    ],
+    tags: [
+      { t: 'Velvet Glove', i: true },
+      { t: 'Warm to Everyone', i: false },
+      { t: 'Love-Bombing', i: true },
+      { t: 'Affectionate Control', i: true },
+      { t: 'A Different Warmth for You', i: true },
+      { t: 'Quiet is the Tell', i: false },
+    ],
+    likes: ['난초', '프티푸르', '형태심리학'],
+    dislikes: ['메트로놈'],
+    quote: {
+      en: '"I already moved your name to the top of the list. You didn\'t have to ask; I like being ahead of what you need."',
+      ko: '네 이름은 벌써 명단 맨 위로 옮겼어. 부탁할 필요 없었어. 난 네가 필요한 걸 앞질러 두는 게 좋거든.'
+    }
+  },
+
+  margot: {
+    accent: '#f2963c',
+    img: './images/683411581939418.webp', ph: 'M',
+    kicker: 'Stage / Stunt · Ashworth Drama',
+    name: 'Margot Laurent',
+    nameKo: '마고 로랑',
+    role: '연극 전공 (무대 액션·스턴트·무대감독 트랙)',
+    intro: '무대 액션·스턴트 트랙의 막내이자 팀의 안전지기. 위험한 장면을 몸으로 도맡고, 정치나 눈치 게임엔 관심이 없어 오히려 편하다는 평이 많다. 좋아하는 걸 못 숨기는 솔직함이 그대로 드러나는 타입이라, 곁에 있으면 대체로 티가 난다.',
+    facts: [
+      { label: 'Age', value: '20세', mono: true },
+      { label: 'From', value: '리옹, FR' },
+      { label: 'Year', value: '학부 3학년' },
+      { label: 'MBTI', value: 'ISTP', mono: true },
+      { label: 'Ennea', value: '6w7', mono: true },
+      { label: 'Instinct', value: 'sx/sp', mono: true },
+    ],
+    lines: [
+      { l: 'Major', v: '연극' },
+      { l: 'Track', v: '무대 액션·스턴트·무대감독' },
+      { l: 'Born', v: '2006.06.08' },
+      { l: 'Home', v: '애쉬워스 홀 도보권 아파트' },
+    ],
+    tags: [
+      { t: 'Wanko-dere', i: true },
+      { t: 'Earnest to a Fault', i: false },
+      { t: 'Touch-First Affection', i: true },
+      { t: 'Clingy-out-of-Courage', i: true },
+      { t: 'Body Before Words', i: true },
+      { t: 'Bad at Hiding It', i: false },
+    ],
+    likes: ['펜싱', '길거리 음식', '동물 다큐멘터리'],
+    dislikes: ['빈말', '겨울'],
+    quote: {
+      en: '"I don\'t do this because it\'s an assignment. I\'m here because I wanted to be, and that\'s new for me, so don\'t make it weird."',
+      ko: '과제라서 하는 거 아니야. 그냥 있고 싶어서 온 거고, 나한텐 낯선 일이라서, 이상하게 만들지 마.'
+    }
+  }
+};
+
+/* ── Dossier render ── */
+const modal        = document.getElementById('charModal');
+const modalPanel   = document.getElementById('modalPanel');
+const modalContent = document.getElementById('modalContent');
+const modalClose   = document.getElementById('modalClose');
+let   lastFocused  = null;
+
+function buildDossier(d) {
+  const facts = d.facts.map(f => `
+    <div class="fact">
+      <div class="fact-label">${f.label}</div>
+      <div class="fact-value">${f.mono ? `<span class="mono-sm">${f.value}</span>` : f.value}</div>
+    </div>`).join('');
+
+  const lines = d.lines.map(l => `
+    <div class="dline">
+      <div class="dline-l">${l.l}</div>
+      <div class="dline-v">${l.v}</div>
+    </div>`).join('');
+
+  const tags = d.tags.map(t => `<span class="tag${t.i ? ' intimacy' : ''}">${t.t}</span>`).join('');
+
+  const tasteCell = (cls, label, arr) => {
+    const body = (arr && arr.length)
+      ? `<div class="taste-list">${arr.map(x => `<span class="taste-item">${x}</span>`).join('')}</div>`
+      : `<span class="taste-item">·</span>`;
+    return `<div class="taste ${cls}"><div class="taste-head"><span class="mk"></span>${label}</div>${body}</div>`;
+  };
+
+  return `
+    <div class="dossier">
+      <div class="dossier-portrait">
+        <img src="${d.img}" alt="${d.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="ph" style="display:none">${d.ph}</div>
+        <div class="portrait-cap">
+          <span class="portrait-chip">${d.kicker.split(' · ')[0]}</span>
+          <p class="portrait-name">${d.name}</p>
+          <p class="portrait-name-ko">${d.nameKo}</p>
+        </div>
+      </div>
+      <div class="dossier-info">
+        <p class="dossier-kicker">${d.kicker}</p>
+        <p class="dossier-role">${d.role}</p>
+        <p class="dossier-intro">${d.intro}</p>
+        <div class="dossier-facts">${facts}</div>
+        <div class="dossier-lines">${lines}</div>
+        <div class="dossier-block">
+          <div class="dossier-sub"><h4>Trope Index</h4><div class="line"></div></div>
+          <div class="tags">${tags}</div>
+        </div>
+        <div class="dossier-block">
+          <div class="dossier-sub"><h4>Likes / Dislikes</h4><div class="line"></div></div>
+          <div class="taste-grid">
+            ${tasteCell('like', 'Likes', d.likes)}
+            ${tasteCell('dislike', 'Dislikes', d.dislikes)}
+          </div>
+        </div>
+        <div class="dossier-quote">
+          <p>${d.quote.en}</p>
+          <p class="ko">${d.quote.ko}</p>
+        </div>
+      </div>
+    </div>`;
+}
+
+function openModal(key) {
+  const d = DOSSIERS[key];
+  if (!d) return;
+  lastFocused = document.activeElement;
+  modalPanel.style.setProperty('--accent', d.accent);
+  modalContent.innerHTML = buildDossier(d);
+  modal.setAttribute('aria-label', d.name + ' — Dossier');
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  modal.scrollTop = 0;
+  const info = modalContent.querySelector('.dossier-info');
+  if (info) info.scrollTop = 0;
+  modalClose.focus();
+}
+function closeModal() {
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+  if (lastFocused) lastFocused.focus();
+}
+document.querySelectorAll('.lead-card[data-modal]').forEach(card => {
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  card.addEventListener('click', () => openModal(card.dataset.modal));
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(card.dataset.modal); }
+  });
+});
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+</script>
+
+</body>
+</html>

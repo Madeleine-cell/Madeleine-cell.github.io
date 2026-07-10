@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heronscliff — A Private Rest Home for Gentlewomen · South Devon, 1888</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Instrument+Sans:wght@400;500;600&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+
+/* ────────────────────────────────────────
+   TOKENS — sea-grey almanac, slate & sandstone
+   cool near-white · one warm cliff accent
+──────────────────────────────────────── */
+:root {
+  --mist:    #eef1f3;   /* cool greyish-white base */
+  --mist-2:  #e4e9ec;   /* deeper sea-grey band */
+  --mist-3:  #f6f8f9;   /* faint wash */
+  --linen:   #ffffff;   /* card */
+  --linen-2: #fbfcfd;
+
+  --ink:      #29323a;   /* deep slate charcoal */
+  --ink-soft: #59666f;
+  --ink-faint:#96a3ab;
+  --line:      rgba(41,50,58,0.12);
+  --line-soft: rgba(41,50,58,0.06);
+
+  --tide:      #6d97b8;  /* refined light blue — primary */
+  --tide-deep: #4f7695;
+  --tide-pale: #aecadd;
+  --sand:      #b08165;  /* red-sandstone warm accent, used sparingly */
+
+  /* three residents — cool register, one warm */
+  --cordelia:  #547794;  /* slate blue — composure, the night sea */
+  --effie:     #6fa09b;  /* sea-glass teal — the sunlit south room */
+  --frank:     #b0825f;  /* sandstone — paint, the west light */
+
+  --cordelia-t: rgba(84,119,148,0.12);
+  --effie-t:    rgba(111,160,155,0.13);
+  --frank-t:    rgba(176,130,95,0.13);
+
+  --ff-d: 'Cormorant Garamond', Georgia, serif;
+  --ff-b: 'Instrument Sans', system-ui, sans-serif;
+  --ff-m: 'Space Mono', ui-monospace, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--mist);
+  color: var(--ink);
+  font-family: var(--ff-b);
+  font-weight: 400;
+  line-height: 1.72;
+  overflow-x: hidden;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+img { display: block; max-width: 100%; }
+a   { color: inherit; text-decoration: none; }
+
+::selection { background: color-mix(in srgb, var(--tide) 26%, transparent); color: var(--ink); }
+:focus-visible { outline: 2px solid var(--tide-deep); outline-offset: 3px; }
+.res-card:focus-visible { outline-offset: 5px; border-radius: 16px; }
+
+/* pale sea-mist aurora, fixed */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(64vw 52vh at 10% -8%, rgba(146,178,201,.22), transparent 60%),
+    radial-gradient(54vw 46vh at 94% 2%, rgba(190,206,216,.20), transparent 62%),
+    radial-gradient(58vw 54vh at 82% 98%, rgba(176,130,95,.08), transparent 64%);
+}
+/* faint paper tooth */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.028'/%3E%3C/svg%3E");
+}
+
+/* ────────────────────────────────────────
+   SIGNATURE — sea-mist drifting seaward
+──────────────────────────────────────── */
+.mist-field {
+  position: fixed; inset: 0; z-index: 1;
+  pointer-events: none; overflow: hidden;
+  transition: opacity .8s ease;
+}
+.mist-field.dormant { visibility: hidden; }
+.haze {
+  position: absolute;
+  bottom: -8vh;
+  left: var(--x, 50%);
+  width: var(--size, 10px); height: var(--size, 10px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 40%, var(--c, #b9cdda), transparent 70%);
+  opacity: 0;
+  animation: haze-drift var(--dur, 22s) linear var(--delay, 0s) infinite;
+  will-change: transform, opacity;
+}
+@keyframes haze-drift {
+  0%   { transform: translate3d(0,0,0) scale(.9); opacity: 0; }
+  14%  { opacity: var(--peak, .4); }
+  86%  { opacity: var(--peak, .4); }
+  100% { transform: translate3d(var(--drift, 8vw), -116vh, 0) scale(1.15); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mist-field { display: none; }
+  .reveal { opacity: 1 !important; transform: none !important; transition: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* ────────────────────────────────────────
+   TYPE UTILITIES
+──────────────────────────────────────── */
+.d-xl {
+  font-family: var(--ff-d);
+  font-size: clamp(3rem, 8vw, 6.4rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -.005em;
+  text-wrap: balance;
+}
+.d-xl em { font-style: italic; font-weight: 400; }
+.d-md {
+  font-family: var(--ff-d);
+  font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+  font-weight: 500;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+/* ────────────────────────────────────────
+   NAV
+──────────────────────────────────────── */
+nav {
+  position: fixed; inset-block-start: 0; inset-inline: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.05rem 3rem;
+  background: rgba(238,241,243,.84);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line-soft);
+}
+.nav-logo {
+  font-family: var(--ff-d); font-weight: 600;
+  font-size: 1.12rem; letter-spacing: .06em;
+  display: flex; align-items: center; gap: .55rem;
+}
+.nav-logo::before {
+  content: ''; width: 7px; height: 7px; transform: rotate(45deg);
+  background: linear-gradient(135deg, var(--tide-deep), var(--sand));
+}
+.nav-links { display: flex; gap: 2.2rem; list-style: none; }
+.nav-links a {
+  font-family: var(--ff-m);
+  font-size: .58rem; letter-spacing: .15em; text-transform: uppercase;
+  color: var(--ink-soft); transition: color .25s;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--ink); }
+
+/* ────────────────────────────────────────
+   LAYOUT
+──────────────────────────────────────── */
+.wrap { max-width: 1140px; margin: 0 auto; padding: 0 3rem; position: relative; z-index: 2; }
+section { position: relative; z-index: 2; }
+.sec-head { display: flex; align-items: center; gap: 1.4rem; margin-bottom: 3.2rem; }
+.sec-folio {
+  font-family: var(--ff-m); font-size: .62rem; letter-spacing: .1em;
+  color: var(--tide-deep);
+}
+.sec-bar { flex: 1; height: 1px; background: var(--line); position: relative; }
+.sec-bar::after {
+  content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%) rotate(45deg);
+  width: 5px; height: 5px; background: var(--ink-faint);
+}
+.sec-tag {
+  font-family: var(--ff-m); font-size: .56rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-faint);
+}
+
+/* reveal */
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity .8s ease, transform .8s ease; }
+.reveal.in { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: .08s; }
+.reveal-delay-2 { transition-delay: .16s; }
+.reveal-delay-3 { transition-delay: .24s; }
+
+/* ────────────────────────────────────────
+   §00  HERO — the admissions register
+──────────────────────────────────────── */
+#hero { padding: 0 0 5.5rem; overflow: hidden; }
+.hero-inner { max-width: 1140px; margin: 0 auto; padding: 0 3rem; }
+.hero-stage { padding: 9rem 0 2.5rem; }
+
+.hero-eyebrow {
+  font-family: var(--ff-m);
+  font-size: .62rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--ink-soft); margin-bottom: 1.7rem;
+  display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+}
+.hero-eyebrow .pin {
+  display: inline-flex; align-items: center; gap: .45rem;
+  padding: .3rem .75rem; border: 1px solid var(--line);
+  border-radius: 100px; background: var(--linen);
+}
+.hero-eyebrow .pin::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--tide);
+}
+.hero-title { margin-bottom: 1.8rem; }
+.hero-title .u {
+  background: linear-gradient(115deg, var(--tide-deep), var(--sand));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero-body { max-width: 43rem; }
+.hero-body p { font-size: 1.04rem; color: var(--ink-soft); margin-bottom: .85rem; }
+.hero-body em { font-style: italic; color: var(--ink); }
+
+/* the register */
+.register {
+  margin-top: 3.2rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background:
+    linear-gradient(var(--linen), var(--linen)) padding-box,
+    linear-gradient(var(--line), var(--line)) border-box;
+  overflow: hidden;
+  box-shadow: 0 30px 66px -40px rgba(41,50,58,.5);
+  position: relative;
+}
+.register::before {  /* inner hairline frame — ledger feel */
+  content: ''; position: absolute; inset: 6px; border: 1px solid var(--line-soft);
+  border-radius: 2px; pointer-events: none;
+}
+.register-top {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.5rem; border-bottom: 1px solid var(--ink);
+  border-bottom-style: double; border-bottom-width: 3px;
+  background: linear-gradient(90deg, var(--mist-3), var(--linen));
+}
+.register-top .t {
+  font-family: var(--ff-m); font-size: .58rem; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--ink-soft);
+}
+.register-top .s {
+  font-family: var(--ff-m); font-size: .54rem; letter-spacing: .08em; color: var(--ink-faint);
+}
+.register-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+.reg-cell {
+  padding: 1.5rem 1.5rem 1.6rem;
+  border-right: 1px solid var(--line-soft);
+  position: relative;
+}
+.reg-cell:last-child { border-right: none; }
+.reg-cell::before {
+  content: ''; position: absolute; inset-block-start: 0; inset-inline: 0;
+  height: 3px; background: var(--c);
+}
+.reg-folio {
+  font-family: var(--ff-m); font-size: .5rem; letter-spacing: .12em;
+  color: var(--ink-faint); margin-bottom: .55rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.reg-folio::after { content: ''; flex: 1; height: 1px; background: var(--line-soft); }
+.reg-role {
+  font-family: var(--ff-m); font-size: .5rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--c); margin-bottom: .5rem;
+}
+.reg-name { font-family: var(--ff-d); font-size: 1.34rem; font-weight: 600; line-height: 1.06; }
+.reg-name-ko { font-size: .74rem; color: var(--ink-soft); margin-top: .2rem; }
+.reg-tag {
+  margin-top: .95rem; font-size: .82rem; color: var(--ink-soft);
+  font-style: italic; font-family: var(--ff-d);
+}
+
+/* ────────────────────────────────────────
+   §01  THE HOUSE
+──────────────────────────────────────── */
+#house { padding: 5rem 0; }
+.house-lead {
+  font-family: var(--ff-d); font-weight: 400;
+  font-size: clamp(1.12rem, 2vw, 1.42rem); line-height: 1.6;
+  max-width: 47rem; margin-bottom: 1.1rem; color: var(--ink);
+}
+.house-lead em { font-style: italic; color: var(--tide-deep); }
+.house-sub {
+  max-width: 45rem; color: var(--ink-soft); font-size: .96rem; margin-bottom: 2.6rem;
+}
+.house-sub strong { color: var(--ink); font-weight: 600; }
+
+.map-tabs { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.6rem; }
+.map-tab {
+  font-family: var(--ff-m); font-size: .55rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-soft);
+  background: var(--linen); border: 1px solid var(--line);
+  border-radius: 100px; padding: .5rem 1rem; cursor: pointer;
+  transition: all .22s ease;
+}
+.map-tab:hover { border-color: var(--ink-faint); }
+.map-tab.active {
+  color: var(--linen); background: var(--tide-deep); border-color: transparent;
+}
+
+.spaces { display: grid; grid-template-columns: repeat(2, 1fr); gap: .9rem; }
+.space-card {
+  --sc: var(--tide);
+  display: grid; grid-template-columns: 3.4rem 1fr; gap: 1.1rem;
+  background: var(--linen); border: 1px solid var(--line);
+  border-radius: 6px; padding: 1.3rem 1.4rem;
+  transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.space-card:hover {
+  border-color: var(--sc); transform: translateY(-3px);
+  box-shadow: 0 22px 44px -30px rgba(41,50,58,.45);
+}
+.space-card.hide { display: none; }
+.space-badge {
+  align-self: start;
+  font-family: var(--ff-m); font-size: .46rem; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--sc); text-align: center;
+  border: 1px solid var(--sc); border-radius: 100px;
+  padding: .34rem .18rem; background: color-mix(in srgb, var(--sc) 8%, transparent);
+}
+.space-name {
+  font-family: var(--ff-d); font-size: 1.18rem; font-weight: 600; line-height: 1.18;
+  display: flex; align-items: baseline; gap: .55rem; flex-wrap: wrap;
+}
+.space-name .en {
+  font-family: var(--ff-m); font-size: .52rem; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--ink-faint); font-weight: 400;
+}
+.space-role { font-size: .87rem; color: var(--ink-soft); margin-top: .45rem; line-height: 1.62; }
+
+/* the house keeps — staff strip */
+.keeps { margin-top: 2.6rem; }
+.keeps-head { display: flex; align-items: center; gap: .8rem; margin-bottom: 1.1rem; }
+.keeps-head h3 {
+  font-family: var(--ff-m); font-size: .56rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-soft); font-weight: 400;
+}
+.keeps-head .line { flex: 1; height: 1px; background: var(--line); }
+.keeps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .9rem; }
+.keep {
+  border: 1px dashed var(--line); border-radius: 6px;
+  padding: 1.05rem 1.2rem; background: var(--mist-3);
+}
+.keep-role {
+  font-family: var(--ff-m); font-size: .48rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--tide-deep); margin-bottom: .45rem;
+}
+.keep-name { font-family: var(--ff-d); font-size: 1.14rem; font-weight: 600; line-height: 1.1; }
+.keep-name .ko { font-size: .72rem; color: var(--ink-soft); font-family: var(--ff-b); font-weight: 400; }
+.keep-note { font-size: .82rem; color: var(--ink-soft); margin-top: .5rem; line-height: 1.58; }
+
+/* ────────────────────────────────────────
+   §02  THE SEASON
+──────────────────────────────────────── */
+#season { padding: 5rem 0; }
+#season::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(180deg, transparent, var(--mist-2) 16%, var(--mist-2) 84%, transparent);
+}
+.season-lead {
+  font-family: var(--ff-d); font-size: clamp(1.1rem, 2vw, 1.36rem); line-height: 1.6;
+  max-width: 46rem; margin-bottom: 2.4rem; color: var(--ink);
+}
+.season-lead em { font-style: italic; color: var(--tide-deep); }
+
+/* the daily round — a real sequence, so a timeline earns its place */
+.round-head { display: flex; align-items: baseline; gap: .8rem; margin-bottom: 1.4rem; }
+.round-head h3 { font-family: var(--ff-d); font-size: 1.4rem; font-weight: 600; }
+.round-head .en {
+  font-family: var(--ff-m); font-size: .54rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ink-faint);
+}
+.round {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  background: var(--linen); border: 1px solid var(--line);
+  border-radius: 6px; overflow: hidden; margin-bottom: 1rem;
+}
+.round-stop {
+  padding: 1.25rem 1.15rem 1.4rem; position: relative;
+  border-right: 1px solid var(--line-soft);
+}
+.round-stop:last-child { border-right: none; }
+.round-stop::before {
+  content: ''; position: absolute; top: 1.25rem; left: 1.15rem;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--linen); border: 2px solid var(--tide);
+}
+.round-time {
+  font-family: var(--ff-m); font-size: .5rem; letter-spacing: .06em;
+  color: var(--tide-deep); margin: 0 0 .35rem 1.5rem;
+}
+.round-t { font-family: var(--ff-d); font-size: 1.04rem; font-weight: 600; line-height: 1.15; margin-bottom: .3rem; }
+.round-b { font-size: .8rem; color: var(--ink-soft); line-height: 1.55; }
+
+/* recurring fixtures */
+.fixtures { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 3rem; }
+.fixture {
+  display: flex; align-items: center; gap: .55rem;
+  border: 1px solid var(--line); border-radius: 100px;
+  padding: .5rem .95rem; background: var(--linen);
+  font-size: .8rem; color: var(--ink-soft);
+}
+.fixture .mono { font-family: var(--ff-m); font-size: .56rem; letter-spacing: .06em; color: var(--tide-deep); }
+
+/* the turning year */
+.year-head { display: flex; align-items: baseline; gap: .8rem; margin-bottom: 1.4rem; }
+.year-head h3 { font-family: var(--ff-d); font-size: 1.4rem; font-weight: 600; }
+.year-head .en {
+  font-family: var(--ff-m); font-size: .54rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ink-faint);
+}
+.seasons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+.snc {
+  --ac: var(--tide);
+  background: var(--linen); border: 1px solid var(--line);
+  border-radius: 8px; overflow: hidden;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.snc:hover { transform: translateY(-4px); box-shadow: 0 24px 48px -32px rgba(41,50,58,.42); }
+.snc-head {
+  padding: 1.1rem 1.25rem .9rem;
+  background: linear-gradient(150deg, color-mix(in srgb, var(--ac) 15%, var(--linen)), var(--linen));
+  border-bottom: 1px solid var(--line);
+}
+.snc-kicker {
+  font-family: var(--ff-m); font-size: .5rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ac); margin-bottom: .35rem;
+}
+.snc-title { font-family: var(--ff-d); font-size: 1.5rem; font-weight: 600; line-height: 1; }
+.snc-window { font-family: var(--ff-m); font-size: .52rem; color: var(--ink-faint); margin-top: .35rem; }
+.snc-body { padding: 1rem 1.25rem 1.3rem; font-size: .84rem; color: var(--ink-soft); line-height: 1.62; }
+.snc-body em { font-style: italic; color: var(--ink); font-family: var(--ff-d); font-size: .96rem; }
+
+/* ────────────────────────────────────────
+   §03  THE RESIDENTS
+──────────────────────────────────────── */
+#residents { padding: 5rem 0 6rem; }
+.res-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+.res-card {
+  background: var(--linen); border: 1px solid var(--line);
+  border-radius: 8px; overflow: hidden; cursor: pointer;
+  transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+  position: relative;
+}
+.res-card::before {
+  content: ''; position: absolute; inset-block-start: 0; inset-inline: 0;
+  height: 3px; background: var(--c); z-index: 3;
+}
+.res-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 30px 60px -34px rgba(41,50,58,.5);
+  border-color: color-mix(in srgb, var(--c) 55%, var(--line));
+}
+.res-portrait { aspect-ratio: 3/4; background: var(--ct); position: relative; overflow: hidden; }
+.res-portrait img { width: 100%; height: 100%; object-fit: cover; transition: transform .55s ease; }
+.res-card:hover .res-portrait img { transform: scale(1.04); }
+.res-portrait .ph {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: var(--ff-d); font-style: italic; font-size: 3rem; color: var(--c);
+  background: linear-gradient(150deg, var(--ct) 0%, transparent 64%);
+}
+.res-portrait::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(41,50,58,.28), transparent 46%);
+}
+.res-info { padding: 1.25rem 1.3rem 1.5rem; }
+.res-role {
+  font-family: var(--ff-m); font-size: .5rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-faint); margin-bottom: .5rem; min-height: 1.6em;
+}
+.res-name { font-family: var(--ff-d); font-size: 1.42rem; font-weight: 600; line-height: 1.04; }
+.res-name-ko { font-size: .76rem; color: var(--ink-soft); margin-top: .25rem; }
+.res-meta {
+  font-family: var(--ff-m); font-size: .54rem; letter-spacing: .05em;
+  color: var(--ink-faint); margin-top: .8rem;
+}
+.res-more {
+  margin-top: 1rem; font-family: var(--ff-m); font-size: .55rem;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--c);
+  display: flex; align-items: center; gap: .4rem;
+}
+.res-more::after { content: '→'; transition: transform .25s; }
+.res-card:hover .res-more::after { transform: translateX(4px); }
+
+/* ────────────────────────────────────────
+   MODAL — dossier
+──────────────────────────────────────── */
+.modal {
+  position: fixed; inset: 0; z-index: 1000;
+  display: none; align-items: center; justify-content: center;
+  padding: 2.4rem 1.5rem; overflow-y: auto;
+  background: rgba(41,50,58,.52); backdrop-filter: blur(7px);
+}
+.modal.open { display: flex; }
+.modal-panel {
+  --accent: var(--tide);
+  position: relative; width: 100%; max-width: 880px;
+  max-height: min(88vh, 820px);
+  background: var(--linen); border-radius: 10px;
+  box-shadow: 0 48px 104px -34px rgba(41,50,58,.64);
+  overflow: hidden; display: flex;
+  animation: pop .34s cubic-bezier(.2,.8,.3,1);
+}
+#modalContent { flex: 1; display: flex; min-width: 0; min-height: 0; }
+@keyframes pop { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
+.modal-close {
+  position: absolute; top: 1rem; right: 1rem; z-index: 6;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.5); background: rgba(41,50,58,.35);
+  color: #fff; font-size: .85rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s, transform .2s;
+}
+.modal-close:hover { background: var(--accent); transform: rotate(90deg); }
+
+.dossier { display: flex; flex: 1; min-width: 0; min-height: 0; }
+.dossier-portrait {
+  flex: 0 0 42%; position: relative;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 24%, var(--mist-2)), var(--mist-2));
+  overflow: hidden;
+}
+.dossier-portrait img { width: 100%; height: 100%; object-fit: cover; }
+.dossier-portrait .ph {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-family: var(--ff-d); font-style: italic; font-size: 5rem; color: var(--accent);
+}
+.dossier-portrait::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(41,50,58,.58), transparent 44%);
+}
+.portrait-cap { position: absolute; left: 1.4rem; bottom: 1.3rem; right: 1.4rem; z-index: 2; }
+.portrait-chip {
+  display: inline-block;
+  font-family: var(--ff-m); font-size: .46rem; letter-spacing: .1em;
+  text-transform: uppercase; color: #fff;
+  background: color-mix(in srgb, var(--accent) 84%, transparent);
+  border-radius: 100px; padding: .3rem .7rem; margin-bottom: .6rem;
+}
+.portrait-name { font-family: var(--ff-d); font-size: 1.75rem; font-weight: 600; color: #fff; line-height: 1; }
+.portrait-name-ko { font-size: .78rem; color: rgba(255,255,255,.86); margin-top: .3rem; }
+
+.dossier-info {
+  flex: 1; min-width: 0; min-height: 0;
+  overflow-y: auto; overscroll-behavior: contain;
+  padding: 2rem 2rem 2.2rem;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 42%, transparent) transparent;
+}
+.dossier-info::-webkit-scrollbar { width: 8px; }
+.dossier-info::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 100px; border: 2px solid var(--linen);
+}
+.dossier-kicker {
+  font-family: var(--ff-m); font-size: .52rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: .7rem;
+}
+.dossier-role {
+  font-size: .84rem; color: var(--ink-soft); margin-bottom: 1.3rem;
+  padding-bottom: 1.1rem; border-bottom: 1px solid var(--line);
+}
+.dossier-intro { font-size: .94rem; color: var(--ink); margin-bottom: 1.5rem; line-height: 1.78; }
+
+/* the house — a heraldic lozenge card, seated at the top of each dossier */
+.dossier-house {
+  display: grid; grid-template-columns: auto 1fr; gap: 1.1rem;
+  margin-bottom: 1.5rem; padding: 1.15rem 1.3rem 1.25rem;
+  border: 1px solid var(--line); border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, var(--mist-3)), var(--mist-3));
+}
+.house-crest {
+  align-self: start; margin-top: .18rem;
+  width: 40px; height: 40px; transform: rotate(45deg);
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--line));
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--linen));
+}
+.house-crest span {
+  transform: rotate(-45deg);
+  font-family: var(--ff-d); font-weight: 600; font-size: 1.15rem;
+  font-style: italic; color: var(--accent); line-height: 1;
+}
+.house-eyebrow {
+  font-family: var(--ff-m); font-size: .46rem; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--ink-faint); margin-bottom: .4rem;
+}
+.house-name {
+  font-family: var(--ff-d); font-size: 1.24rem; font-weight: 600;
+  line-height: 1.1; display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap;
+}
+.house-name .en {
+  font-family: var(--ff-m); font-size: .5rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--accent); font-weight: 400;
+}
+.house-seat {
+  font-family: var(--ff-m); font-size: .54rem; letter-spacing: .04em;
+  color: var(--ink-faint); margin-top: .3rem;
+}
+.house-desc { font-size: .84rem; color: var(--ink-soft); line-height: 1.68; margin-top: .7rem; }
+.house-meta { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .8rem; }
+.house-chip {
+  font-family: var(--ff-m); font-size: .5rem; letter-spacing: .05em;
+  color: var(--ink-soft); background: var(--linen);
+  border: 1px solid var(--line); border-radius: 100px; padding: .3rem .65rem;
+}
+
+.dossier-facts {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--line);
+  border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-bottom: 1.2rem;
+}
+.fact { background: var(--linen); padding: .78rem .9rem; }
+.fact-label {
+  font-family: var(--ff-m); font-size: .44rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-faint); margin-bottom: .3rem;
+}
+.fact-value { font-size: .82rem; font-weight: 500; }
+.mono-sm { font-family: var(--ff-m); font-size: .74rem; }
+
+.dossier-lines {
+  display: grid; margin-bottom: 1.7rem;
+  border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+}
+.dline {
+  display: grid; grid-template-columns: 5.4rem 1fr; gap: .8rem;
+  padding: .72rem .95rem; align-items: baseline;
+  border-bottom: 1px solid var(--line-soft); background: var(--mist-3);
+}
+.dline:last-child { border-bottom: none; }
+.dline-l {
+  font-family: var(--ff-m); font-size: .46rem; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-faint);
+}
+.dline-v { font-size: .82rem; color: var(--ink); }
+
+.dossier-block { margin-bottom: 1.5rem; }
+.dossier-sub { display: flex; align-items: center; gap: .8rem; margin-bottom: .9rem; }
+.dossier-sub h4 {
+  font-family: var(--ff-m); font-size: .54rem; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--ink-soft); font-weight: 400;
+}
+.dossier-sub .line { flex: 1; height: 1px; background: var(--line); }
+
+.tags { display: flex; flex-wrap: wrap; gap: .5rem; }
+.tag {
+  font-size: .74rem; padding: .3rem .7rem;
+  border: 1px solid var(--line); border-radius: 100px;
+  color: var(--ink-soft); background: var(--mist);
+}
+.tag.intimacy {
+  border-color: var(--accent); color: var(--accent);
+  font-style: italic; font-family: var(--ff-d); font-size: .86rem;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.taste-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.taste { border: 1px solid var(--line); border-radius: 8px; padding: 1rem; background: var(--mist); }
+.taste-head {
+  font-family: var(--ff-m); font-size: .5rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: .7rem;
+  display: flex; align-items: center; gap: .45rem;
+}
+.taste-head .mk { width: 7px; height: 7px; border-radius: 50%; }
+.taste.like .mk { background: var(--effie); }
+.taste.dislike .mk { background: var(--sand); }
+.taste-list { display: flex; flex-wrap: wrap; gap: .4rem; }
+.taste-item { font-size: .76rem; color: var(--ink); }
+.taste-item:not(:last-child)::after { content: ' ·'; color: var(--ink-faint); }
+
+.dossier-quote {
+  margin-top: 1.6rem; padding: 1.35rem 1.5rem;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 11%, var(--mist-2)), var(--mist-2));
+  border-radius: 8px; border-left: 3px solid var(--accent);
+}
+.dossier-quote p { font-family: var(--ff-d); font-style: italic; font-size: 1.08rem; line-height: 1.5; }
+.dossier-quote .ko { font-family: var(--ff-b); font-style: normal; font-size: .84rem; color: var(--ink-soft); margin-top: .5rem; }
+
+/* ────────────────────────────────────────
+   FOOTER
+──────────────────────────────────────── */
+footer {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 2rem; flex-wrap: wrap;
+  padding: 3rem; border-top: 1px solid var(--line);
+  max-width: 1140px; margin: 0 auto; position: relative; z-index: 2;
+}
+.footer-l { font-family: var(--ff-m); font-size: .56rem; letter-spacing: .05em; color: var(--ink-faint); line-height: 1.9; }
+.footer-r { font-family: var(--ff-d); font-style: italic; font-size: 1.14rem; color: var(--ink-soft); }
+
+/* ────────────────────────────────────────
+   RESPONSIVE
+──────────────────────────────────────── */
+@media (max-width: 980px) {
+  .register-grid { grid-template-columns: 1fr; }
+  .reg-cell { border-right: none; border-bottom: 1px solid var(--line-soft); }
+  .reg-cell:last-child { border-bottom: none; }
+  .spaces { grid-template-columns: 1fr; }
+  .keeps-grid { grid-template-columns: 1fr; }
+  .round { grid-template-columns: 1fr 1fr; }
+  .seasons { grid-template-columns: 1fr 1fr; }
+  .res-grid { grid-template-columns: 1fr 1fr; }
+  .wrap, .hero-inner { padding: 0 1.8rem; }
+  nav { padding: 1rem 1.8rem; }
+  .nav-links { gap: 1.4rem; }
+}
+@media (max-width: 720px) {
+  .modal { align-items: flex-start; }
+  .dossier { flex-direction: column; }
+  .modal-panel { max-height: none; }
+  .dossier-portrait { flex: 0 0 auto; height: 300px; }
+  .dossier-info { overflow-y: visible; }
+}
+@media (max-width: 600px) {
+  .nav-links { display: none; }
+  .round { grid-template-columns: 1fr; }
+  .seasons { grid-template-columns: 1fr; }
+  .res-grid { grid-template-columns: 1fr; }
+  .space-card { grid-template-columns: 1fr; gap: .6rem; }
+  .space-badge { justify-self: start; padding: .3rem .8rem; }
+  .dossier-facts { grid-template-columns: 1fr 1fr; }
+  .taste-grid { grid-template-columns: 1fr; }
+  .dossier-info { padding: 1.5rem; }
+  footer { flex-direction: column; align-items: flex-start; }
+  .hero-stage { padding: 7rem 0 2rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="mist-field" id="mistField" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">Heronscliff</span>
+  <ul class="nav-links">
+    <li><a href="#hero">Register</a></li>
+    <li><a href="#house">The House</a></li>
+    <li><a href="#season">The Season</a></li>
+    <li><a href="#residents">The Residents</a></li>
+  </ul>
+</nav>
+
+<!-- §00 HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-stage">
+      <p class="hero-eyebrow reveal">
+        <span class="pin">South Devon · Torbay</span>
+        Spring 1888 — 1889 · The English Riviera
+      </p>
+
+      <h1 class="d-xl hero-title reveal reveal-delay-1">
+        Three of them.<br><em>One</em> <span class="u">of you.</span>
+      </h1>
+
+      <div class="hero-body reveal reveal-delay-2">
+        <p>헤런스클리프는 잉글랜드 남서부 해안, 붉은 사암 절벽 아래 자리한 <em>미혼 숙녀를 위한 사설 휴양의 집</em>이다. 온화한 요양 벨트의 최고급 리조트답게 아름답고 안락하다.</p>
+        <p>다만 이곳에 머무는 이들은 저마다, 조용히 지워진 사연을 안고 왔다. 그리고 지금, 가장 늦게 도착한 사람이 문을 들어선다.</p>
+        <p>세 사람이 <em>같은 바다</em>를 마주하고 있다. 다가서는 방식만, 저마다 다르다.</p>
+      </div>
+
+      <div class="register reveal reveal-delay-3">
+        <div class="register-top">
+          <span class="t">Admissions Register — Heronscliff</span>
+          <span class="s">3 residents · slow burn</span>
+        </div>
+        <div class="register-grid">
+          <div class="reg-cell" style="--c:var(--cordelia)">
+            <p class="reg-folio">Fol. № I</p>
+            <p class="reg-role">The East Room</p>
+            <p class="reg-name">Cordelia Sedgwick</p>
+            <p class="reg-name-ko">코델리아 세드윅</p>
+            <p class="reg-tag">고른 저음, 각이 맞는 서류</p>
+          </div>
+          <div class="reg-cell" style="--c:var(--effie)">
+            <p class="reg-folio">Fol. № II</p>
+            <p class="reg-role">The South Room</p>
+            <p class="reg-name">Euphemia Barlow</p>
+            <p class="reg-name-ko">유페미아 '에피' 바로우</p>
+            <p class="reg-tag">말 대신, 손과 공책으로</p>
+          </div>
+          <div class="reg-cell" style="--c:var(--frank)">
+            <p class="reg-folio">Fol. № III</p>
+            <p class="reg-role">The West Room</p>
+            <p class="reg-name">Frances Hartley</p>
+            <p class="reg-name-ko">프랜시스 '프랭크' 하틀리</p>
+            <p class="reg-tag">날카로운 눈, 더 날카로운 혀</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- §01 THE HOUSE -->
+<section id="house">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-folio">Fol. 01</span>
+      <h2 class="d-md">The House &amp; Grounds</h2>
+      <div class="sec-bar"></div>
+      <span class="sec-tag">헤런스클리프 · 사설 휴양의 집</span>
+    </div>
+
+    <p class="house-lead reveal">헤런스클리프는 표면상 미혼 숙녀를 위한 <em>사설 휴양의 집</em>이다. 파혼·스캔들·결혼 시장에서 밀려나 가문의 체면에 부담이 된 딸들을, 우아하게 거리를 두어 머물게 하는 곳이기도 하다.</p>
+    <p class="house-sub reveal">겉은 최고급 요양지라 <strong>아름답고 안락하나</strong>, 아무도 병자라 이름 붙이지 않는 한 이곳은 병원이 아니라 숙녀들의 휴양지로 남는다. 하루는 해수욕과 해안 산책으로 열려, 응접실의 서한과 오후의 독서·자수·화실 작업으로 이어지고, 저녁 다과와 낭독으로 닫힌다. 아래는 그 하루가 지나는 자리들 — 눌러 <strong>본관</strong>·<strong>정원과 해안</strong>·<strong>거처</strong>로 나누어 볼 수 있다.</p>
+
+    <div class="map-tabs reveal" id="mapTabs">
+      <button class="map-tab active" data-cat="all">전체</button>
+      <button class="map-tab" data-cat="main">본관</button>
+      <button class="map-tab" data-cat="grounds">정원 · 해안</button>
+      <button class="map-tab" data-cat="rooms">거처</button>
+    </div>
+
+    <div class="spaces reveal reveal-delay-1" id="spaces">
+
+      <div class="space-card" data-cat="main" style="--sc:var(--tide)">
+        <span class="space-badge">Hall</span>
+        <div>
+          <p class="space-name">응접실 <span class="en">The Drawing Room</span></p>
+          <p class="space-role">집의 중심. 오전엔 서한을 쓰고 저녁엔 다과와 낭독이 오른다. 주 1회 매트론이 주재하는 응접이 여기서 열려, 입소자들이 가장 자주 마주치는 자리다.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="main" style="--sc:var(--cordelia)">
+        <span class="space-badge">Books</span>
+        <div>
+          <p class="space-name">음악실 · 도서실 <span class="en">Music Room &amp; Library</span></p>
+          <p class="space-role">피아노와 장서가 놓인 조용한 두 방. 낮의 독서와 저녁의 낭독, 이따금의 연주가 이어진다. 말수 적은 오후를 보내기 좋은 구석.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="main" style="--sc:var(--tide-deep)">
+        <span class="space-badge">Post</span>
+        <div>
+          <p class="space-name">서한실 <span class="en">The Correspondence Room</span></p>
+          <p class="space-role">편지를 쓰고 받는 방. 바깥과 이어지는 유일한 통로이자, 오간 편지와 끊긴 소식이 함께 머무는 자리.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="main" style="--sc:var(--frank)">
+        <span class="space-badge">Studio</span>
+        <div>
+          <p class="space-name">화실 <span class="en">The Studio</span></p>
+          <p class="space-role">서쪽 방을 겸한 작업 공간. 이젤과 마르지 않은 캔버스가 놓여, 모델을 세우고 응시하는 낮의 시간이 이곳에서 흐른다.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="main" style="--sc:var(--ink-soft)">
+        <span class="space-badge">Clinic</span>
+        <div>
+          <p class="space-name">진료실 <span class="en">The Consulting Room</span></p>
+          <p class="space-role">월례 방문의의 임상 회진이 열리는 방. 격식과 예의가 흐르는, 이 집에서 가장 서늘한 공기가 도는 자리.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="grounds" style="--sc:var(--effie)">
+        <span class="space-badge">Glass</span>
+        <div>
+          <p class="space-name">온실 · 오랑제리 <span class="en">The Orangery</span></p>
+          <p class="space-role">유리 지붕 아래 야자수와 화분이 늘어선 온실. 오후 산책과 눌러 말릴 들꽃을 고르는 자리로, 볕이 가장 오래 머문다.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="grounds" style="--sc:var(--tide-deep)">
+        <span class="space-badge">Cliff</span>
+        <div>
+          <p class="space-name">절벽 산책로 <span class="en">The Cliff Walk</span></p>
+          <p class="space-role">붉은 사암 절벽을 따라 난 해안 산책로. 이른 아침 짠 해무가 낮게 깔리고, 길어진 저녁볕이 바다로 떨어진다.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="grounds" style="--sc:var(--tide)">
+        <span class="space-badge">Shore</span>
+        <div>
+          <p class="space-name">조약돌 해변 <span class="en">Pebble Cove</span></p>
+          <p class="space-role">절벽 아래 작은 해변. 아침 해수욕과 여름의 해수욕 천막이 서는 곳. 규칙적인 파도 소리가 하루의 배경음이 된다.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="rooms" style="--sc:var(--cordelia)">
+        <span class="space-badge">East</span>
+        <div>
+          <p class="space-name">동쪽 방 <span class="en">The East Room</span></p>
+          <p class="space-role">바다가 보이는 코델리아의 방. 책상 위 서류는 언제나 각이 맞고, 창 너머로 밤바다의 파도 소리가 들어온다.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="rooms" style="--sc:var(--effie)">
+        <span class="space-badge">South</span>
+        <div>
+          <p class="space-name">남쪽 방 <span class="en">The South Room</span></p>
+          <p class="space-role">볕 드는 에피의 방, 문은 늘 조금 열려 있다. 창가엔 눌러 말린 꽃과 낱장 공책, 벽엔 개와 말을 그린 서툰 스케치.</p>
+        </div>
+      </div>
+
+      <div class="space-card" data-cat="rooms" style="--sc:var(--frank)">
+        <span class="space-badge">West</span>
+        <div>
+          <p class="space-name">서쪽 방 <span class="en">The West Room</span></p>
+          <p class="space-role">북향 채광을 이유로 배정된 프랭크의 방 겸 화실. 이젤과 캔버스가 벽을 두르고, 낮의 빛이 그림 위로 옮겨 앉는다.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- THE HOUSE KEEPS -->
+    <div class="keeps reveal reveal-delay-1">
+      <div class="keeps-head">
+        <h3>The House Keeps · 상주 인원</h3>
+        <div class="line"></div>
+      </div>
+      <div class="keeps-grid">
+        <div class="keep">
+          <p class="keep-role">Matron · 원장</p>
+          <p class="keep-name">Honoria Payne <span class="ko">오노리아 페인 부인</span></p>
+          <p class="keep-note">이 집을 진심으로 안식처라 믿는 구세대. 입소자들의 애착을 낭만적 우정의 미덕으로 너그러이 대한다.</p>
+        </div>
+        <div class="keep">
+          <p class="keep-role">Visiting Physician · 방문 임상의</p>
+          <p class="keep-name">Dr. Edmund Rhodes <span class="ko">에드먼드 로즈 의사</span></p>
+          <p class="keep-note">월례 회진을 도는 젊은 임상의. 단정한 예의 아래, 관찰과 기록을 좋아하는 눈이 있다.</p>
+        </div>
+        <div class="keep">
+          <p class="keep-role">Nurse &amp; Interpreter · 간호 · 수화 통역</p>
+          <p class="keep-name">Meredith Poole <span class="ko">메러디스 폴</span></p>
+          <p class="keep-note">에피의 수화를 유창히 읽는 유일한 직원. 규정과 온정 사이에서 조용히 눈감아 주는 완충지대.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- §02 THE SEASON -->
+<section id="season">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-folio">Fol. 02</span>
+      <h2 class="d-md">The Season</h2>
+      <div class="sec-bar"></div>
+      <span class="sec-tag">하루의 리듬 · 계절의 궤적</span>
+    </div>
+
+    <p class="season-lead reveal">헤런스클리프의 하루는 정해진 리듬을 따라 <em>바다에서 열려 응접실에서 닫힌다</em>. 그 하루가 봄에서 겨울로 접히는 사이, 1888년의 이야기가 이듬해로 넘어간다.</p>
+
+    <!-- THE DAILY ROUND -->
+    <div class="reveal">
+      <div class="round-head">
+        <h3>하루의 일과</h3>
+        <span class="en">The Daily Round</span>
+      </div>
+      <div class="round">
+        <div class="round-stop">
+          <p class="round-time">이른 아침</p>
+          <p class="round-t">해수욕 · 해안 산책</p>
+          <p class="round-b">조약돌 해변과 절벽 산책로에서 하루를 연다.</p>
+        </div>
+        <div class="round-stop">
+          <p class="round-time">오전</p>
+          <p class="round-t">응접실 · 서한</p>
+          <p class="round-b">응접실에 모여 편지를 쓰고 소식을 나눈다.</p>
+        </div>
+        <div class="round-stop">
+          <p class="round-time">오후</p>
+          <p class="round-t">독서 · 자수 · 화실 · 온실</p>
+          <p class="round-b">저마다의 방과 온실에서 조용한 낮을 보낸다.</p>
+        </div>
+        <div class="round-stop">
+          <p class="round-time">저녁</p>
+          <p class="round-t">다과 · 낭독</p>
+          <p class="round-b">응접실 다과와 낭독으로 하루를 닫는다.</p>
+        </div>
+        <div class="round-stop">
+          <p class="round-time">밤</p>
+          <p class="round-t">각자의 방</p>
+          <p class="round-b">창 너머 파도 소리와 가스등 아래의 정적.</p>
+        </div>
+      </div>
+      <div class="fixtures">
+        <span class="fixture"><span class="mono">Weekly</span> 주 1회 · 매트론 주재 응접</span>
+        <span class="fixture"><span class="mono">Monthly</span> 월례 · 방문의의 임상 회진</span>
+      </div>
+    </div>
+
+    <!-- THE TURNING YEAR -->
+    <div class="reveal reveal-delay-1">
+      <div class="year-head">
+        <h3>계절의 궤적</h3>
+        <span class="en">The Turning Year · 1888 — 1889</span>
+      </div>
+      <div class="seasons">
+        <div class="snc" style="--ac:var(--effie)">
+          <div class="snc-head">
+            <p class="snc-kicker">Movement I</p>
+            <p class="snc-title">봄</p>
+            <p class="snc-window">1888 · Spring</p>
+          </div>
+          <p class="snc-body"><em>붉은 사암 절벽 아래 야자수.</em> 젖은 산책로와 길어진 저녁볕. 이야기가 처음 문을 여는 계절.</p>
+        </div>
+        <div class="snc" style="--ac:var(--tide)">
+          <div class="snc-head">
+            <p class="snc-kicker">Movement II</p>
+            <p class="snc-title">여름</p>
+            <p class="snc-window">1888 · Summer</p>
+          </div>
+          <p class="snc-body"><em>만조의 짠 공기.</em> 해변의 해수욕 천막과 응접실 창으로 스미는 한낮의 열기.</p>
+        </div>
+        <div class="snc" style="--ac:var(--tide-deep)">
+          <div class="snc-head">
+            <p class="snc-kicker">Movement III</p>
+            <p class="snc-title">가을</p>
+            <p class="snc-window">1888 · Autumn</p>
+          </div>
+          <p class="snc-body"><em>해무에 잠긴 아침.</em> 낙엽 밟는 정원과, 점점 짧아지는 볕.</p>
+        </div>
+        <div class="snc" style="--ac:var(--frank)">
+          <div class="snc-head">
+            <p class="snc-kicker">Movement IV</p>
+            <p class="snc-title">겨울</p>
+            <p class="snc-window">1888 — 1889 · Winter</p>
+          </div>
+          <p class="snc-body"><em>바다에서 불어오는 칼바람.</em> 가스등 아래 응접실의 온기로 해를 넘긴다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- §03 THE RESIDENTS -->
+<section id="residents">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-folio">Fol. 03</span>
+      <h2 class="d-md">The Residents</h2>
+      <div class="sec-bar"></div>
+      <span class="sec-tag">카드를 눌러 상세 보기</span>
+    </div>
+
+    <div class="res-grid reveal">
+
+      <div class="res-card" data-modal="cordelia" style="--c:var(--cordelia);--ct:var(--cordelia-t)">
+        <div class="res-portrait">
+          <img src="./images/Cordelia.webp" alt="Cordelia Sedgwick" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="ph" style="display:none">C</div>
+        </div>
+        <div class="res-info">
+          <p class="res-role">The East Room · 세드윅 가 장녀</p>
+          <h3 class="res-name">Cordelia Sedgwick</h3>
+          <p class="res-name-ko">코델리아 세드윅</p>
+          <p class="res-meta">INTJ · 1w9 · 체셔</p>
+          <p class="res-more">Dossier</p>
+        </div>
+      </div>
+
+      <div class="res-card" data-modal="effie" style="--c:var(--effie);--ct:var(--effie-t)">
+        <div class="res-portrait">
+          <img src="./images/Effie.webp" alt="Euphemia Barlow" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="ph" style="display:none">E</div>
+        </div>
+        <div class="res-info">
+          <p class="res-role">The South Room · 바로우 가 막내</p>
+          <h3 class="res-name">Euphemia Barlow</h3>
+          <p class="res-name-ko">유페미아 '에피' 바로우</p>
+          <p class="res-meta">ESFP · 2w1 · 켄트</p>
+          <p class="res-more">Dossier</p>
+        </div>
+      </div>
+
+      <div class="res-card" data-modal="frank" style="--c:var(--frank);--ct:var(--frank-t)">
+        <div class="res-portrait">
+          <img src="./images/Frank.webp" alt="Frances Hartley" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="ph" style="display:none">F</div>
+        </div>
+        <div class="res-info">
+          <p class="res-role">The West Room · 하틀리 가 차녀</p>
+          <h3 class="res-name">Frances Hartley</h3>
+          <p class="res-name-ko">프랜시스 '프랭크' 하틀리</p>
+          <p class="res-meta">ENTP · 7w8 · 맨체스터</p>
+          <p class="res-more">Dossier</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-l">
+    Heronscliff &nbsp;·&nbsp; A Private Rest Home for Gentlewomen — South Devon, 1888<br>
+    A Victorian slow burn. Three residents, one you.
+  </div>
+  <div class="footer-r">"The sea keeps the same hour every night."</div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal" id="charModal" role="dialog" aria-modal="true">
+  <div class="modal-panel" id="modalPanel">
+    <button class="modal-close" id="modalClose" aria-label="닫기">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+/* ── Sea-mist: pale haze drifting up and seaward ── */
+(function () {
+  const field = document.getElementById('mistField');
+  if (!field) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const colors = ['#b9cdda', '#a9c6dc', '#c7d3d1', '#cbb6a3'];
+  const N = 20;
+  for (let i = 0; i < N; i++) {
+    const m = document.createElement('div');
+    m.className = 'haze';
+    const size = 6 + Math.random() * 12;
+    m.style.setProperty('--x', (Math.random() * 100) + 'vw');
+    m.style.setProperty('--size', size + 'px');
+    m.style.setProperty('--dur', (18 + Math.random() * 14) + 's');
+    m.style.setProperty('--delay', (-Math.random() * 26) + 's');
+    m.style.setProperty('--drift', ((Math.random() - .3) * 12) + 'vw');
+    m.style.setProperty('--peak', (0.18 + Math.random() * 0.3).toFixed(2));
+    m.style.setProperty('--c', colors[i % colors.length]);
+    field.appendChild(m);
+  }
+  const hero = document.getElementById('hero');
+  const io = new IntersectionObserver((es) => {
+    es.forEach(e => {
+      field.style.opacity = e.isIntersecting ? '1' : '0';
+      field.classList.toggle('dormant', !e.isIntersecting);
+    });
+  }, { threshold: 0.02 });
+  io.observe(hero);
+})();
+
+/* ── Reveal on scroll ── */
+(function () {
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  els.forEach(el => io.observe(el));
+})();
+
+/* ── Nav active state ── */
+(function () {
+  const links = document.querySelectorAll('.nav-links a');
+  const map = {};
+  links.forEach(a => { const id = a.getAttribute('href').slice(1); const s = document.getElementById(id); if (s) map[id] = a; });
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(a => a.classList.remove('active'));
+        if (map[e.target.id]) map[e.target.id].classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+  Object.keys(map).forEach(id => { const s = document.getElementById(id); if (s) io.observe(s); });
+})();
+
+/* ── Location filter tabs ── */
+(function () {
+  const tabs = document.querySelectorAll('.map-tab');
+  const cards = document.querySelectorAll('#spaces .space-card');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const cat = tab.dataset.cat;
+      cards.forEach(c => {
+        const show = cat === 'all' || c.dataset.cat === cat;
+        c.classList.toggle('hide', !show);
+      });
+    });
+  });
+})();
+
+/* ══════════════════════════════════════
+   DOSSIER DATA — surface only
+══════════════════════════════════════ */
+const DOSSIERS = {
+  cordelia: {
+    accent: '#547794',
+    img: './images/Cordelia.webp', ph: 'C',
+    kicker: 'The East Room · Heronscliff',
+    name: 'Cordelia Sedgwick',
+    nameKo: '코델리아 세드윅',
+    role: '체셔 세드윅 가 장녀 · 상회의 회계와 판단을 맡아온 사람',
+    house: {
+      crest: 'S',
+      name: '세드윅 가',
+      en: 'Sedgwick of Thornleigh',
+      seat: '체셔 손리 홀 · 세드윅 브라더스 상회',
+      desc: '리버풀 상관을 발판으로 동인도·중국과 교역해 홍차·원면·인디고로 한 세대 만에 부를 일으킨 상인 젠트리. 계승자는 장남 제럴드이나, 상회의 장부와 실질적 판단은 오래도록 코델리아의 몫이었다. 번영의 이면에 밴 교역의 얼룩을, 이 집은 말없이 안고 있다.',
+      meta: ['체셔 · 손리 홀', '동인도·중국 교역', '신흥 상인가'],
+    },
+    intro: '고른 저음으로 짧게 끊어 말하는, 좀처럼 속을 내보이지 않는 사람. 책상 위 서류는 늘 각이 맞고, 판단은 냉정하고 정확하다. 입소자 중 유일하게, 서두르지 않는 인내로 에피의 공책과 손짓을 읽어낸다. 곁을 내주기까지는 더디지만, 한번 내준 온기는 흔들리지 않는다.',
+    facts: [
+      { label: 'Age', value: '24세', mono: true },
+      { label: 'From', value: '체셔 손리 홀' },
+      { label: 'Room', value: '동쪽 방' },
+      { label: 'MBTI', value: 'INTJ', mono: true },
+      { label: 'Ennea', value: '1w9', mono: true },
+      { label: 'Instinct', value: 'sp/sx', mono: true },
+    ],
+    lines: [
+      { l: 'House', v: '세드윅 가 (손리 홀)' },
+      { l: 'Firm', v: '세드윅 브라더스 상회 · 회계·판단' },
+      { l: 'Function', v: 'LVFE · 논리 우선' },
+      { l: 'Born', v: '1864.03.19' },
+    ],
+    tags: [
+      { t: 'Composed Ledger-hand', i: false },
+      { t: 'Reads the Unsaid', i: false },
+      { t: 'Quiet Authority', i: false },
+      { t: 'Patient with Effie', i: true },
+      { t: 'Warmth for the Few', i: true },
+    ],
+    likes: ['밤바다의 규칙적인 파도 소리', '각이 맞는 서류', '낮은 정적'],
+    dislikes: ['값싼 위로', '논리 없이 눌러오는 권위'],
+    quote: {
+      en: '"Say the thing plainly. I have no patience for comfort that costs you nothing."',
+      ko: '말은 분명히 해. 값싼 위로에 내줄 인내는 없으니까.'
+    }
+  },
+
+  effie: {
+    accent: '#6fa09b',
+    img: './images/Effie.webp', ph: 'E',
+    kicker: 'The South Room · Heronscliff',
+    name: 'Euphemia Barlow',
+    nameKo: "유페미아 '에피' 바로우",
+    role: '켄트 바로우 가 막내딸 · 말 대신 손과 공책으로 이야기하는 사람',
+    house: {
+      crest: 'B',
+      name: '바로우 가',
+      en: 'Barlow of the Weald',
+      seat: '켄트 메이드스톤 인근 · 과수·홉 농장',
+      desc: '"잉글랜드의 정원"이라 불리는 켄트 윌드에서 사과와 체리, 맥주용 홉을 대대로 거둬들인 토지 지주. 오래된 땅과 체면에 뿌리를 둔 만큼 결혼 시장의 격식에 유독 엄격했고, 막내딸 에피는 그 격식의 저울 위에서 조용히 밀려났다.',
+      meta: ['켄트 · 메이드스톤', '과수·홉 농장', '토지 지주가'],
+    },
+    intro: '목소리는 없어도 표정과 손이 그보다 크게 말한다. 다정하고 활달하며 잘 웃고, 손은 잠시도 가만있지 못한다. 영국 수화를 아는 이에게는 손짓으로, 아니면 늘 지니는 공책의 필담으로 이야기한다. 남쪽 방의 문은 늘 조금 열려 있고, 창가엔 눌러 말린 꽃과 서툰 스케치가 쌓여 있다.',
+    facts: [
+      { label: 'Age', value: '20세', mono: true },
+      { label: 'From', value: '켄트 메이드스톤' },
+      { label: 'Room', value: '남쪽 방' },
+      { label: 'MBTI', value: 'ESFP', mono: true },
+      { label: 'Ennea', value: '2w1', mono: true },
+      { label: 'Instinct', value: 'so/sx', mono: true },
+    ],
+    lines: [
+      { l: 'House', v: '바로우 가 · 켄트 과수·홉 농장' },
+      { l: 'Voice', v: '영국 수화(BSL) · 공책 필담' },
+      { l: 'Function', v: 'EFVL · 정동 우선' },
+      { l: 'Born', v: '1868.05.02' },
+    ],
+    tags: [
+      { t: 'Speaks with Her Hands', i: false },
+      { t: 'Preemptive Sweetness', i: false },
+      { t: 'Sunlit Guard', i: false },
+      { t: 'Pressed-flower Keeper', i: false },
+      { t: 'Warmth as Welcome', i: true },
+    ],
+    likes: ['눌러 말린 들꽃', '따끈한 군밤', '말(馬)'],
+    dislikes: ['자신을 서둘러 치워버리는 시선'],
+    quote: {
+      en: '(공책에 적어) "You read my hands without hurrying. Most people look away first."',
+      ko: '넌 서두르지 않고 내 손을 읽어줘. 다들 먼저 눈을 돌리는데.'
+    }
+  },
+
+  frank: {
+    accent: '#b0825f',
+    img: './images/Frank.webp', ph: 'F',
+    kicker: 'The West Room · Heronscliff',
+    name: 'Frances Hartley',
+    nameKo: "프랜시스 '프랭크' 하틀리",
+    role: '맨체스터 하틀리 가 차녀 · 파리에서 그림을 배운 화가',
+    house: {
+      crest: 'H',
+      name: '하틀리 가',
+      en: 'Hartley of Manchester',
+      seat: '맨체스터 · 유니테리언 상인·예술 후원 가문',
+      desc: '산업 도시 맨체스터의 부를 쥔 유니테리언 상인가이자 예술 후원가. 비국교도 특유의 진보적 기질로 교육과 개혁, 그리고 그림을 후원해 딸을 파리로 보낼 만큼 열려 있었으나, 그 자유가 감당할 수 없는 소문이 되자 결국 발을 뺐다.',
+      meta: ['맨체스터', '유니테리언 상인가', '예술 후원'],
+    },
+    intro: '괄괄하고 직선적인 사람. 안목과 혀가 무기라, 허영이나 위선을 정확히 도려낸다. 다만 무차별 공격형은 아니어서, 자기 그림 앞에 앉은 모델에게는 프랭크 나름의 기준으로 다정하다. 파리에서 그림을 배웠고, 지금은 서쪽 방을 화실 삼아 이젤 앞을 떠나지 않는다. 자유를 맛본 사람에게, 이 조용한 요양지는 가장 견디기 어려운 자리다.',
+    facts: [
+      { label: 'Age', value: '23세', mono: true },
+      { label: 'From', value: '맨체스터' },
+      { label: 'Room', value: '서쪽 방 · 화실' },
+      { label: 'MBTI', value: 'ENTP', mono: true },
+      { label: 'Ennea', value: '7w8', mono: true },
+      { label: 'Instinct', value: 'sx/so', mono: true },
+    ],
+    lines: [
+      { l: 'House', v: '하틀리 가 · 상인·예술 후원 가문' },
+      { l: 'Trained', v: '파리 · 아카데미 줄리앙' },
+      { l: 'Function', v: 'VEFL · 자기확신 우선' },
+      { l: 'Born', v: '1865.09.28' },
+    ],
+    tags: [
+      { t: 'Sharp Eye, Sharper Tongue', i: false },
+      { t: 'Paints What She Watches', i: false },
+      { t: 'Blunt but Fair', i: false },
+      { t: 'Paris in Her Hands', i: false },
+      { t: 'Warmth for Her Sitter', i: true },
+    ],
+    likes: ['페이터 『르네상스』', '독한 커피', '담배 한 대'],
+    dislikes: ['아카데미의 위선', '자기 눈을 못 믿는 검열'],
+    quote: {
+      en: '"Sit still. I\'d rather paint what you are than what you\'d like me to see."',
+      ko: '가만히 앉아 있어. 보이고 싶은 것 말고, 지금의 널 그리고 싶으니까.'
+    }
+  }
+};
+
+/* ── Dossier render ── */
+const modal        = document.getElementById('charModal');
+const modalPanel   = document.getElementById('modalPanel');
+const modalContent = document.getElementById('modalContent');
+const modalClose   = document.getElementById('modalClose');
+let   lastFocused  = null;
+
+function buildDossier(d) {
+  const facts = d.facts.map(f => `
+    <div class="fact">
+      <div class="fact-label">${f.label}</div>
+      <div class="fact-value">${f.mono ? `<span class="mono-sm">${f.value}</span>` : f.value}</div>
+    </div>`).join('');
+
+  const lines = d.lines.map(l => `
+    <div class="dline">
+      <div class="dline-l">${l.l}</div>
+      <div class="dline-v">${l.v}</div>
+    </div>`).join('');
+
+  const tags = d.tags.map(t => `<span class="tag${t.i ? ' intimacy' : ''}">${t.t}</span>`).join('');
+
+  const house = d.house ? `
+    <div class="dossier-house">
+      <div class="house-crest"><span>${d.house.crest}</span></div>
+      <div class="house-body">
+        <p class="house-eyebrow">The House · 가문</p>
+        <p class="house-name">${d.house.name}<span class="en">${d.house.en}</span></p>
+        <p class="house-seat">${d.house.seat}</p>
+        <p class="house-desc">${d.house.desc}</p>
+        <div class="house-meta">${d.house.meta.map(m => `<span class="house-chip">${m}</span>`).join('')}</div>
+      </div>
+    </div>` : '';
+
+  const tasteCell = (cls, label, arr) => {
+    const body = (arr && arr.length)
+      ? `<div class="taste-list">${arr.map(x => `<span class="taste-item">${x}</span>`).join('')}</div>`
+      : `<span class="taste-item">·</span>`;
+    return `<div class="taste ${cls}"><div class="taste-head"><span class="mk"></span>${label}</div>${body}</div>`;
+  };
+
+  return `
+    <div class="dossier">
+      <div class="dossier-portrait">
+        <img src="${d.img}" alt="${d.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="ph" style="display:none">${d.ph}</div>
+        <div class="portrait-cap">
+          <span class="portrait-chip">${d.kicker.split(' · ')[0]}</span>
+          <p class="portrait-name">${d.name}</p>
+          <p class="portrait-name-ko">${d.nameKo}</p>
+        </div>
+      </div>
+      <div class="dossier-info">
+        <p class="dossier-kicker">${d.kicker}</p>
+        <p class="dossier-role">${d.role}</p>
+        ${house}
+        <p class="dossier-intro">${d.intro}</p>
+        <div class="dossier-facts">${facts}</div>
+        <div class="dossier-lines">${lines}</div>
+        <div class="dossier-block">
+          <div class="dossier-sub"><h4>Manner &amp; Bearing</h4><div class="line"></div></div>
+          <div class="tags">${tags}</div>
+        </div>
+        <div class="dossier-block">
+          <div class="dossier-sub"><h4>Likes / Dislikes</h4><div class="line"></div></div>
+          <div class="taste-grid">
+            ${tasteCell('like', 'Likes', d.likes)}
+            ${tasteCell('dislike', 'Dislikes', d.dislikes)}
+          </div>
+        </div>
+        <div class="dossier-quote">
+          <p>${d.quote.en}</p>
+          <p class="ko">${d.quote.ko}</p>
+        </div>
+      </div>
+    </div>`;
+}
+
+function openModal(key) {
+  const d = DOSSIERS[key];
+  if (!d) return;
+  lastFocused = document.activeElement;
+  modalPanel.style.setProperty('--accent', d.accent);
+  modalContent.innerHTML = buildDossier(d);
+  modal.setAttribute('aria-label', d.name + ' — Dossier');
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  modal.scrollTop = 0;
+  const info = modalContent.querySelector('.dossier-info');
+  if (info) info.scrollTop = 0;
+  modalClose.focus();
+}
+function closeModal() {
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+  if (lastFocused) lastFocused.focus();
+}
+document.querySelectorAll('.res-card[data-modal]').forEach(card => {
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  card.addEventListener('click', () => openModal(card.dataset.modal));
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(card.dataset.modal); }
+  });
+});
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>移交 · HANDOVER NOIR — 環宇貿易 機密人事記錄</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Space+Grotesk:wght@300;400;500&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+/* ──────────────────────────────────────────
+   TOKENS — audit-net dossier, cool void + neon trace
+────────────────────────────────────────── */
+:root{
+  --void:     #06080e;
+  --panel:    #0a0d16;
+  --panel-2:  #0d1220;
+  --panel-3:  #0f1524;
+  --hi:       #dee6ef;
+  --mid:      #6e7b8b;
+  --lo:       #4a5766;
+  --line:     rgba(255,255,255,.07);
+  --line-2:   rgba(255,255,255,.12);
+
+  --net:      #33e3d1;      /* audit-net cyan — system UI */
+  --net-dim:  rgba(51,227,209,.14);
+  --alert:    #ff2d55;      /* redaction / danger red   */
+  --alert-dim:rgba(255,45,85,.12);
+
+  /* per-character accents */
+  --c-hin:    #cc2450;      /* 시우힌 · 루비           */
+  --c-lim:    #57bd6a;      /* 혹림 · 조준경 인광 녹색  */
+  --c-fei:    #a3b1c0;      /* 페이위 · 유령의 회색     */
+  --c-tong:   #b6604e;      /* 라이통 · 버건디 브라운   */
+  --c-koo:    #8cc3e8;      /* 쿠 · 아이스 블루        */
+  --c-syu:    #3fb9a6;      /* 몽쉬 · 수조의 물빛      */
+  --c-lun:    #ff3350;      /* 시우룬 · 말소된 붉은색   */
+
+  /* mono type scale — 4 steps, one per role */
+  --fs-tag:  .5rem;    /* micro label            */
+  --fs-meta: .58rem;   /* nav / kicker / stamp   */
+  --fs-mono: .72rem;   /* machine readout        */
+  --fs-code: .86rem;   /* feed / verse           */
+
+  /* space scale — 8px rhythm */
+  --s1: .5rem;  --s2: .75rem; --s3: 1rem;
+  --s4: 1.5rem; --s5: 2rem;   --s6: 2.5rem;
+
+  --ff-d: 'Chakra Petch', system-ui, sans-serif;
+  --ff-s: 'Cormorant Garamond', Georgia, serif;
+  --ff-b: 'Space Grotesk', system-ui, sans-serif;
+  --ff-m: 'Space Mono', ui-monospace, monospace;
+}
+
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; font-size:16px; }
+body{
+  background:var(--void);
+  color:var(--hi);
+  font-family:var(--ff-b);
+  font-weight:300;
+  line-height:1.75;
+  overflow-x:hidden;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+}
+img{ display:block; max-width:100%; }
+a{ color:inherit; text-decoration:none; }
+button{ font:inherit; color:inherit; background:none; border:none; cursor:pointer; }
+::selection{ background:var(--net-dim); color:var(--hi); }
+:focus-visible{ outline:1px solid var(--net); outline-offset:3px; }
+
+/* ambient field: faint net grid + corner glows */
+body::before{
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(60vw 46vh at 8% -6%, rgba(51,227,209,.08), transparent 60%),
+    radial-gradient(52vw 42vh at 96% 4%, rgba(204,36,80,.055), transparent 62%),
+    radial-gradient(58vw 60vh at 80% 104%, rgba(140,195,232,.045), transparent 64%);
+}
+/* scanlines + grain */
+body::after{
+  content:''; position:fixed; inset:0; z-index:9998; pointer-events:none; opacity:.5;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.014) 0 1px, transparent 1px 3px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E");
+}
+
+/* ── type utilities ── */
+.mono{ font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.18em; text-transform:uppercase; color:var(--mid); }
+.mono.net{ color:var(--net); }
+.serif{ font-family:var(--ff-s); }
+/* keyword highlights for World / Network */
+.kw{ color:var(--net); }
+.kw-a{ color:var(--alert); }
+
+/* ──────────────────────────────────────────
+   NAV
+────────────────────────────────────────── */
+nav{
+  position:fixed; inset-block-start:0; inset-inline:0; z-index:300;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.95rem 2.4rem;
+  background:rgba(6,8,14,.82);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.nav-brand{ display:flex; align-items:baseline; gap:.7rem; }
+.nav-brand .zh{ font-family:var(--ff-d); font-weight:600; font-size:.95rem; letter-spacing:.12em; }
+.nav-brand .en{ font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.24em; text-transform:uppercase; color:var(--net); }
+.nav-links{ display:flex; gap:1.9rem; list-style:none; }
+.nav-links a{ font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.16em; text-transform:uppercase; color:var(--mid); transition:color .25s; position:relative; }
+.nav-links a::after{ content:''; position:absolute; left:0; bottom:-5px; width:0; height:1px; background:var(--net); transition:width .3s; }
+.nav-links a:hover, .nav-links a.active{ color:var(--hi); }
+.nav-links a.active::after{ width:100%; }
+.nav-clock{ font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.1em; color:var(--net); }
+@media(max-width:820px){ .nav-links{ display:none; } .nav-clock{ display:none; } }
+
+/* ──────────────────────────────────────────
+   ACCESS / HERO — decrypt a classified file
+────────────────────────────────────────── */
+#access{ position:relative; z-index:2; min-height:100vh; display:flex; align-items:center; }
+.access-inner{ width:100%; max-width:1120px; margin:0 auto; padding:8rem 2.4rem 4rem; }
+
+.stamp-row{ display:flex; align-items:center; gap:.9rem; flex-wrap:wrap; margin-bottom:2.4rem; }
+.stamp{
+  font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.2em; text-transform:uppercase;
+  padding:.4rem .75rem; border:1px solid var(--line-2); color:var(--mid);
+}
+.stamp.hot{ color:var(--alert); border-color:rgba(255,45,85,.4); background:var(--alert-dim); }
+.stamp.net{ color:var(--net); border-color:rgba(51,227,209,.4); background:var(--net-dim); }
+
+/* decrypt terminal */
+.term{ font-family:var(--ff-m); font-size:var(--fs-mono); line-height:2.1; color:var(--mid); margin-bottom:2.6rem; min-height:6.6em; }
+.term .k{ color:var(--net); }
+.term .r{ color:var(--alert); }
+.term-cursor{ display:inline-block; width:.6ch; background:var(--net); color:transparent; animation:blink 1s steps(1) infinite; }
+@keyframes blink{ 50%{ opacity:0; } }
+
+.access-title{ position:relative; margin-bottom:1.6rem; }
+.access-title .zh{
+  font-family:var(--ff-d); font-weight:700;
+  font-size:clamp(4rem,15vw,10rem); line-height:.9; letter-spacing:.02em;
+}
+.access-title .en{
+  font-family:var(--ff-m); font-size:clamp(.7rem,2.4vw,1.05rem); letter-spacing:.5em;
+  text-transform:uppercase; color:var(--hi); margin-top:.6rem; padding-left:.3rem;
+}
+/* hero title holds still. the noise belongs to the archive, not the cover. */
+
+.access-lede{ max-width:38rem; font-size:1.02rem; color:var(--hi); line-height:1.85; margin-top:2rem; }
+.access-lede .zh{ font-family:var(--ff-s); font-style:italic; color:var(--net); }
+.access-lede p+p{ margin-top:.7rem; color:var(--mid); }
+
+.access-scroll{ margin-top:3.4rem; display:flex; align-items:center; gap:.8rem; }
+.access-scroll .bar{ width:44px; height:1px; background:var(--net); }
+.access-scroll span{ font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.2em; text-transform:uppercase; color:var(--mid); }
+
+/* ──────────────────────────────────────────
+   SHARED SECTION FRAME
+────────────────────────────────────────── */
+.wrap{ max-width:1120px; margin:0 auto; padding:0 2.4rem; position:relative; z-index:2; }
+section{ position:relative; }
+.sec-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:1.5rem; padding:5.5rem 0 2.6rem; border-bottom:1px solid var(--line); margin-bottom:3rem; flex-wrap:wrap; }
+.sec-head .l .idx{ font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.24em; color:var(--net); text-transform:uppercase; }
+.sec-head .l h2{ font-family:var(--ff-d); font-weight:600; font-size:clamp(1.8rem,4vw,2.7rem); line-height:1.05; margin-top:.7rem; letter-spacing:.01em; }
+.sec-head .l h2 .zh{ color:var(--mid); font-weight:400; margin-left:.4rem; }
+.sec-head .r{ font-family:var(--ff-s); font-style:italic; font-size:1.02rem; color:var(--mid); max-width:22rem; text-align:right; }
+@media(max-width:720px){ .sec-head .r{ text-align:left; } }
+
+/* ──────────────────────────────────────────
+   WORLD — VERTICAL timeline + concept cards
+────────────────────────────────────────── */
+.timeline{ position:relative; margin:.5rem 0 0; padding-left:2.6rem; }
+.timeline::before{
+  content:''; position:absolute; left:0; top:.6rem; bottom:.6rem; width:1px;
+  background:linear-gradient(180deg, transparent, var(--line-2) 6%, var(--line-2) 94%, transparent);
+}
+.tl-node{ position:relative; padding:0 0 2.7rem; outline:none; }
+.tl-node:last-child{ padding-bottom:.6rem; }
+
+.tl-dot{
+  position:absolute; left:-2.6rem; top:.45rem; transform:translateX(-50%);
+  width:12px; height:12px; border-radius:50%;
+  background:var(--panel); border:1px solid var(--mid);
+  transition:background .35s ease, border-color .35s ease, box-shadow .35s ease, transform .35s ease;
+}
+.tl-dot.lg{ width:19px; height:19px; }
+.tl-dot.sm{ width:9px; height:9px; }
+.tl-dot::after{
+  content:''; position:absolute; inset:-7px; border-radius:50%;
+  border:1px solid var(--net); opacity:0; pointer-events:none;
+}
+.tl-node:hover .tl-dot,
+.tl-node:focus-visible .tl-dot{
+  background:var(--net); border-color:var(--net);
+  box-shadow:0 0 16px color-mix(in srgb, var(--net) 70%, transparent);
+  transform:translateX(-50%) scale(1.12);
+}
+.tl-node.key:hover .tl-dot,
+.tl-node.key:focus-visible .tl-dot{
+  background:var(--alert); border-color:var(--alert);
+  box-shadow:0 0 18px color-mix(in srgb, var(--alert) 70%, transparent);
+}
+.tl-node:hover .tl-dot::after,
+.tl-node:focus-visible .tl-dot::after{ animation:ripple 1.5s ease-out infinite; }
+.tl-node.key:hover .tl-dot::after,
+.tl-node.key:focus-visible .tl-dot::after{ border-color:var(--alert); }
+@keyframes ripple{ 0%{ transform:scale(.55); opacity:.75; } 100%{ transform:scale(2.6); opacity:0; } }
+
+.tl-yr{
+  font-family:var(--ff-d); font-weight:700; font-size:1.5rem; letter-spacing:.02em;
+  color:var(--mid); transition:color .35s ease, text-shadow .35s ease; display:inline-block;
+}
+.tl-tag{ font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.16em; text-transform:uppercase; color:var(--lo); margin:.45rem 0 .55rem; transition:color .35s ease; }
+.tl-title{ font-family:var(--ff-d); font-weight:500; font-size:1.02rem; color:var(--mid); margin-bottom:.4rem; transition:color .35s ease; }
+.tl-desc{ font-size:.87rem; color:var(--mid); line-height:1.68; max-width:40rem; transition:color .4s ease; }
+
+.tl-node:hover .tl-yr,
+.tl-node:focus-visible .tl-yr{ color:var(--net); text-shadow:0 0 18px color-mix(in srgb, var(--net) 45%, transparent); }
+.tl-node.key:hover .tl-yr,
+.tl-node.key:focus-visible .tl-yr{ color:var(--alert); text-shadow:0 0 18px color-mix(in srgb, var(--alert) 45%, transparent); }
+.tl-node:hover .tl-tag,
+.tl-node:focus-visible .tl-tag{ color:var(--mid); }
+.tl-node:hover .tl-title,
+.tl-node:focus-visible .tl-title{ color:var(--hi); }
+.tl-node:hover .tl-desc,
+.tl-node:focus-visible .tl-desc{ color:var(--hi); }
+
+.concepts{ display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; margin-top:3.4rem; }
+.concept{ border:1px solid var(--line); border-top:2px solid var(--net); background:linear-gradient(170deg,var(--panel-2),var(--panel)); padding:1.8rem 1.7rem 2rem; }
+.concept.b{ border-top-color:var(--c-koo); }
+.concept.c{ border-top-color:var(--alert); }
+.concept .k{ font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.16em; text-transform:uppercase; color:var(--mid); margin-bottom:.9rem; }
+.concept h3{ font-family:var(--ff-d); font-weight:600; font-size:1.2rem; margin-bottom:.5rem; }
+.concept h3 .zh{ color:var(--mid); font-weight:400; font-size:.9rem; margin-left:.35rem; }
+.concept p{ font-size:.88rem; color:var(--mid); line-height:1.72; }
+@media(max-width:920px){ .concepts{ grid-template-columns:1fr; } }
+
+/* ──────────────────────────────────────────
+   NETWORK — 環宇貿易 hierarchy
+────────────────────────────────────────── */
+.org-note{ font-size:.92rem; color:var(--mid); max-width:46rem; margin-bottom:2.6rem; line-height:1.8; }
+.org-note b{ color:var(--hi); font-weight:500; }
+
+.org{ display:flex; flex-direction:column; gap:.7rem; }
+.orow{
+  position:relative; display:grid; grid-template-columns:180px 1fr; align-items:stretch;
+  border:1px solid var(--line); background:var(--panel);
+  transition:border-color .3s ease, background .3s ease;
+}
+.orow::before{
+  content:''; position:absolute; left:0; top:0; bottom:0; width:2px;
+  background:var(--net); opacity:.5; transition:opacity .3s ease;
+}
+.orow:hover{ border-color:var(--line-2); background:var(--panel-2); }
+.orow:hover::before{ opacity:1; }
+.orow .lvl{ padding:1.35rem 1.4rem; border-right:1px solid var(--line); display:flex; flex-direction:column; justify-content:center; gap:.35rem; background:linear-gradient(120deg, var(--panel-2), transparent); }
+.orow .lvl .n{ font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.18em; text-transform:uppercase; color:var(--net); }
+.orow .lvl .t{ font-family:var(--ff-d); font-weight:500; font-size:.98rem; }
+.orow .body{ padding:1.35rem 1.6rem; display:flex; flex-direction:column; justify-content:center; }
+.orow .body .who{ font-family:var(--ff-s); font-size:1.2rem; color:var(--hi); }
+.orow .body .who .zh{ color:var(--mid); font-size:.9rem; margin-left:.4rem; }
+.orow .body p{ font-size:.86rem; color:var(--mid); margin-top:.35rem; line-height:1.62; }
+@media(max-width:640px){
+  .orow{ grid-template-columns:1fr; }
+  .orow .lvl{ border-right:none; border-bottom:1px solid var(--line); flex-direction:row; align-items:center; gap:.8rem; }
+}
+
+/* ── FACTIONS — 통합파 × 비축파 ── */
+.factions-head{ margin:4.6rem 0 1.6rem; }
+.factions-head .k{ font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.22em; text-transform:uppercase; color:var(--mid); }
+.factions-head h3{ font-family:var(--ff-d); font-weight:600; font-size:clamp(1.3rem,3vw,1.8rem); margin-top:.6rem; }
+.factions-head h3 .zh{ color:var(--mid); font-weight:400; margin-left:.4rem; }
+
+.factions{ display:grid; grid-template-columns:1fr 1fr; gap:1.3rem; position:relative; }
+.faction{
+  --f:var(--net); --f-dim:var(--net-dim);
+  position:relative; border:1px solid var(--line); background:linear-gradient(165deg, var(--panel-2), var(--panel));
+  padding:1.9rem 1.8rem 2rem; overflow:hidden; transition:transform .35s ease, border-color .35s ease;
+}
+.faction.integ{ --f:var(--net); --f-dim:var(--net-dim); }
+.faction.hoard{ --f:var(--alert); --f-dim:var(--alert-dim); }
+.faction::before{ content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--f); }
+.faction::after{
+  content:''; position:absolute; right:-30%; top:-40%; width:70%; height:120%;
+  background:radial-gradient(circle, var(--f-dim), transparent 68%); pointer-events:none;
+}
+.faction:hover{ transform:translateY(-4px); border-color:color-mix(in srgb, var(--f) 40%, var(--line-2)); }
+.f-tag{ font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.2em; text-transform:uppercase; color:var(--f); }
+.f-name{ font-family:var(--ff-d); font-weight:700; font-size:1.8rem; margin:.55rem 0 .1rem; letter-spacing:.02em; }
+.f-name .en{ font-family:var(--ff-m); font-weight:400; font-size:.7rem; letter-spacing:.12em; color:var(--mid); margin-left:.5rem; text-transform:uppercase; }
+.f-line{ font-family:var(--ff-s); font-style:italic; font-size:1.16rem; color:var(--hi); margin:.5rem 0 1.1rem; }
+.f-desc{ font-size:.9rem; color:var(--mid); line-height:1.72; padding-bottom:1.3rem; margin-bottom:1.3rem; border-bottom:1px solid var(--line); }
+.f-desc b{ color:color-mix(in srgb, var(--f) 78%, var(--hi)); font-weight:500; }
+.f-rows{ display:flex; flex-direction:column; gap:.85rem; }
+.f-r{ display:grid; grid-template-columns:104px 1fr; gap:.9rem; align-items:baseline; }
+.f-r .rk{ font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.12em; text-transform:uppercase; color:var(--f); padding-top:.15rem; }
+.f-r .rv{ font-size:.85rem; color:var(--hi); line-height:1.5; }
+.f-r .rv .zh{ color:var(--mid); }
+
+.f-bridge{
+  grid-column:1 / -1; text-align:center; margin-top:.4rem;
+  font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.14em; color:var(--mid);
+  padding:1rem; border:1px dashed var(--line-2); background:rgba(255,255,255,.012);
+}
+.f-bridge b{ color:var(--net); font-weight:400; }
+.f-bridge .amp{ color:var(--alert); }
+@media(max-width:760px){ .factions{ grid-template-columns:1fr; } }
+
+/* ── RIVAL — 통합파 경쟁조직 (부분 말소 인텔 카드) ── */
+.rival{
+  position:relative; margin-top:1.3rem; border:1px solid rgba(255,45,85,.24);
+  background:linear-gradient(150deg, rgba(255,45,85,.05), var(--panel));
+  padding:1.8rem 1.9rem 1.9rem; overflow:hidden;
+}
+.rival::before{ content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:repeating-linear-gradient(90deg, var(--alert) 0 10px, transparent 10px 18px); opacity:.7; }
+.rival::after{ content:'?'; position:absolute; right:1.4rem; top:.2rem;
+  font-family:var(--ff-d); font-weight:700; font-size:7rem; color:rgba(255,45,85,.06); pointer-events:none; }
+.rival .rv-head{ display:flex; align-items:baseline; gap:.8rem; flex-wrap:wrap; margin-bottom:.2rem; }
+.rival .rv-tag{ font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.2em; text-transform:uppercase; color:var(--alert); }
+.rival .rv-name{ font-family:var(--ff-d); font-weight:700; font-size:1.5rem; letter-spacing:.02em; }
+.rival .rv-name .blk{ display:inline-block; background:var(--alert); color:transparent; border-radius:1px; user-select:none; }
+.rival .rv-name .en{ font-family:var(--ff-m); font-weight:400; font-size:var(--fs-meta); letter-spacing:.12em; color:var(--mid); text-transform:uppercase; }
+.rival p{ font-size:.88rem; color:var(--mid); line-height:1.75; margin-top:.9rem; max-width:52rem; }
+.rival p b{ color:color-mix(in srgb, var(--alert) 72%, var(--hi)); font-weight:500; }
+.rival .rv-foot{ margin-top:1.1rem; padding-top:1rem; border-top:1px solid var(--line);
+  font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.06em; color:rgba(255,80,110,.6); }
+
+/* ── RELATIONSHIP DYNAMICS — 관계 역학 ── */
+.rel-head{ margin:4.6rem 0 .7rem; }
+.rel-head .k{ font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.22em; text-transform:uppercase; color:var(--mid); }
+.rel-head h3{ font-family:var(--ff-d); font-weight:600; font-size:clamp(1.3rem,3vw,1.8rem); margin-top:.6rem; }
+.rel-head h3 .zh{ color:var(--mid); font-weight:400; margin-left:.4rem; }
+.rel-intro{ font-size:.9rem; color:var(--mid); max-width:46rem; margin-bottom:2rem; line-height:1.78; }
+.rel-intro b{ color:var(--hi); font-weight:500; }
+
+.rel-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
+.rel{
+  --rc:var(--net);
+  position:relative; border:1px solid var(--line); border-left:2px solid var(--rc);
+  background:linear-gradient(160deg, var(--panel-2), var(--panel));
+  padding:1.6rem 1.7rem 1.7rem; transition:border-color .3s ease, transform .3s ease;
+}
+.rel:hover{ transform:translateY(-3px); border-color:color-mix(in srgb, var(--rc) 34%, var(--line-2)); }
+.rel .rel-k{ font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.16em; text-transform:uppercase; color:var(--rc); margin-bottom:.9rem; }
+/* the bond line: name — connector — name */
+.rel-bond{ display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; margin-bottom:1rem; }
+.rel-bond .node{ font-family:var(--ff-s); font-size:1.16rem; color:var(--hi); line-height:1.15; }
+.rel-bond .node .zh{ display:block; font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.08em; color:var(--mid); margin-top:.2rem; }
+.rel-bond .link{ flex:1; min-width:34px; height:0; border-top:1px dashed color-mix(in srgb, var(--rc) 55%, var(--line-2)); position:relative; }
+.rel-bond .link::after{ content:attr(data-l); position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  padding:0 .45rem; background:var(--panel-2); font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.12em;
+  text-transform:uppercase; color:color-mix(in srgb, var(--rc) 70%, var(--hi)); white-space:nowrap; }
+/* surface vs underneath */
+.rel-du{ display:grid; grid-template-columns:1fr; gap:.55rem; }
+.rel-du .row{ display:grid; grid-template-columns:58px 1fr; gap:.7rem; align-items:baseline; }
+.rel-du .rl{ font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.1em; text-transform:uppercase; color:var(--mid); padding-top:.15rem; }
+.rel-du .rt{ font-size:.86rem; color:var(--hi); line-height:1.6; }
+.rel-du .row.under .rl{ color:var(--rc); }
+.rel-du .row.under .rt{ color:var(--mid); }
+.rel-du .rt em{ font-style:normal; color:color-mix(in srgb, var(--rc) 66%, var(--hi)); }
+@media(max-width:760px){ .rel-grid{ grid-template-columns:1fr; } }
+
+/* ──────────────────────────────────────────
+   FILES — character dossiers, expanded carousel LEFT
+────────────────────────────────────────── */
+.dossier-wrap{
+  display:grid; grid-template-columns:minmax(300px,47%) 1fr; gap:0;
+  border:1px solid var(--line); background:var(--panel); margin-bottom:2.4rem; overflow:hidden;
+}
+
+/* ── VISUAL / carousel ── */
+.dossier-visual{ position:relative; min-height:600px; overflow:hidden; background:#070a11; }
+.image-track{ display:flex; height:100%; width:100%; transition:transform .55s cubic-bezier(.5,0,.15,1); }
+.slide{ position:relative; flex:0 0 100%; height:100%; min-height:600px; overflow:hidden; }
+.slide img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:2; }
+
+/* placeholder shown when the image file is absent */
+.slide-fallback{
+  position:absolute; inset:0; z-index:1;
+  background:
+    radial-gradient(120% 90% at 30% 18%, color-mix(in srgb, var(--c) 26%, transparent), transparent 60%),
+    linear-gradient(160deg, var(--panel-2), #070a11);
+}
+.slide-fallback::after{ content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.30) 0 1px, transparent 1px 4px); mix-blend-mode:multiply; }
+.fb-hz{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:var(--ff-d); font-weight:700; font-size:clamp(4.4rem,12vw,8rem); letter-spacing:.05em;
+  color:color-mix(in srgb, var(--c) 82%, #fff); opacity:.9; writing-mode:vertical-rl; line-height:.92;
+  text-shadow:0 0 44px color-mix(in srgb,var(--c) 55%, transparent); }
+.fb-scan{ position:absolute; inset:0; pointer-events:none; height:36%; opacity:0;
+  background:linear-gradient(180deg, transparent, color-mix(in srgb,var(--c) 42%,transparent) 50%, transparent); }
+/* one sweep per card: only the slide on screen, only while the card is on screen */
+.dossier-visual.live .slide.on .fb-scan{ opacity:.5; animation:sweep 5.5s cubic-bezier(.5,0,.5,1) infinite; }
+@keyframes sweep{ 0%{ transform:translateY(-110%);} 100%{ transform:translateY(320%);} }
+.fb-corner{ position:absolute; width:16px; height:16px; border:1px solid color-mix(in srgb,var(--c) 60%, var(--line-2)); }
+.fb-corner.tl{ top:14px; left:14px; border-right:none; border-bottom:none; }
+.fb-corner.br{ bottom:14px; right:14px; border-left:none; border-top:none; }
+.fb-tag{ position:absolute; top:16px; left:16px; font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.14em; text-transform:uppercase; color:color-mix(in srgb,var(--c) 75%, #fff); }
+.fb-id{ position:absolute; left:16px; bottom:52px; font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.1em; color:var(--mid); }
+.fb-bar{ position:absolute; left:16px; right:16px; bottom:18px; height:26px; opacity:.5;
+  background:repeating-linear-gradient(90deg, color-mix(in srgb,var(--c) 70%,#fff) 0 2px, transparent 2px 3px, color-mix(in srgb,var(--c) 70%,#fff) 3px 4px, transparent 4px 7px); }
+
+/* arrows */
+.carousel-nav{ position:absolute; inset:0; z-index:4; display:flex; align-items:center; justify-content:space-between;
+  padding:0 .9rem; opacity:0; transition:opacity .32s ease; pointer-events:none; }
+.dossier-visual:hover .carousel-nav,
+.dossier-visual:focus-within .carousel-nav{ opacity:1; }
+.carousel-nav button{
+  pointer-events:auto; width:38px; height:52px; display:flex; align-items:center; justify-content:center;
+  color:#fff; background:rgba(6,8,14,.35); border:1px solid rgba(255,255,255,.16);
+  backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+  transition:background .25s ease, border-color .25s ease, transform .2s ease;
+}
+.carousel-nav button:hover{ background:rgba(6,8,14,.6); border-color:rgba(255,255,255,.42); }
+.carousel-nav button:active{ transform:scale(.92); }
+.carousel-nav svg{ width:15px; height:15px; }
+
+/* indicators */
+.carousel-indicators{ position:absolute; right:1.1rem; bottom:1.1rem; z-index:5; display:flex; gap:.55rem; }
+.carousel-indicators .cdot{
+  width:9px; height:9px; border-radius:50%; background:rgba(220,230,240,.28);
+  transition:background .3s ease, box-shadow .3s ease, transform .3s ease;
+}
+.carousel-indicators .cdot:hover{ background:rgba(220,230,240,.55); }
+.carousel-indicators .cdot.active{ background:var(--c); box-shadow:0 0 10px color-mix(in srgb, var(--c) 80%, transparent); transform:scale(1.15); }
+
+/* ── DATA ── */
+.dossier-data{ padding:var(--s6) var(--s6) var(--s6); display:flex; flex-direction:column; }
+.dossier-data .kicker{ font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.2em; text-transform:uppercase; color:var(--c); margin-bottom:1rem; display:flex; align-items:center; gap:.7rem; }
+.dossier-data .kicker .no{ color:var(--mid); }
+.d-name{ font-family:var(--ff-s); font-size:clamp(2.1rem,4vw,2.9rem); font-weight:500; line-height:1.02; letter-spacing:-.01em; }
+.d-name .ko{ display:block; font-family:var(--ff-d); font-weight:400; font-size:1rem; color:var(--mid); letter-spacing:.04em; margin-top:.5rem; }
+.d-role{ font-size:.9rem; color:var(--hi); margin:var(--s4) 0 var(--s4); padding-bottom:var(--s4); border-bottom:1px solid var(--line); line-height:1.6; }
+
+.facts{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:var(--s4); }
+.fact{ background:var(--panel-2); padding:.9rem .95rem; }
+.fact .l{ font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.14em; text-transform:uppercase; color:var(--mid); margin-bottom:.35rem; }
+.fact .v{ font-size:.82rem; color:var(--hi); line-height:1.35; }
+.fact .v.m{ font-family:var(--ff-m); font-size:.7rem; letter-spacing:.03em; }
+@media(max-width:520px){ .facts{ grid-template-columns:1fr 1fr; } }
+
+/* ── psychometric classification : typology + trope index ── */
+.classify{ margin-bottom:var(--s4); }
+.cls-head{ display:flex; align-items:center; gap:.9rem; margin-bottom:.85rem; }
+.cls-head h4{ font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.16em; text-transform:uppercase; color:var(--c); font-weight:400; }
+.cls-head .ln{ flex:1; height:1px; background:var(--line); }
+
+.typ-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); }
+.typ{ position:relative; background:var(--panel-2); padding:.72rem .82rem .78rem; overflow:hidden; }
+.typ::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--c); opacity:.5; }
+.typ .tl{ display:block; font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.14em; text-transform:uppercase; color:var(--mid); margin-bottom:.42rem; }
+.typ .tv{ font-family:var(--ff-m); font-size:.82rem; letter-spacing:.04em; color:color-mix(in srgb, var(--c) 68%, var(--hi)); }
+@media(max-width:520px){ .typ-grid{ grid-template-columns:1fr 1fr; } }
+
+.tropes{ display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; margin-top:1rem; }
+.tropes .tr-label{ font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.16em; text-transform:uppercase; color:var(--mid); margin-right:.15rem; }
+.trope{
+  font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.05em; line-height:1;
+  padding:.36rem .62rem;
+  border:1px solid color-mix(in srgb, var(--c) 28%, var(--line-2));
+  color:color-mix(in srgb, var(--c) 66%, var(--hi));
+  background:color-mix(in srgb, var(--c) 7%, transparent);
+  transition:border-color .25s ease, background .25s ease, color .25s ease, transform .2s ease;
+}
+.trope:hover{
+  border-color:color-mix(in srgb, var(--c) 62%, var(--line-2));
+  background:color-mix(in srgb, var(--c) 16%, transparent);
+  color:var(--hi); transform:translateY(-1px);
+}
+
+.d-block{ margin-bottom:var(--s4); }
+.d-sub{ display:flex; align-items:center; gap:.9rem; margin-bottom:.75rem; }
+.d-sub h4{ font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.16em; text-transform:uppercase; color:var(--c); font-weight:400; }
+.d-sub .ln{ flex:1; height:1px; background:var(--line); }
+.d-block p{ font-size:.9rem; color:var(--mid); line-height:1.8; }
+.d-block p .hl{ color:var(--hi); }
+
+/* ── disposition : what a person keeps near, and what they will not have ── */
+.dispo{ margin-bottom:var(--s4); }
+.dp{ display:flex; flex-direction:column; gap:.55rem; }
+.dp-row{ display:grid; grid-template-columns:34px 1fr; gap:.75rem; align-items:start; }
+.dp-k{ font-family:var(--ff-d); font-weight:500; font-size:.72rem; letter-spacing:.06em; padding-top:.3rem; }
+.dp-k.pos{ color:color-mix(in srgb, var(--c) 72%, var(--hi)); }
+.dp-k.neg{ color:rgba(255,80,110,.72); }
+.dp-c{ display:flex; flex-wrap:wrap; gap:.42rem; }
+.chip{
+  font-size:.76rem; line-height:1; padding:.4rem .66rem;
+  border:1px solid color-mix(in srgb, var(--c) 22%, var(--line-2));
+  background:color-mix(in srgb, var(--c) 6%, transparent);
+  color:color-mix(in srgb, var(--c) 40%, var(--hi));
+}
+.chip.neg{
+  border-color:rgba(255,45,85,.2); background:rgba(255,45,85,.045);
+  color:rgba(230,180,192,.9); text-decoration:line-through; text-decoration-color:rgba(255,45,85,.45);
+  text-decoration-thickness:1px; text-underline-offset:2px;
+}
+.chip.void{
+  font-family:var(--ff-m); font-size:var(--fs-meta); letter-spacing:.1em;
+  border-style:dashed; border-color:var(--line-2); background:transparent; color:var(--mid);
+}
+.chip.void .blk{ display:inline-block; background:var(--mid); color:transparent; user-select:none; border-radius:1px; }
+
+/* ── the expunged file : a rule where a summary should have been ── */
+.d-rule{
+  height:1px; border:0; margin:var(--s4) 0 var(--s4);
+  background:linear-gradient(90deg,
+    color-mix(in srgb, var(--c) 80%, transparent),
+    color-mix(in srgb, var(--c) 22%, transparent) 30%,
+    var(--line-2) 58%, transparent);
+}
+
+/* ── recovery attempt on a corrupted node ── */
+.recover-log{
+  position:relative; margin:0 0 var(--s4); padding:1.2rem 1.35rem 1.1rem;
+  border:1px solid var(--line); border-left:2px solid rgba(255,45,85,.45);
+  background:linear-gradient(118deg, rgba(255,45,85,.04), var(--panel-2));
+  font-family:var(--ff-m); font-size:var(--fs-mono); line-height:2.05; color:var(--mid);
+}
+.recover-log .rl-l{ position:relative; }
+.recover-log .rl-l .a{ color:rgba(255,90,118,.92); }
+.recover-log .rl-l .k{ color:var(--net); }
+.recover-log .blk{ display:inline-block; background:var(--alert); color:transparent; user-select:none; border-radius:1px; vertical-align:baseline; }
+.recover-log .rl-cur{ display:inline-block; width:.55ch; background:var(--alert); color:transparent; animation:blink 1.1s steps(1) infinite; }
+.rl-bar{ position:relative; height:2px; margin-top:.95rem; background:rgba(255,255,255,.05); overflow:hidden; }
+.rl-bar span{ position:absolute; inset:0 auto 0 0; width:12%; background:var(--alert); opacity:.65; }
+.rl-bar::after{ content:''; position:absolute; inset:0 0 0 12%;
+  background:repeating-linear-gradient(90deg, rgba(255,45,85,.22) 0 2px, transparent 2px 6px); }
+
+/* margin note (Lai-tong) */
+.note{ margin-top:auto; padding:1.4rem 1.5rem; border-left:2px solid var(--c);
+  background:linear-gradient(120deg, color-mix(in srgb,var(--c) 8%, var(--panel-2)), var(--panel-2)); }
+.note .h{ font-family:var(--ff-m); font-size:var(--fs-tag); letter-spacing:.16em; text-transform:uppercase; color:var(--c); margin-bottom:.7rem; display:flex; align-items:center; gap:.5rem; }
+.note .h .zh{ color:var(--mid); }
+.note p{ font-family:var(--ff-s); font-style:italic; font-size:1.06rem; line-height:1.6; color:var(--hi); }
+
+@media(max-width:760px){
+  .dossier-wrap{ grid-template-columns:1fr; }
+  .dossier-visual, .slide{ min-height:0; }
+  .dossier-visual{ aspect-ratio:4/3; }
+  .fb-hz{ writing-mode:horizontal-tb; }
+}
+
+/* ── REDACTED record : 시우룬 ── */
+.redacted{ --c:var(--c-lun); border-color:rgba(255,45,85,.28); }
+.redacted .dossier-visual{ background:linear-gradient(160deg,#120608,#070406); }
+.redacted-screen{
+  position:absolute; inset:0; z-index:2; display:flex; flex-direction:column; justify-content:center;
+  gap:.9rem; padding:2rem 1.9rem; font-family:var(--ff-m); font-size:var(--fs-mono); line-height:1.9;
+  color:rgba(255,80,110,.9);
+}
+.redacted-screen::before{ content:'✕'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:var(--ff-d); font-size:15rem; color:rgba(255,45,85,.07); z-index:-1; }
+.redacted-screen::after{ content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(0deg, rgba(255,45,85,.05) 0 1px, transparent 1px 4px); }
+.rs-line{ position:relative; }
+.rs-line .blk{ display:inline-block; background:var(--alert); color:transparent; user-select:none; border-radius:1px; vertical-align:baseline; }
+.rs-line.dim{ color:rgba(255,80,110,.6); }
+.rs-cur{ display:inline-block; width:.55ch; background:var(--alert); color:transparent; animation:blink 1.1s steps(1) infinite; }
+
+/* ── ghost feed (corrupted broadcast verse) ── */
+.ghost-feed{
+  position:relative; margin:0 0 var(--s4); padding:1.5rem 1.6rem; overflow:hidden;
+  font-family:var(--ff-m); font-size:var(--fs-code); line-height:2.15;
+  border:1px solid rgba(255,45,85,.22);
+  background:linear-gradient(120deg, rgba(255,45,85,.05), var(--panel-2));
+}
+.ghost-feed.live{ animation:feedflicker 7s infinite steps(1); }
+.ghost-feed::before{ content:''; position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background:repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px); }
+.ghost-feed::after{ content:''; position:absolute; left:0; right:0; height:34%; opacity:0;
+  background:linear-gradient(180deg, transparent, rgba(255,45,85,.10), transparent);
+  pointer-events:none; }
+.ghost-feed.live::after{ opacity:1; animation:feedsweep 4.5s linear infinite; }
+@keyframes feedsweep{ 0%{ transform:translateY(-120%);} 100%{ transform:translateY(320%);} }
+@keyframes feedflicker{ 0%,93%,100%{ opacity:1; } 94%{ opacity:.62; } 95%{ opacity:1; } 96%{ opacity:.4; } 97%{ opacity:1; } }
+
+.feed-line{ position:relative; color:rgba(255,120,145,.9); }
+
+.gw{ position:relative; display:inline-block; color:#fff; }
+.gw::after{ content:'█████'; position:absolute; left:0; top:0; color:var(--alert); background:var(--void);
+  opacity:0; overflow:hidden; white-space:nowrap; }
+.ghost-feed.live .gw.g1::after{ animation:gwflick 5.5s infinite steps(1); }
+.gw.g2::after{ content:'████'; }
+.ghost-feed.live .gw.g2::after{ animation:gwflick 5.5s .9s infinite steps(1); }
+.gw.g3::after{ content:'█████'; }
+.ghost-feed.live .gw.g3::after{ animation:gwflick 5.5s 1.8s infinite steps(1); }
+@keyframes gwflick{ 0%,66%,100%{ opacity:0; } 67%{ opacity:1; } 69%{ opacity:0; } 80%{ opacity:1; } 82%{ opacity:0; } }
+.feed-noise{ margin-top:.9rem; font-size:var(--fs-meta); letter-spacing:.05em; color:rgba(255,45,85,.55); }
+
+/* ──────────────────────────────────────────
+   FOOTER
+────────────────────────────────────────── */
+footer{ position:relative; z-index:2; margin-top:6rem; border-top:1px solid var(--line); }
+.foot-in{ max-width:1120px; margin:0 auto; padding:3rem 2.4rem 4rem; display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; }
+.foot-l .zh{ font-family:var(--ff-d); font-weight:600; font-size:1rem; letter-spacing:.1em; }
+.foot-l .mono{ display:block; margin-top:.6rem; line-height:1.9; }
+
+/* ── reveal ── */
+.reveal{ opacity:0; transform:translateY(22px); transition:opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
+.reveal.in{ opacity:1; transform:none; }
+.reveal.d1{ transition-delay:.1s; } .reveal.d2{ transition-delay:.2s; } .reveal.d3{ transition-delay:.3s; }
+@media(prefers-reduced-motion:reduce){
+  .reveal{ opacity:1; transform:none; transition:none; }
+  .fb-scan, .access-title .glitch::before, .access-title .glitch::after,
+  .ghost-feed, .ghost-feed::after, .feed-line::before, .feed-line::after,
+  .gw::after, .tl-dot::after, .term-cursor, .rs-cur, .rl-cur,
+  .mapscan, .cablepulse, .shelf-core, .zone .ping{ animation:none; }
+  .image-track{ transition:none; }
+}
+
+/* ──────────────────────────────────────────
+   DISTRICTS — audit-net terrain scan of the harbour
+────────────────────────────────────────── */
+.terrain-intro{ font-size:.92rem; color:var(--mid); max-width:47rem; margin-bottom:2.4rem; line-height:1.8; }
+.terrain-intro b{ color:var(--hi); font-weight:500; }
+.terrain-intro .kw{ color:var(--net); } .terrain-intro .kw-a{ color:var(--alert); }
+
+/* map shell */
+.mapframe{
+  position:relative; border:1px solid var(--line-2); overflow:hidden;
+  background:
+    radial-gradient(120% 96% at 82% 24%, rgba(51,227,209,.06), transparent 58%),
+    radial-gradient(90% 90% at 24% 86%, rgba(140,195,232,.04), transparent 60%),
+    linear-gradient(168deg, #070c15, #05070d);
+}
+.mapframe .brk{ position:absolute; width:22px; height:22px; border:1px solid rgba(51,227,209,.4); z-index:6; pointer-events:none; }
+.mapframe .brk.tl{ top:12px; left:12px; border-right:none; border-bottom:none; }
+.mapframe .brk.tr{ top:12px; right:12px; border-left:none; border-bottom:none; }
+.mapframe .brk.bl{ bottom:12px; left:12px; border-right:none; border-top:none; }
+.mapframe .brk.br{ bottom:12px; right:12px; border-left:none; border-top:none; }
+/* ambient scan sweep over the whole map */
+.mapframe .mapscan{ position:absolute; left:0; right:0; height:30%; z-index:5; pointer-events:none; opacity:.5; mix-blend-mode:screen;
+  background:linear-gradient(180deg, transparent, rgba(51,227,209,.16) 46%, rgba(51,227,209,.03) 62%, transparent);
+  animation:mapSweep 7.5s cubic-bezier(.5,0,.5,1) infinite; animation-play-state:paused; }
+.mapframe.live .mapscan{ animation-play-state:running; }
+@keyframes mapSweep{ 0%{ transform:translateY(-110%);} 100%{ transform:translateY(360%);} }
+
+.hkmap{ display:block; width:100%; height:auto; position:relative; z-index:2; }
+.hkmap text{ user-select:none; }
+
+/* base terrain */
+.hkmap .water{ fill:#050810; }
+.hkmap .grid line{ stroke:rgba(255,255,255,.032); }
+.hkmap .depth{ fill:none; stroke:rgba(51,227,209,.09); stroke-width:1; stroke-dasharray:1 7; }
+.hkmap .land{ fill:#0b111d; stroke:rgba(140,160,185,.13); stroke-width:.8; }
+.hkmap .coast{ fill:none; stroke:var(--net); stroke-width:1.1; opacity:.42; }
+.hkmap .peakline{ fill:none; stroke:rgba(140,195,232,.22); stroke-width:.9; }
+
+/* the Shelf cable + pipeline — the plot's spine */
+.hkmap .pipe{ fill:none; stroke:rgba(159,176,194,.34); stroke-width:1.1; stroke-dasharray:1 8; }
+.hkmap .cable{ fill:none; stroke:var(--net); stroke-width:1.1; opacity:.32; stroke-dasharray:2 6; }
+.hkmap .cablepulse{ fill:none; stroke:var(--net); stroke-width:2.1; stroke-linecap:round; opacity:.95;
+  stroke-dasharray:16 300; filter:drop-shadow(0 0 5px var(--net)); animation:cableRun 5s linear infinite; animation-play-state:paused; }
+.mapframe.live .cablepulse{ animation-play-state:running; }
+@keyframes cableRun{ from{ stroke-dashoffset:316; } to{ stroke-dashoffset:0; } }
+
+/* the Shelf node */
+.hkmap .shelf-plate{ fill:rgba(51,227,209,.05); stroke:var(--net); stroke-width:1.2; }
+.hkmap .shelf-grid{ stroke:rgba(51,227,209,.32); stroke-width:.7; }
+.hkmap .shelf-core{ fill:var(--net); filter:drop-shadow(0 0 8px var(--net)); animation:shelfPulse 3.2s ease-in-out infinite; animation-play-state:paused; }
+.mapframe.live .shelf-core{ animation-play-state:running; }
+@keyframes shelfPulse{ 0%,100%{ opacity:.85; } 50%{ opacity:.35; } }
+
+/* zones — audit-net targeting reticle */
+.zone{ cursor:pointer; }
+/* every animated / transformed reticle part spins around its own centre */
+.zone .node > *{ transform-box:fill-box; transform-origin:center; }
+
+/* radar ping — a lock pulse that breathes outward (replaces the old dashed ellipse) */
+.zone .ping{ fill:none; stroke:var(--zc); stroke-width:1.1; opacity:0;
+  animation:zonePing 4.2s cubic-bezier(.22,.61,.36,1) infinite; }
+@keyframes zonePing{ 0%{ transform:scale(.34); opacity:.5; } 62%{ opacity:0; } 100%{ transform:scale(1.5); opacity:0; } }
+
+/* faint permanent halo under the node */
+.zone .halo{ fill:var(--zc); opacity:.05; transition:opacity .4s ease; }
+
+/* lock ring — invisible at rest, snaps in on hover */
+.zone .lock{ fill:none; stroke:var(--zc); stroke-width:1; opacity:0;
+  transform:scale(1.25); transition:opacity .3s ease, transform .3s cubic-bezier(.2,.8,.2,1); }
+
+/* four corner brackets — the targeting frame; pulls inward + brightens on lock */
+.zone .reticle{ fill:none; stroke:var(--zc); stroke-width:1.3; stroke-linecap:round;
+  opacity:.5; transform:scale(1); transition:opacity .3s ease, transform .35s cubic-bezier(.2,.8,.2,1); }
+
+/* diamond core */
+.zone .core{ fill:none; stroke:var(--zc); stroke-width:1.1; opacity:.75; transition:opacity .3s ease, stroke-width .3s ease; }
+.zone .dot{ fill:var(--zc); filter:drop-shadow(0 0 4px var(--zc)); transition:filter .35s ease; }
+
+/* thin annotation leader from node to label */
+.zone .leader{ stroke:var(--zc); stroke-width:1; opacity:.34; transition:opacity .3s ease; }
+.zone .leader .cap{ fill:var(--zc); }
+
+.zone .lbl{ font-family:var(--ff-d); font-weight:600; font-size:15px; fill:var(--hi); transition:fill .3s ease; }
+.zone .lbl .zh{ fill:var(--mid); font-weight:400; font-size:11px; }
+.zone .sub{ font-family:var(--ff-m); font-size:8px; letter-spacing:.14em; fill:var(--mid); text-transform:uppercase; }
+
+/* locked state (hover / focus / active) */
+.zone:hover .halo, .zone.active .halo{ opacity:.16; }
+.zone:hover .lock, .zone.active .lock{ opacity:.9; transform:scale(1); }
+.zone:hover .reticle, .zone.active .reticle{ opacity:1; transform:scale(.8); }
+.zone:hover .core, .zone.active .core{ opacity:1; stroke-width:1.4; }
+.zone:hover .dot, .zone.active .dot{ filter:drop-shadow(0 0 12px var(--zc)); }
+.zone:hover .leader, .zone.active .leader{ opacity:.85; }
+.zone:hover .lbl, .zone.active .lbl{ fill:#fff; }
+
+/* map furniture */
+.hkmap .furn{ font-family:var(--ff-m); fill:var(--mid); letter-spacing:.16em; }
+.hkmap .furn.net{ fill:var(--net); }
+.hkmap .furn.big{ font-family:var(--ff-d); font-weight:600; fill:var(--hi); letter-spacing:.06em; }
+.hkmap .tick{ stroke:rgba(255,255,255,.14); stroke-width:1; }
+.hkmap .compass g line, .hkmap .compass circle{ stroke:rgba(51,227,209,.55); stroke-width:1; fill:none; }
+.hkmap .compass .needle-n{ fill:var(--alert); }
+.hkmap .compass .needle-s{ fill:rgba(140,160,185,.5); }
+.hkmap .scale line{ stroke:var(--mid); stroke-width:1.2; }
+
+/* ── audit-net live readout (hover tooltip) ───────────────── */
+.mtip{
+  --zc:var(--net);
+  position:absolute; z-index:20; width:230px; pointer-events:none;
+  padding:0; opacity:0; visibility:hidden; transform:translateY(4px);
+  transition:opacity .16s ease, transform .16s ease;
+  font-family:var(--ff-b);
+  background:linear-gradient(158deg, rgba(13,18,32,.97), rgba(7,10,18,.98));
+  border:1px solid color-mix(in srgb,var(--zc) 34%, var(--line-2));
+  box-shadow:0 18px 44px -18px rgba(0,0,0,.9), 0 0 0 1px rgba(0,0,0,.4) inset;
+  backdrop-filter:blur(3px);
+}
+.mtip.show{ opacity:1; visibility:visible; transform:translateY(0); }
+.mtip::before{ content:''; position:absolute; inset:0 auto auto 0; width:100%; height:2px;
+  background:linear-gradient(90deg, var(--zc), transparent 78%); opacity:.9; }
+/* corner ticks */
+.mtip .mt-brk{ position:absolute; width:8px; height:8px; border:1px solid color-mix(in srgb,var(--zc) 60%,transparent); pointer-events:none; }
+.mtip .mt-brk.tr{ top:5px; right:5px; border-left:none; border-bottom:none; }
+.mtip .mt-brk.br{ bottom:5px; right:5px; border-left:none; border-top:none; }
+
+.mtip .mt-hd{ display:flex; align-items:center; gap:.4rem; padding:.62rem .8rem .1rem;
+  font-family:var(--ff-m); font-size:.44rem; letter-spacing:.2em; text-transform:uppercase; color:var(--lo); }
+.mtip .mt-hd .live{ width:5px; height:5px; border-radius:50%; background:var(--zc);
+  box-shadow:0 0 7px var(--zc); animation:mtBlink 1.5s steps(1) infinite; }
+@keyframes mtBlink{ 0%,60%{ opacity:1; } 61%,100%{ opacity:.25; } }
+.mtip .mt-hd .co{ margin-left:auto; color:color-mix(in srgb,var(--zc) 70%,var(--mid)); letter-spacing:.14em; }
+
+.mtip .mt-top{ display:flex; align-items:center; gap:.5rem; padding:.28rem .8rem 0; }
+.mtip .mt-code{ font-family:var(--ff-m); font-size:.5rem; letter-spacing:.14em; color:var(--zc); }
+.mtip .mt-status{ margin-left:auto; font-family:var(--ff-m); font-size:.46rem; letter-spacing:.12em; text-transform:uppercase;
+  padding:.16rem .38rem; line-height:1; border:1px solid color-mix(in srgb,var(--zc) 34%,var(--line-2));
+  color:color-mix(in srgb,var(--zc) 70%,var(--hi)); background:color-mix(in srgb,var(--zc) 8%,transparent); }
+.mtip .mt-status[data-tone="danger"]{ --zc:var(--alert); }
+
+.mtip .mt-name{ font-family:var(--ff-d); font-weight:600; font-size:.98rem; color:var(--hi); padding:.28rem .8rem 0; letter-spacing:.01em; }
+.mtip .mt-name span{ font-weight:400; font-size:.68rem; color:var(--mid); margin-left:.28rem; }
+.mtip .mt-en{ font-family:var(--ff-m); font-size:.44rem; letter-spacing:.18em; text-transform:uppercase; color:var(--lo); padding:.06rem .8rem .1rem; }
+
+/* population block */
+.mtip .mt-pop{ display:flex; align-items:baseline; gap:.5rem; padding:.5rem .8rem .1rem; }
+.mtip .mt-popn{ font-family:var(--ff-d); font-weight:700; font-size:1.34rem; line-height:1; color:var(--hi);
+  font-variant-numeric:tabular-nums; }
+.mtip .mt-popn .u{ font-size:.6rem; color:var(--mid); font-weight:400; margin-left:.12rem; }
+.mtip .mt-delta{ font-family:var(--ff-m); font-size:.5rem; letter-spacing:.04em; }
+.mtip .mt-delta.up{ color:var(--alert); } .mtip .mt-delta.down{ color:var(--net); }
+.mtip .mt-popl{ font-family:var(--ff-m); font-size:.44rem; letter-spacing:.1em; color:var(--lo); padding:0 .8rem .1rem; text-transform:uppercase; }
+
+/* meters */
+.mtip .mt-bars{ padding:.55rem .8rem .2rem; display:flex; flex-direction:column; gap:.5rem; }
+.mtip .mt-bar .mt-bl{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.22rem; }
+.mtip .mt-bar .mt-bl .k{ font-family:var(--ff-m); font-size:.46rem; letter-spacing:.12em; text-transform:uppercase; color:var(--mid); }
+.mtip .mt-bar .mt-bl .v{ font-family:var(--ff-m); font-size:.52rem; color:var(--hi); font-variant-numeric:tabular-nums; }
+.mtip .mt-track{ position:relative; height:6px; background:rgba(255,255,255,.05); overflow:hidden; }
+.mtip .mt-track i{ position:absolute; inset:0 auto 0 0; width:var(--v,0%); background:var(--bc,var(--zc));
+  box-shadow:0 0 8px -1px var(--bc,var(--zc)); }
+/* segment overlay to read like a HUD gauge */
+.mtip .mt-track::after{ content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(90deg, transparent 0 8px, rgba(7,10,18,.9) 8px 9px); pointer-events:none; }
+.mtip .mt-bar.threat i{ --bc:var(--alert); }
+.mtip .mt-bar.audit  i{ --bc:var(--net); }
+
+/* sparkline */
+.mtip .mt-spark{ padding:.35rem .8rem .1rem; }
+.mtip .mt-spark .sl{ display:flex; justify-content:space-between; font-family:var(--ff-m);
+  font-size:.44rem; letter-spacing:.1em; text-transform:uppercase; color:var(--lo); margin-bottom:.16rem; }
+.mtip .mt-spark svg{ display:block; width:100%; height:30px; overflow:visible; }
+.mtip .mt-spark .sp-line{ fill:none; stroke:var(--zc); stroke-width:1.3; }
+.mtip .mt-spark .sp-area{ fill:var(--zc); opacity:.1; }
+.mtip .mt-spark .sp-dot{ fill:var(--zc); filter:drop-shadow(0 0 4px var(--zc)); }
+
+.mtip .mt-foot{ display:flex; flex-wrap:wrap; gap:.3rem; padding:.45rem .8rem .7rem; }
+.mtip .mt-tag{ font-family:var(--ff-m); font-size:.44rem; letter-spacing:.04em; padding:.16rem .38rem; line-height:1;
+  border:1px solid color-mix(in srgb,var(--zc) 22%,var(--line)); color:color-mix(in srgb,var(--zc) 56%,var(--mid)); }
+
+@media(prefers-reduced-motion:reduce){ .mtip{ transition:none; } .mtip .mt-hd .live{ animation:none; } }
+
+/* district cards */
+.districts{ display:grid; grid-template-columns:repeat(4,1fr); gap:1.05rem; margin-top:1.5rem; }
+.dcard{
+  --zc:var(--net); position:relative; width:100%; text-align:left; border:1px solid var(--line); border-top:2px solid var(--zc);
+  background:linear-gradient(168deg,var(--panel-2),var(--panel)); padding:1.35rem 1.35rem 1.4rem;
+  cursor:pointer; transition:transform .3s ease, border-color .3s ease; overflow:hidden;
+}
+.dcard::after{ content:''; position:absolute; right:-26%; top:-40%; width:60%; height:120%;
+  background:radial-gradient(circle, color-mix(in srgb,var(--zc) 12%, transparent), transparent 68%); pointer-events:none; opacity:0; transition:opacity .35s ease; }
+.dcard:hover, .dcard.active{ transform:translateY(-4px); border-color:color-mix(in srgb,var(--zc) 42%,var(--line-2)); }
+.dcard:hover::after, .dcard.active::after{ opacity:1; }
+.dcard .dc-idx{ display:flex; align-items:center; gap:.5rem; font-family:var(--ff-m); font-size:.5rem; letter-spacing:.18em; text-transform:uppercase; color:var(--zc); }
+.dcard .dc-idx .pin{ width:7px; height:7px; border-radius:50%; background:var(--zc); box-shadow:0 0 8px color-mix(in srgb,var(--zc) 80%,transparent); }
+.dcard .dc-name{ font-family:var(--ff-d); font-weight:600; font-size:1.18rem; margin:.6rem 0 .12rem; letter-spacing:.01em; }
+.dcard .dc-name .zh{ color:var(--mid); font-weight:400; font-size:.82rem; margin-left:.34rem; }
+.dcard .dc-en{ font-family:var(--ff-m); font-size:.5rem; letter-spacing:.2em; text-transform:uppercase; color:var(--mid); }
+.dcard .dc-desc{ font-size:.85rem; color:var(--mid); line-height:1.72; margin:.9rem 0 1rem; }
+.dcard .dc-desc .hl{ color:color-mix(in srgb,var(--zc) 66%,var(--hi)); }
+.dcard .dc-tags{ display:flex; flex-wrap:wrap; gap:.4rem; }
+.dcard .dtag{ font-family:var(--ff-m); font-size:.52rem; letter-spacing:.05em; padding:.3rem .55rem; line-height:1;
+  border:1px solid color-mix(in srgb,var(--zc) 26%,var(--line-2)); color:color-mix(in srgb,var(--zc) 62%,var(--hi));
+  background:color-mix(in srgb,var(--zc) 6%,transparent); }
+.dcard .dc-occ{ margin-top:.95rem; padding-top:.8rem; border-top:1px solid var(--line);
+  font-family:var(--ff-m); font-size:.56rem; letter-spacing:.04em; color:var(--lo); line-height:1.7; }
+.dcard .dc-occ b{ color:color-mix(in srgb,var(--zc) 58%,var(--hi)); font-weight:400; }
+@media(max-width:1000px){ .districts{ grid-template-columns:1fr 1fr; } }
+@media(max-width:520px){ .districts{ grid-template-columns:1fr; } }
+
+/* the Shelf — offshore prize, full-width banner */
+.shelfcard{
+  --zc:var(--net); position:relative; display:block; width:100%; text-align:left; margin-top:1.05rem; border:1px solid rgba(51,227,209,.28);
+  background:linear-gradient(150deg, rgba(51,227,209,.06), var(--panel)); padding:1.6rem 1.7rem 1.7rem; overflow:hidden;
+  cursor:pointer; transition:transform .3s ease, border-color .3s ease;
+}
+.shelfcard::before{ content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:repeating-linear-gradient(90deg, var(--net) 0 12px, transparent 12px 20px); opacity:.75; }
+.shelfcard::after{ content:'陸棚'; position:absolute; right:1.3rem; top:-.3rem; font-family:var(--ff-d); font-weight:700;
+  font-size:6.5rem; color:rgba(51,227,209,.05); pointer-events:none; letter-spacing:.05em; }
+.shelfcard:hover, .shelfcard.active{ transform:translateY(-4px); border-color:rgba(51,227,209,.55); }
+.shelfcard .sc-head{ display:flex; align-items:baseline; gap:.8rem; flex-wrap:wrap; }
+.shelfcard .sc-tag{ font-family:var(--ff-m); font-size:.54rem; letter-spacing:.2em; text-transform:uppercase; color:var(--net); }
+.shelfcard .sc-name{ font-family:var(--ff-d); font-weight:700; font-size:1.6rem; letter-spacing:.02em; }
+.shelfcard .sc-name .en{ font-family:var(--ff-m); font-weight:400; font-size:.62rem; letter-spacing:.14em; color:var(--mid); text-transform:uppercase; margin-left:.2rem; }
+.shelfcard p{ font-size:.88rem; color:var(--mid); line-height:1.74; margin-top:.85rem; max-width:56rem; }
+.shelfcard p b{ color:color-mix(in srgb,var(--net) 72%,var(--hi)); font-weight:500; }
+
+@media(max-width:680px){
+  .zone .sub, .hkmap .furn.ticklbl{ display:none; }
+  .zone .lbl{ font-size:18px; } .zone .lbl .zh{ font-size:13px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <span class="zh">環宇貿易</span>
+    <span class="en">World Ferry Trading</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#access" class="active">Access</a></li>
+    <li><a href="#world">City</a></li>
+    <li><a href="#districts">Terrain</a></li>
+    <li><a href="#network">Network</a></li>
+    <li><a href="#files">Personnel</a></li>
+  </ul>
+  <div class="nav-clock" id="clock">香港 · --:--:--</div>
+</nav>
+
+<!-- ACCESS -->
+<section id="access">
+  <div class="access-inner">
+    <div class="stamp-row reveal">
+      <span class="stamp hot">機密 · Classified</span>
+      <span class="stamp">人事記錄 · Personnel File</span>
+      <span class="stamp net">감사망 열람 · Audit-net Access</span>
+    </div>
+
+    <div class="term reveal d1" id="term"></div>
+
+    <div class="access-title reveal d1">
+      <div class="zh">移交</div>
+      <div class="en">Handover · Noir</div>
+    </div>
+
+    <div class="access-lede reveal d2">
+      <p><span class="zh">2066, 香港.</span> 두 번째 이양을 1년 앞둔 도시. 봉쇄와 유혈이 임박했다는 공기가 네온 아래 빗물처럼 깔려 있다.</p>
+      <p>2047년 이후 모든 거래는 로그로 남고, AI가 쉬지 않고 감사한다. 현금 뇌물은 죽었다. 이제 범죄는 폭력이 아니라 합법 기업의 흐름과 깨끗한 데이터 트레일 속으로 숨어든다. 이 파일 또한 그 안에 있었다.</p>
+    </div>
+
+    <div class="access-scroll reveal d3">
+      <span class="bar"></span>
+      <span>기록 열람 중 — 아래로 내려가시오</span>
+    </div>
+  </div>
+</section>
+
+<!-- WORLD -->
+<section id="world">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="l">
+        <span class="idx">§01 — 도시의 연혁</span>
+        <h2>두 번의 이양 사이 <span class="zh">兩次移交之間</span></h2>
+      </div>
+      
+    </div>
+
+    <div class="timeline">
+      <div class="tl-node reveal" tabindex="0">
+        <span class="tl-dot sm"></span>
+        <div class="tl-yr">1997</div>
+        <div class="tl-tag">7·1 · 원점</div>
+        <div class="tl-title">1차 주권 반환</div>
+        <div class="tl-desc">일국양제 50년 보장이 걸린 첫 반환. 이 <span class="kw">50년 시계</span>가 만료되는 날이 곧 도시의 운명을 결정하는 방아쇠가 된다. 이야기의 모든 연대는 이 날을 기준으로 센다.</div>
+      </div>
+
+      <div class="tl-node key reveal" tabindex="0">
+        <span class="tl-dot lg"></span>
+        <div class="tl-yr">2047</div>
+        <div class="tl-tag">첫 번째 소멸</div>
+        <div class="tl-title">일국양제 만료 · 완전 흡수</div>
+        <div class="tl-desc">50년 보장이 끝나며 홍콩이 본토에 완전히 흡수되고 <span class="kw-a">특별 지위</span>가 소멸한다. 독자적 법·금융의 성격을 잃은 도시는 국제 허브에서 여러 항구 중 하나로 격하된다. <span class="kw">이 몰락이 이후 모든 사건의 바닥</span>이다.</div>
+      </div>
+
+      <div class="tl-node reveal" tabindex="0">
+        <span class="tl-dot"></span>
+        <div class="tl-yr">2047~</div>
+        <div class="tl-tag">편집증의 인프라</div>
+        <div class="tl-title">알고리즘 염정 감사망</div>
+        <div class="tl-desc">본토가 1974년 염정공서(ICAC)를 계승·확장한 <span class="kw">감사망</span>을 깐다. 전 거래가 로그화되고 AI가 상시 감사하니, 현금 뇌물·경찰 매수 같은 전통적 회피가 죽는다. 그 결과 범죄는 폭력으로 숨는 대신 <span class="kw">합법 기업의 흐름과 깨끗한 데이터 트레일 안으로 파고들 수밖에</span> 없게 된다.</div>
+      </div>
+
+      <div class="tl-node reveal" tabindex="0">
+        <span class="tl-dot sm"></span>
+        <div class="tl-yr">2050s</div>
+        <div class="tl-tag">판을 뒤집은 자원</div>
+        <div class="tl-title">상온 초전도 광물</div>
+        <div class="tl-desc">남중국해 심해 대륙붕에서 <span class="kw">상온 초전도</span>를 가능케 하는 희귀 광물이 발견된다. 저비용 대규모 연산과 발전을 한꺼번에 여는 자원 하나가 세계를 다시 배선하며, 에너지·연산 붐이 터진다.</div>
+      </div>
+
+      <div class="tl-node reveal" tabindex="0">
+        <span class="tl-dot"></span>
+        <div class="tl-yr">2050s~</div>
+        <div class="tl-tag">붐의 물리적 실체</div>
+        <div class="tl-title">陸棚 · the Shelf</div>
+        <div class="tl-desc">심해 냉수로 냉각하는 거대 해저 데이터센터(모두가 의존하는 AI 연산의 몸체)와 발전 설비를 한 몸으로 묶은 해상 복합단지. 관제·케이블 육양·금융·법무를 감당할 <span class="kw">유일한 육지 거점</span>이 홍콩이다 — 깊은 항구, 케이블 착륙점, 몰락해도 잔존한 금융·법률 인프라 덕이다. 몰락했던 도시가 이 단지 하나로 전략 요충으로 부활한다.</div>
+      </div>
+
+      <div class="tl-node key reveal" tabindex="0">
+        <span class="tl-dot lg"></span>
+        <div class="tl-yr">2061</div>
+        <div class="tl-tag">포획된 주권</div>
+        <div class="tl-title">새 헌장, 표면상의 자치</div>
+        <div class="tl-desc">the Shelf 지상 관제권이 곧 홍콩 통제권 문제가 되자, 메가코프 컨소시엄과 물러나기 싫은 잔존 국가기관이 딜을 봉합한다. 홍콩에 새 헌장(제2의 기본법 격)을 주고 자치를 복원하지만, 그 자치는 애초에 재벌·컨소시엄이 선점해둔 껍데기다. <span class="kw-a">서류상 자유도시, 실제로는 다자 각축전</span> — 국가보다 기업이 위에 서는 권력 감각이 여기서 나온다.</div>
+      </div>
+
+      <div class="tl-node key reveal" tabindex="0">
+        <span class="tl-dot lg"></span>
+        <div class="tl-yr">2062</div>
+        <div class="tl-tag">겨울 · 배신</div>
+        <div class="tl-title">시우룬 전향 · 첫 분할전 참패</div>
+        <div class="tl-desc">새 헌장 직후 the Shelf 관제지분이 처음 갈리던 국면에, <span class="kw-a">시우룬이 통합파 경쟁조직으로 전향</span>한다. 케이블 육양점 지분을 노리던 대형 거래의 구조·경비·자금경로가 통째로 유출되며 시우힌 부대는 궤멸에 가까운 타격을, 지분은 경쟁조직이 가져갔다. <span class="kw-a">환우무역이 지금까지 열세인 근본 원인</span>이자, 이양이 다가올수록 재소환되는 상처다.</div>
+      </div>
+
+      <div class="tl-node reveal" tabindex="0">
+        <span class="tl-dot"></span>
+        <div class="tl-yr">2066</div>
+        <div class="tl-tag">現在 · 지금 여기</div>
+        <div class="tl-title">두 번째 전야</div>
+        <div class="tl-desc">정식 이양 1년 전야. 그 순간 무엇이 터질지 아무도 모른다 — 보안 봉쇄, 코프 용병 소탕, 잔존 국가기관의 <span class="kw">the Shelf 전리품 탈취</span> 같은 최악을 점치는 목소리가 도시에 깔려 있다. 이 불안이 조직 범죄의 <span class="kw">두 갈래 베팅</span>(비축파·통합파)을 낳는다.</div>
+      </div>
+
+      <div class="tl-node key reveal" tabindex="0">
+        <span class="tl-dot lg"></span>
+        <div class="tl-yr">2067</div>
+        <div class="tl-tag">7·1 · 반환 70주년</div>
+        <div class="tl-title">정식 이양 예정일</div>
+        <div class="tl-desc">관제권을 포함한 새 질서의 정식 이관이 <span class="kw-a">2067.7.1</span>로 잡혀 있다 — 1차 반환으로부터 정확히 <span class="kw">70년째</span> 되는 날. 아무도 이 이양이 황금기의 개막일지 유혈사태일지 알지 못한다.</div>
+      </div>
+    </div>
+
+    <div class="concepts">
+      <div class="concept reveal">
+        <div class="k">System · 감사망</div>
+        <h3>깨끗한 데이터 <span class="zh">乾淨的痕跡</span></h3>
+        <p>모든 것이 기록된다. 현금 매수·폭력 은닉이 죽은 자리에서, 범죄의 핵심 역량은 <span class="kw">감사에 걸리지 않는 자금과 데이터의 설계</span>로 옮겨간다. 무역·물류·유흥이라는 합법 위장이 필수가 되고, 흔적을 다루는 자(시우힌·몽쉬)가 조직의 심장이 된다.</p>
+      </div>
+      <div class="concept b reveal d1">
+        <div class="k">Territory · 陸棚</div>
+        <h3>the Shelf</h3>
+        <p>모두가 의존하는 AI 연산의 몸체이자 발전소. 광물이 방아쇠였다면, 실제로 다투는 대상은 <span class="kw">이 단지의 통제권</span> 그 자체다. 지상 관제·케이블 육양·이를 뒷받침할 금융·법무를 한데 감당할 육지는 홍콩뿐이라, 2047년에 몰락했던 도시가 이것 하나로 부활한다.</p>
+      </div>
+      <div class="concept c reveal d2">
+        <div class="k">Power · 기업 &gt; 국가</div>
+        <h3>포획된 자치 <span class="zh">被捕的自治</span></h3>
+        <p>2061년 헌장으로 주권은 표면상 홍콩에 돌아왔으나, 그 자치는 <span class="kw-a">재벌·컨소시엄이 선점해둔 껍데기</span>다. 물러나기 싫은 국가기관도 완전히 퇴진하지 않았다. 국가보다 기업이 위에 서는 이 다자 각축이 조직 범죄가 파고들 틈을 만든다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DISTRICTS · 구역 & 거점 -->
+<section id="districts">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="l">
+        <span class="idx">§02 — 구역 · 거점</span>
+        <h2>지형과 거점 <span class="zh">地形與據點</span></h2>
+      </div>
+      
+    </div>
+
+    <p class="terrain-intro reveal">2047년 이후 도시의 모든 것이 로그로 남지만, 지형만은 거짓말을 하지 않는다. 아래는 감사망이 빅토리아항 일대를 훑어 환우무역의 이해가 걸린 <b>다섯 거점</b>을 태그한 지형 스캔이다. 위쪽 구룡반도와 아래쪽 홍콩섬 사이로 항이 갈리고, 모든 <span class="kw">케이블</span>은 외해의 <span class="kw">陸棚</span>으로 이어진다.</p>
+
+    <div class="mapframe reveal" data-motion>
+      <span class="brk tl"></span><span class="brk tr"></span><span class="brk bl"></span><span class="brk br"></span>
+      <div class="mapscan" aria-hidden="true"></div>
+      <svg class="hkmap" viewBox="0 0 1000 620" role="img" aria-label="빅토리아항 감사망 지형 스캔 — 다섯 거점">
+
+        <!-- base water -->
+        <rect class="water" x="0" y="0" width="1000" height="620"/>
+
+        <!-- grid -->
+        <g class="grid" aria-hidden="true">
+          <line x1="125" y1="0" x2="125" y2="620"/><line x1="250" y1="0" x2="250" y2="620"/>
+          <line x1="375" y1="0" x2="375" y2="620"/><line x1="500" y1="0" x2="500" y2="620"/>
+          <line x1="625" y1="0" x2="625" y2="620"/><line x1="750" y1="0" x2="750" y2="620"/>
+          <line x1="875" y1="0" x2="875" y2="620"/>
+          <line x1="0" y1="103" x2="1000" y2="103"/><line x1="0" y1="206" x2="1000" y2="206"/>
+          <line x1="0" y1="309" x2="1000" y2="309"/><line x1="0" y1="412" x2="1000" y2="412"/>
+          <line x1="0" y1="515" x2="1000" y2="515"/>
+        </g>
+
+        <!-- depth contours (open water) -->
+        <path class="depth" d="M 120 590 C 300 560 620 566 900 596"/>
+        <path class="depth" d="M 150 612 C 340 586 640 590 942 616"/>
+        <path class="depth" d="M 686 470 C 758 448 842 452 906 470"/>
+
+        <!-- land: Kowloon + New Territories (north) -->
+        <path class="land" d="M -20 -20 H 1020 V 252
+          C 930 240 895 238 862 238 C 822 238 802 250 784 254
+          C 764 258 750 300 728 318 C 708 302 690 260 660 256
+          C 632 252 616 242 600 242 C 562 238 542 228 512 224
+          C 486 246 462 300 438 314 C 414 288 396 234 366 218
+          C 326 210 286 178 244 176 C 194 184 152 196 120 194
+          C 72 192 30 184 -20 180 Z"/>
+
+        <!-- land: Hong Kong Island (south) -->
+        <path class="land" d="M 150 404
+          C 210 394 250 390 300 386 C 348 382 384 382 416 394
+          C 452 382 500 378 548 382 C 610 388 690 398 760 416
+          C 812 430 848 454 866 488 C 848 530 792 558 720 568
+          C 620 582 470 584 360 568 C 262 554 196 522 168 472
+          C 150 444 146 422 150 404 Z"/>
+
+        <!-- harbour-facing coast glow -->
+        <path class="coast" d="M -20 180 C 30 184 72 192 120 194 C 152 196 194 184 244 176 C 286 178 326 210 366 218 C 396 234 414 288 438 314 C 462 300 486 246 512 224 C 542 228 562 238 600 242 C 616 242 632 252 660 256 C 690 260 708 302 728 318 C 750 300 764 258 784 254 C 802 250 822 238 862 238 C 895 238 930 240 1020 252"/>
+        <path class="coast" d="M 150 404 C 210 394 250 390 300 386 C 348 382 384 382 416 394 C 452 382 500 378 548 382 C 610 388 690 398 760 416 C 812 430 848 454 866 488"/>
+
+        <!-- Peak elevation contours -->
+        <path class="peakline" d="M 320 484 C 332 468 372 468 384 482"/>
+        <path class="peakline" d="M 304 494 C 322 462 382 462 400 492"/>
+        <path class="peakline" d="M 290 504 C 314 458 390 458 414 502"/>
+
+        <!-- pipelines + cable to the Shelf -->
+        <path class="pipe"  d="M 908 356 C 812 322 706 306 626 296 C 556 288 500 244 452 206"/>
+        <path class="cable" d="M 908 356 C 740 350 560 356 470 372 C 448 376 432 382 416 388"/>
+        <path class="cablepulse" d="M 908 356 C 740 350 560 356 470 372 C 448 376 432 382 416 388"/>
+
+        <!-- frame ticks -->
+        <g aria-hidden="true">
+          <line class="tick" x1="0" y1="0" x2="0" y2="10"/><line class="tick" x1="250" y1="0" x2="250" y2="8"/>
+          <line class="tick" x1="500" y1="0" x2="500" y2="10"/><line class="tick" x1="750" y1="0" x2="750" y2="8"/>
+          <line class="tick" x1="1000" y1="0" x2="1000" y2="10"/>
+          <line class="tick" x1="0" y1="206" x2="10" y2="206"/><line class="tick" x1="0" y1="412" x2="10" y2="412"/>
+          <text class="furn ticklbl" x="504" y="20" font-size="7">E · 114°10′</text>
+          <text class="furn ticklbl" x="14" y="210" font-size="7">N · 22°18′</text>
+        </g>
+
+        <!-- title + readout -->
+        <text class="furn big" x="38" y="54" font-size="26">維多利亞港</text>
+        <text class="furn net" x="40" y="72" font-size="9">VICTORIA HARBOUR · 감사망 지형 스캔</text>
+        <text class="furn" x="962" y="50" font-size="8" text-anchor="end">SCAN 04471-██</text>
+        <text class="furn net" x="962" y="64" font-size="8" text-anchor="end">NODES TAGGED · 05</text>
+
+        <!-- ZONES · audit-net targeting reticles -->
+        <!-- 구룡 지하 -->
+        <g class="zone" data-zone="kowloon" style="--zc:#9fb0c2" tabindex="0" role="button" aria-label="구룡 지하 · 오프그리드">
+          <g class="node" transform="translate(452,206)">
+            <circle class="halo" r="24"/>
+            <circle class="ping" r="20" style="animation-delay:0s"/>
+            <circle class="lock" r="15"/>
+            <path class="reticle" d="M -15 -9.5 V -15 H -9.5  M 9.5 -15 H 15 V -9.5  M 15 9.5 V 15 H 9.5  M -9.5 15 H -15 V 9.5"/>
+            <path class="core" d="M 0 -6 L 6 0 L 0 6 L -6 0 Z"/>
+            <circle class="dot" r="2.6"/>
+          </g>
+          <path class="leader" d="M 470 206 H 486"/><circle class="leader cap" cx="486" cy="206" r="1.6"/>
+          <text class="lbl" x="490" y="211">구룡 지하 <tspan class="zh">九龍地下</tspan></text>
+          <text class="sub" x="491" y="224">KOWLOON UNDERGROUND</text>
+        </g>
+        <!-- 카이탁 -->
+        <g class="zone" data-zone="kaitak" style="--zc:#d69a4a" tabindex="0" role="button" aria-label="카이탁 · 수몰 도심">
+          <g class="node" transform="translate(712,300)">
+            <circle class="halo" r="24"/>
+            <circle class="ping" r="20" style="animation-delay:.9s"/>
+            <circle class="lock" r="15"/>
+            <path class="reticle" d="M -15 -9.5 V -15 H -9.5  M 9.5 -15 H 15 V -9.5  M 15 9.5 V 15 H 9.5  M -9.5 15 H -15 V 9.5"/>
+            <path class="core" d="M 0 -6 L 6 0 L 0 6 L -6 0 Z"/>
+            <circle class="dot" r="2.6"/>
+          </g>
+          <path class="leader" d="M 730 300 H 746"/><circle class="leader cap" cx="746" cy="300" r="1.6"/>
+          <text class="lbl" x="750" y="305">카이탁 <tspan class="zh">啓德</tspan></text>
+          <text class="sub" x="751" y="318">KAI TAK · SUBMERGED</text>
+        </g>
+        <!-- 해라장 -->
+        <g class="zone" data-zone="hoilo" style="--zc:#cc2450" tabindex="0" role="button" aria-label="해라장 · 환우무역 본사">
+          <g class="node" transform="translate(416,388)">
+            <circle class="halo" r="24"/>
+            <circle class="ping" r="20" style="animation-delay:1.7s"/>
+            <circle class="lock" r="15"/>
+            <path class="reticle" d="M -15 -9.5 V -15 H -9.5  M 9.5 -15 H 15 V -9.5  M 15 9.5 V 15 H 9.5  M -9.5 15 H -15 V 9.5"/>
+            <path class="core" d="M 0 -6 L 6 0 L 0 6 L -6 0 Z"/>
+            <circle class="dot" r="2.6"/>
+          </g>
+          <path class="leader" d="M 434 388 H 450"/><circle class="leader cap" cx="450" cy="388" r="1.6"/>
+          <text class="lbl" x="454" y="393">해라장 <tspan class="zh">海螺莊</tspan></text>
+          <text class="sub" x="455" y="406">HOI LO JONG · WFT HQ</text>
+        </g>
+        <!-- 더 피크 -->
+        <g class="zone" data-zone="peak" style="--zc:#8cc3e8" tabindex="0" role="button" aria-label="더 피크 · 공중 성채">
+          <g class="node" transform="translate(352,470)">
+            <circle class="halo" r="24"/>
+            <circle class="ping" r="20" style="animation-delay:2.5s"/>
+            <circle class="lock" r="15"/>
+            <path class="reticle" d="M -15 -9.5 V -15 H -9.5  M 9.5 -15 H 15 V -9.5  M 15 9.5 V 15 H 9.5  M -9.5 15 H -15 V 9.5"/>
+            <path class="core" d="M 0 -6 L 6 0 L 0 6 L -6 0 Z"/>
+            <circle class="dot" r="2.6"/>
+          </g>
+          <path class="leader" d="M 334 470 H 318"/><circle class="leader cap" cx="318" cy="470" r="1.6"/>
+          <text class="lbl" x="314" y="475" text-anchor="end">더 피크 <tspan class="zh">太平山</tspan></text>
+          <text class="sub" x="314" y="488" text-anchor="end">THE PEAK · 726M</text>
+        </g>
+        <!-- 陸棚 the Shelf — the offshore prize, distinct sea-platform node -->
+        <g class="zone" data-zone="shelf" style="--zc:#33e3d1" tabindex="0" role="button" aria-label="陸棚 the Shelf · 최종 쟁탈 대상">
+          <g class="node" transform="translate(908,356)">
+            <circle class="halo" r="34"/>
+            <circle class="ping" r="30" style="animation-delay:1.2s"/>
+            <circle class="lock" r="26"/>
+            <path class="reticle" d="M -26 -17 V -26 H -17  M 17 -26 H 26 V -17  M 26 17 V 26 H 17  M -17 26 H -26 V 17"/>
+            <g transform="rotate(-12)">
+              <rect class="shelf-plate" x="-26" y="-19" width="52" height="38" rx="3"/>
+              <g class="shelf-grid">
+                <line x1="-26" y1="-6" x2="26" y2="-6"/><line x1="-26" y1="6" x2="26" y2="6"/>
+                <line x1="-9" y1="-19" x2="-9" y2="19"/><line x1="9" y1="-19" x2="9" y2="19"/>
+              </g>
+            </g>
+            <circle class="shelf-core" r="3.4"/>
+          </g>
+          <text class="lbl" x="908" y="312" text-anchor="middle">陸棚 <tspan class="zh" style="font-size:9px">the Shelf</tspan></text>
+          <text class="sub" x="908" y="404" text-anchor="middle">OFFSHORE · THE PRIZE</text>
+        </g>
+
+        <!-- compass -->
+        <g class="compass" transform="translate(96,516)">
+          <circle r="24"/>
+          <g><line x1="0" y1="-30" x2="0" y2="30"/><line x1="-30" y1="0" x2="30" y2="0"/></g>
+          <polygon class="needle-n" points="0,-19 5,2 -5,2"/>
+          <polygon class="needle-s" points="0,19 5,-2 -5,-2"/>
+          <text class="furn net" x="0" y="-33" text-anchor="middle" font-size="10">N</text>
+        </g>
+        <!-- scale bar -->
+        <g class="scale" transform="translate(748,586)">
+          <line x1="0" y1="0" x2="150" y2="0"/>
+          <line x1="0" y1="-5" x2="0" y2="5"/><line x1="75" y1="-4" x2="75" y2="4"/><line x1="150" y1="-5" x2="150" y2="5"/>
+          <text class="furn" x="0" y="15" font-size="8" text-anchor="middle">0</text>
+          <text class="furn" x="150" y="15" font-size="8" text-anchor="middle">2&#8202;km</text>
+        </g>
+      </svg>
+      <!-- audit-net live readout -->
+      <div class="mtip" id="mtip" role="status" aria-live="polite">
+        <span class="mt-brk tr"></span><span class="mt-brk br"></span>
+      </div>
+    </div>
+
+    <!-- district cards (four onshore strongholds) -->
+    <div class="districts">
+      <button class="dcard reveal" data-zone="kowloon" style="--zc:#9fb0c2" type="button">
+        <div class="dc-idx"><span class="pin"></span>거점 S-01</div>
+        <div class="dc-name">구룡 지하 <span class="zh">九龍地下</span></div>
+        <div class="dc-en">Kowloon Underground</div>
+        <p class="dc-desc">감사망 로그가 얕게만 드는 <span class="hl">오프그리드 구역</span>. 외해에서 올라온 해저 데이터센터 육양 파이프라인이 이곳 지하에 밀집한다. 빛도 기록도 닿지 않는 땅.</p>
+        <div class="dc-tags"><span class="dtag">오프그리드</span><span class="dtag">육양 파이프라인</span><span class="dtag">미등록</span></div>
+        <div class="dc-occ"><b>비고</b> · 기록 없는 자들이 자라는 곳 — 페이위가 세상과 격리된 채 길러진 결이 이런 어둠에서 나왔다.</div>
+      </button>
+
+      <button class="dcard reveal d1" data-zone="kaitak" style="--zc:#d69a4a" type="button">
+        <div class="dc-idx"><span class="pin"></span>거점 S-02</div>
+        <div class="dc-name">카이탁 <span class="zh">啓德</span></div>
+        <div class="dc-en">Kai Tak · Submerged</div>
+        <p class="dc-desc">물에 잠긴 옛 도심. 수면 위 <span class="hl">상층부는 슬럼</span>, 그 아래 하층부는 암시장과 해상 밀수 루트가 얽힌다. 옛 활주로 자리로 배가 드나든다.</p>
+        <div class="dc-tags"><span class="dtag">수몰 도심</span><span class="dtag">슬럼</span><span class="dtag">밀수 루트</span></div>
+        <div class="dc-occ"><b>인근</b> · 쿤통의 버려진 공장을 개조한 고층 — 혹림이 방아쇠에서 물러나 몸을 누이는 곳이 이 동쪽 끝에 있다.</div>
+      </button>
+
+      <button class="dcard reveal d2" data-zone="hoilo" style="--zc:#cc2450" type="button">
+        <div class="dc-idx"><span class="pin"></span>거점 S-03</div>
+        <div class="dc-name">해라장 <span class="zh">海螺莊</span></div>
+        <div class="dc-en">Hoi Lo Jong · WFT HQ</div>
+        <p class="dc-desc">센트럴에 선 <span class="hl">환우무역 본사</span>. 지상은 합법 물류사, 그 아래 지하는 the Shelf 케이블이 육양되는 지점이자 사설 집행·심문이 이뤄지는 구역이다.</p>
+        <div class="dc-tags"><span class="dtag">환우무역 본사</span><span class="dtag">케이블 육양</span><span class="dtag">집행·심문</span></div>
+        <div class="dc-occ"><b>거주</b> · 페이위의 비공개 거주구역이 이 건물 상층부에 있다 — 등록되지 않은 자가 가장 높은 곳에 산다.</div>
+      </button>
+
+      <button class="dcard reveal d3" data-zone="peak" style="--zc:#8cc3e8" type="button">
+        <div class="dc-idx"><span class="pin"></span>거점 S-04</div>
+        <div class="dc-name">더 피크 <span class="zh">太平山</span></div>
+        <div class="dc-en">The Peak</div>
+        <p class="dc-desc">감사망조차 올려다보지 못하는 자본가와 메가코프의 <span class="hl">공중 성채</span>. 도시를 내려다보는 높이가 곧 권력의 고도다.</p>
+        <div class="dc-tags"><span class="dtag">자치의 정점</span><span class="dtag">감사망 사각</span><span class="dtag">메가코프</span></div>
+        <div class="dc-occ"><b>거주</b> · 시우힌의 최고급 보안 펜트하우스가 이 하층부에 있다 — 판을 그리는 손은 도시의 위쪽에서 내려다본다.</div>
+      </button>
+    </div>
+
+    <!-- the Shelf — offshore prize -->
+    <button class="shelfcard reveal" data-zone="shelf" type="button">
+      <div class="sc-head">
+        <span class="sc-tag">Offshore · 최종 쟁탈 대상</span>
+        <span class="sc-name">陸棚 <span class="en">the Shelf</span></span>
+      </div>
+      <p>심해 냉수로 냉각하는 <b>해저 데이터센터</b>와 발전 설비를 한 몸으로 묶은 해상 복합단지. 모두가 의존하는 AI 연산의 몸체이자, 재벌·코프·잔존 국가기관이 다투는 <b>이 이야기의 최종 쟁탈 대상</b>이다. 관제·케이블 육양·금융·법무를 감당할 육지 거점은 오직 홍콩뿐 — 지도 위의 모든 선이 결국 이 한 점으로 돌아온다.</p>
+    </button>
+
+  </div>
+</section>
+
+<!-- NETWORK -->
+<section id="network">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="l">
+        <span class="idx">§03 — 조직도 · 세력 구조</span>
+        <h2>環宇貿易 <span class="zh">World Ferry Trading</span></h2>
+      </div>
+    </div>
+
+    <p class="org-note reveal">화물선·해저 서버 바지선·케이블 육양선·소형 잠수정을 운용하는 <b>정상 등기 물류 회사</b>. 그 실물과 데이터의 흐름 속에 <span class="kw-a">밀수·자금세탁·불법 이송</span>이 섞여 든다. 위계는 도식이 아니라 배경으로 <span class="kw">내면화</span>되어 있다 — 회장(쿠)이 판을 소유하고, 시우힌이 자본으로 작전을 <b>설계</b>하며, 라이통이 무력을 <b>집행</b>하고, 몽쉬가 위계 밖에서 뒤를 정리한다. 통합파를 표방하나 이양이 어느 쪽으로 터지든 지주회사가 이득을 보도록 <span class="kw-a">양다리</span>가 설계돼 있다.</p>
+
+    <div class="org">
+      <div class="orow reveal">
+        <div class="lvl"><span class="n">최상층</span><span class="t">지주회사</span></div>
+        <div class="body">
+          <div class="who">쿠 <span class="zh">顧世衡 · Aurelio Koo</span></div>
+          <p>무역·부동산·유흥을 아우르는 회장. <span class="kw">컨소시엄 고위층·본토 관료</span>와 이름이 걸쳐 있으나 직접 폭력엔 관여하지 않고 모든 실행을 위임한다. 판이 근본에서 흔들리는 국면에만 드물게 개입한다.</p>
+        </div>
+      </div>
+      <div class="orow reveal d1">
+        <div class="lvl"><span class="n">설계</span><span class="t">자본·작전</span></div>
+        <div class="body">
+          <div class="who">시우힌 <span class="zh">溫兆軒 · Wan Siu-hin</span></div>
+          <p>감사망 아래에선 어디로 얼마가 어떤 트레일을 남기며 흐르느냐가 곧 성패다. <span class="kw">자금 설계가 곧 전략</span>이며, 거래별로 얼마의 화력·인력을 태울지 그가 결정한다. 판 자체를 그리는 자리라 집행 라인과는 층위가 다르다.</p>
+        </div>
+      </div>
+      <div class="orow reveal">
+        <div class="lvl"><span class="n">집행</span><span class="t">무력 총괄</span></div>
+        <div class="body">
+          <div class="who">라이통 <span class="zh">何禮堂 · Ho Lai-tong</span></div>
+          <p><span class="kw">무력을 누가 휘두르느냐</span>의 관리자. 현장의 최종 실행은 두 청년 — 근접전·폭발물의 <span class="kw-a">페이위</span>, 저격의 <span class="kw-a">혹림</span> — 이 맡는다. 시우힌이 "그 무력을 어디에 쓸지"를 자본으로 설계한다면, 라이통은 그것을 실제로 쥔 손이다. 권한이 겹치지 않으면서 맞물리는 자리라 둘 사이엔 미묘한 긴장이 흐른다.</p>
+        </div>
+      </div>
+      <div class="orow reveal d1">
+        <div class="lvl"><span class="n">외부</span><span class="t">조력</span></div>
+        <div class="body">
+          <div class="who">몽쉬 <span class="zh">謝望舒 · Tse Mong-syu</span></div>
+          <p>위계 밖 외부 조력. 거래의 사후 처리, 계약과 <span class="kw">데이터세탁 구조</span>를 설계한다. 분쟁이 나도 의뢰인이 책임을 피하도록 조항과 데이터를 재배치하는데, 이는 전직 형사법정변호사로서 <span class="kw">법정에서 사실을 재배치하던</span> 능력의 연장선이다.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FACTIONS -->
+    <div class="factions-head reveal">
+      <div class="k">Factions · 두 갈래의 베팅</div>
+      <h3>統合派 <span class="zh">×</span> 備蓄派</h3>
+    </div>
+
+    <div class="factions">
+      <div class="faction integ reveal">
+        <div class="f-tag">Integrationist · 통합파</div>
+        <div class="f-name">統合派 <span class="en">Assimilate</span></div>
+        <div class="f-line">시스템 내부로의 기생.</div>
+        <p class="f-desc">메가코프의 <b>하청</b>과 <b>데이터 세탁</b>을 교환하여, 새로운 헌장 안에서 <b>합법을 가장한 포식자</b>가 된다. 환우무역의 표면적 노선.</p>
+        <div class="f-rows">
+          <div class="f-r"><span class="rk">내주는 것</span><span class="rv">기술 · 자본 · 데이터세탁 · <span class="zh">the Shelf 접근권</span></span></div>
+          <div class="f-r"><span class="rk">받는 것</span><span class="rv">인력 · 밀수 사이버웨어 · <span class="zh">암시장 연산</span></span></div>
+          <div class="f-r"><span class="rk">전장</span><span class="rv">컨소시엄 보안하청 · 본토조직 제휴 · 계약서 사이의 공백</span></div>
+        </div>
+      </div>
+
+      <div class="faction hoard reveal d1">
+        <div class="f-tag">Stockpiler · 비축파</div>
+        <div class="f-name">備蓄派 <span class="en">Stockpile</span></div>
+        <div class="f-line">폭력적 붕괴에 대한 베팅.</div>
+        <p class="f-desc">무질서와 유혈 사태를 대비해 <b>군용 사이버웨어</b>와 <b>블랙 ICE</b>를 비축하며, 다가올 <b>봉쇄의 날</b>을 기다린다.</p>
+        <div class="f-rows">
+          <div class="f-r"><span class="rk">축적</span><span class="rv">군용 사이버웨어 · 전투 드론 · <span class="zh">블랙 ICE</span></span></div>
+          <div class="f-r"><span class="rk">거점</span><span class="rv">무기고 · 오프그리드 은신처 · <span class="zh">그리드 밖의 어둠</span></span></div>
+          <div class="f-r"><span class="rk">시계</span><span class="rv">이양의 밤 · 도시가 잠기는 순간을 향한 카운트다운</span></div>
+        </div>
+      </div>
+
+      <div class="f-bridge reveal">
+        環宇貿易 — 표면은 <b>통합파</b>, 그러나 저울 양쪽에 발을 걸친 <span class="amp">양다리</span>
+      </div>
+    </div>
+
+    <!-- RIVAL ORG -->
+    <div class="rival reveal">
+      <div class="rv-head">
+        <span class="rv-tag">Rival · 통합파 경쟁조직</span>
+        <span class="rv-name"><span class="blk">██████</span> <span class="en">Designation Withheld</span></span>
+      </div>
+      <p>환우무역과 같은 <b>통합파 노선의 직접 경쟁자</b>. 뒤늦게 통합 노선에 올라탔으나, <b>2062년 the Shelf 케이블 육양점 관제지분을 환우무역에서 채가며</b> 단숨에 판도를 뒤집은 신흥 실세다. 데이터·연산 쪽 지분에 강하고, 컨소시엄 하청 라인에서 환우무역과 정면으로 부딪힌다. 배신 사건이 단순 이탈이 아니라 <b>같은 시장을 노리는 경쟁자에게 우리 패를 통째로 넘긴 일</b>이 되는 이유가 여기 있다 — 상처의 치수가 그만큼 깊다.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- FILES -->
+<section id="files">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="l">
+        <span class="idx">§04 — 인사 기록</span>
+        <h2>등재 인물 <span class="zh">在籍人物</span></h2>
+      </div>
+    </div>
+
+    <!-- 시우힌 -->
+    <div class="dossier-wrap reveal" style="--c:var(--c-hin)">
+      <div class="dossier-visual" data-carousel data-motion>
+        <div class="image-track">
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 01 / 03</span><span class="fb-hz">溫兆軒</span><span class="fb-scan"></span><span class="fb-id">NO IMG · WFT-0201</span><span class="fb-bar"></span></div><img src="./images/hin_01.webp" alt="溫兆軒 인사 사진 1" onerror="this.remove()"></div>
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 02 / 03</span><span class="fb-hz">溫兆軒</span><span class="fb-scan"></span><span class="fb-id">NO IMG · WFT-0201</span><span class="fb-bar"></span></div><img src="./images/hin_02.webp" alt="溫兆軒 인사 사진 2" onerror="this.remove()"></div>
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 03 / 03</span><span class="fb-hz">溫兆軒</span><span class="fb-scan"></span><span class="fb-id">NO IMG · WFT-0201</span><span class="fb-bar"></span></div><img src="./images/hin_03.webp" alt="溫兆軒 인사 사진 3" onerror="this.remove()"></div>
+        </div>
+        <div class="carousel-nav">
+          <button class="nav-prev" aria-label="이전 사진"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button class="nav-next" aria-label="다음 사진"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+        <div class="carousel-indicators">
+          <span class="cdot active" data-i="0" role="button" aria-label="사진 1"></span>
+          <span class="cdot" data-i="1" role="button" aria-label="사진 2"></span>
+          <span class="cdot" data-i="2" role="button" aria-label="사진 3"></span>
+        </div>
+      </div>
+      <div class="dossier-data">
+        <div class="kicker"><span class="no">파일 01</span> · 자본·작전 설계</div>
+        <div class="d-name">Wan Siu-hin<span class="ko">溫兆軒 · 완 시우힌</span></div>
+        <div class="d-role">환우무역의 자본과 작전을 설계하는 손. 감사망 아래에서 자금의 흐름은 곧 전략이며, 유사시엔 직접 실행에 나선다.</div>
+        <div class="facts">
+          <div class="fact"><div class="l">나이</div><div class="v m">33</div></div>
+          <div class="fact"><div class="l">특기</div><div class="v">자본·작전 설계 · 카타나</div></div>
+          <div class="fact"><div class="l">등재</div><div class="v m">WFT-0201</div></div>
+        </div>
+        <div class="classify">
+          <div class="cls-head"><h4>분류 지표 · Classification</h4><span class="ln"></span></div>
+          <div class="typ-grid">
+            <div class="typ"><span class="tl">MBTI</span><span class="tv">INTJ</span></div>
+            <div class="typ"><span class="tl">Enneagram</span><span class="tv">3w4</span></div>
+            <div class="typ"><span class="tl">Instinct</span><span class="tv">Sx/So</span></div>
+            <div class="typ"><span class="tl">처리순위</span><span class="tv">LVEF</span></div>
+          </div>
+          <div class="tropes">
+            <span class="tr-label">Trope Index</span>
+            <span class="trope">The Mastermind</span>
+            <span class="trope">Dual-Wielding</span>
+            <span class="trope">Twisted Loyalty</span>
+            <span class="trope">Red Baron</span>
+          </div>
+        </div>
+        <div class="dispo">
+          <div class="d-sub"><h4>기호 · Disposition</h4><span class="ln"></span></div>
+          <div class="dp">
+            <div class="dp-row"><span class="dp-k pos">選好</span><span class="dp-c"><span class="chip">옛 광둥 오페라</span><span class="chip">종이와 먹의 향기</span></span></div>
+            <div class="dp-row"><span class="dp-k neg">忌避</span><span class="dp-c"><span class="chip neg">씹는 소리가 큰 음식</span></span></div>
+          </div>
+        </div>
+        <div class="d-block">
+          <div class="d-sub"><h4>심리 프로파일 · Profile</h4><span class="ln"></span></div>
+          <p>자본과 작전 설계를 총괄. 회의석에서의 화술은 고전과 계약서 사이를 오가며, 정중하되 시선은 늘 상대의 한 뼘 위에 머문다. 길게 끌 자리와 <span class="hl">한 문장으로 끝을 내려칠 자리</span>를 혼동하는 법이 없다. 실무진 다수는 그의 이름이 거래 조건에 오르내리는 것만으로 값이 달라진다고 증언한다. 카타나를 상시 패용하나 설계자가 직접 칼을 드는 광경은 드물게 목격될 뿐이다.</p>
+        </div>
+        <div class="d-block">
+          <div class="d-sub"><h4>교전 특기 · Engagement</h4><span class="ln"></span></div>
+          <p>전신에 고르게 밴 신체 강화, 근접 간합에서의 <span class="hl">쌍수 운용</span>. 설계자로 분류되나 유사시 현장 투입 시 감정을 지운 정확한 처리로 평가된다. 분노보다 정밀에 가까운 도살 — 목격담이 실제보다 크게 부풀려질 이유가 여기 있다.</p>
+        </div>
+        <div class="note">
+          <div class="h">欄外註 · 何禮堂 <span class="zh">Margin — Lai-tong</span></div>
+          <p>“판을 그리는 손이 칼도 제일 잘 쓴다니, 재미없는 농담 같지 않나? 계산기 두드리던 양반이 제 손으로 피를 뒤집어썼을 땐 다들 오줌을 지렸지. 나야 뭐 박수를 쳤네만. 저 냉정함이 실은 얼마나 뜨거운 자리에서 얼어붙은 건지, 그걸 아는 사람은 이 바닥에 나 하나뿐일 거야.”</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 혹림 -->
+    <div class="dossier-wrap reveal" style="--c:var(--c-lim)">
+      <div class="dossier-visual" data-carousel data-motion>
+        <div class="image-track">
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 01 / 03</span><span class="fb-hz">陳學廉</span><span class="fb-scan"></span><span class="fb-id">NO IMG · WFT-0207</span><span class="fb-bar"></span></div><img src="./images/lim_01.webp" alt="陳學廉 인사 사진 1" onerror="this.remove()"></div>
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 02 / 03</span><span class="fb-hz">陳學廉</span><span class="fb-scan"></span><span class="fb-id">NO IMG · WFT-0207</span><span class="fb-bar"></span></div><img src="./images/lim_02.webp" alt="陳學廉 인사 사진 2" onerror="this.remove()"></div>
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 03 / 03</span><span class="fb-hz">陳學廉</span><span class="fb-scan"></span><span class="fb-id">NO IMG · WFT-0207</span><span class="fb-bar"></span></div><img src="./images/lim_03.webp" alt="陳學廉 인사 사진 3" onerror="this.remove()"></div>
+        </div>
+        <div class="carousel-nav">
+          <button class="nav-prev" aria-label="이전 사진"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button class="nav-next" aria-label="다음 사진"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+        <div class="carousel-indicators">
+          <span class="cdot active" data-i="0" role="button" aria-label="사진 1"></span>
+          <span class="cdot" data-i="1" role="button" aria-label="사진 2"></span>
+          <span class="cdot" data-i="2" role="button" aria-label="사진 3"></span>
+        </div>
+      </div>
+      <div class="dossier-data">
+        <div class="kicker"><span class="no">파일 02</span> · 저격 · 정밀화기</div>
+        <div class="d-name">Chan Hok-lim<span class="ko">陳學廉 · 찬 혹림</span></div>
+        <div class="d-role">도시에서 가장 깨끗하게 방아쇠를 당기는 무력 집행자.</div>
+        <div class="facts">
+          <div class="fact"><div class="l">나이</div><div class="v m">30</div></div>
+          <div class="fact"><div class="l">특기</div><div class="v">저격 · 정밀화기</div></div>
+          <div class="fact"><div class="l">등재</div><div class="v m">WFT-0207</div></div>
+        </div>
+        <div class="classify">
+          <div class="cls-head"><h4>분류 지표 · Classification</h4><span class="ln"></span></div>
+          <div class="typ-grid">
+            <div class="typ"><span class="tl">MBTI</span><span class="tv">ISTP</span></div>
+            <div class="typ"><span class="tl">Enneagram</span><span class="tv">6w5</span></div>
+            <div class="typ"><span class="tl">Instinct</span><span class="tv">Sx/So</span></div>
+            <div class="typ"><span class="tl">처리순위</span><span class="tv">LFEV</span></div>
+          </div>
+          <div class="tropes">
+            <span class="tr-label">Trope Index</span>
+            <span class="trope">The Atoner</span>
+            <span class="trope">Sniper Rifle</span>
+            <span class="trope">Hit &amp; Run</span>
+            <span class="trope">Defective Detective</span>
+          </div>
+        </div>
+        <div class="dispo">
+          <div class="d-sub"><h4>기호 · Disposition</h4><span class="ln"></span></div>
+          <div class="dp">
+            <div class="dp-row"><span class="dp-k pos">選好</span><span class="dp-c"><span class="chip">낡은 어쿠스틱 블루스</span><span class="chip">완탕면</span></span></div>
+            <div class="dp-row"><span class="dp-k neg">忌避</span><span class="dp-c"><span class="chip neg">아마추어들의 허세</span></span></div>
+          </div>
+        </div>
+        <div class="d-block">
+          <div class="d-sub"><h4>심리 프로파일 · Profile</h4><span class="ln"></span></div>
+          <p>저격과 정밀화기 담당. 오만과 냉소가 대화의 기본값이고 욕설이 잦으나, 어느 선을 넘으면 말수가 뚝 끊긴다. 동료들은 그가 <span class="hl">현장을 읽는 눈이 실행자치고 지나치게 밝다</span>고 입을 모은다 — 마치 오래 반대편에 서 봤던 사람처럼. 앞머리로 한쪽 눈을 가리는 버릇, 방아쇠 직전의 짧은 정적. 조카의 학비를 대느라 남아 있다는 사실만은 본인도 숨기지 않는다.</p>
+        </div>
+        <div class="d-block">
+          <div class="d-sub"><h4>교전 특기 · Engagement</h4><span class="ln"></span></div>
+          <p><span class="hl">장거리 정밀 저격과 근접 기동타격.</span> 광학 조준 임플란트와 미세 반동 제어가 밴 오른팔로 오차 없는 저격을 수행하고, 거리가 좁혀지면 핸드건으로 적의 사각에 파고들어 치명상만 남긴 뒤 즉시 이탈한다. 군더더기 없이 꿰뚫고 빠지는, 실용적이고 냉혹한 히트 앤드 런.</p>
+        </div>
+        <div class="note">
+          <div class="h">欄外註 · 何禮堂 <span class="zh">Margin — Lai-tong</span></div>
+          <p>“우리 저격수 나리? 방아쇠는 도시에서 제일 깨끗하게 당기는데, 정작 자기 손이 더러운 걸 못 견뎌서 매일 밤 스스로를 쏘고 있지. 뭐, 조카 학비 대주는 삼촌치고 그만한 성실함이 어디 흔한가. 아깝다니까, 그 재능이 죄책감이라는 세금을 너무 많이 떼여.”</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 페이위 -->
+    <div class="dossier-wrap reveal" style="--c:var(--c-fei)">
+      <div class="dossier-visual" data-carousel data-motion>
+        <div class="image-track">
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 01 / 03</span><span class="fb-hz">飛宇</span><span class="fb-scan"></span><span class="fb-id">NO IMG · ██-████</span><span class="fb-bar"></span></div><img src="./images/fei_01.webp" alt="歐陽飛宇 인사 사진 1" onerror="this.remove()"></div>
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 02 / 03</span><span class="fb-hz">飛宇</span><span class="fb-scan"></span><span class="fb-id">NO IMG · ██-████</span><span class="fb-bar"></span></div><img src="./images/fei_02.webp" alt="歐陽飛宇 인사 사진 2" onerror="this.remove()"></div>
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 03 / 03</span><span class="fb-hz">飛宇</span><span class="fb-scan"></span><span class="fb-id">NO IMG · ██-████</span><span class="fb-bar"></span></div><img src="./images/fei_03.webp" alt="歐陽飛宇 인사 사진 3" onerror="this.remove()"></div>
+        </div>
+        <div class="carousel-nav">
+          <button class="nav-prev" aria-label="이전 사진"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button class="nav-next" aria-label="다음 사진"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+        <div class="carousel-indicators">
+          <span class="cdot active" data-i="0" role="button" aria-label="사진 1"></span>
+          <span class="cdot" data-i="1" role="button" aria-label="사진 2"></span>
+          <span class="cdot" data-i="2" role="button" aria-label="사진 3"></span>
+        </div>
+      </div>
+      <div class="dossier-data">
+        <div class="kicker"><span class="no">파일 03</span> · 근접전 · 폭발물</div>
+        <div class="d-name">Au-yeung Fei-jyu<span class="ko">歐陽飛宇 · 아우영 페이위</span></div>
+        <div class="d-role">근접전과 폭발물을 다루는 젊은 실행자. 라이통이 손수 거뒀다. 감사망이 조회할 수 있는 등록 기록은 존재하지 않는다.</div>
+        <div class="facts">
+          <div class="fact"><div class="l">나이</div><div class="v m">겉보기 25</div></div>
+          <div class="fact"><div class="l">특기</div><div class="v">근접전 · 폭발물 자작</div></div>
+          <div class="fact"><div class="l">등재</div><div class="v m">조회 불가</div></div>
+        </div>
+        <div class="classify">
+          <div class="cls-head"><h4>분류 지표 · Classification</h4><span class="ln"></span></div>
+          <div class="typ-grid">
+            <div class="typ"><span class="tl">MBTI</span><span class="tv">ENTP</span></div>
+            <div class="typ"><span class="tl">Enneagram</span><span class="tv">7w6</span></div>
+            <div class="typ"><span class="tl">Instinct</span><span class="tv">Sx/So</span></div>
+            <div class="typ"><span class="tl">처리순위</span><span class="tv">FELV</span></div>
+          </div>
+          <div class="tropes">
+            <span class="tr-label">Trope Index</span>
+            <span class="trope">Knife Nut</span>
+            <span class="trope">Mad Bomber</span>
+            <span class="trope">Child Soldier</span>
+            <span class="trope">Blue &amp; Orange Morality</span>
+          </div>
+        </div>
+        <div class="dispo">
+          <div class="d-sub"><h4>기호 · Disposition</h4><span class="ln"></span></div>
+          <div class="dp">
+            <div class="dp-row"><span class="dp-k pos">選好</span><span class="dp-c"><span class="chip">하이퍼팝</span><span class="chip">캔디</span><span class="chip">맵고 짠 합성 정크푸드</span></span></div>
+            <div class="dp-row"><span class="dp-k neg">忌避</span><span class="dp-c"><span class="chip neg">기다림</span></span></div>
+          </div>
+        </div>
+        <div class="d-block">
+          <div class="d-sub"><h4>심리 프로파일 · Profile</h4><span class="ln"></span></div>
+          <p>근접전과 폭발물 담당. 라이통이 손수 거둔 청년으로, 조직 내에서 가장 어린 축에 든다. 처음 세상을 구경하는 사람처럼 질문이 많고 화제가 사방으로 튀며, 갓 주워들은 표현을 시험하듯 꺼내 반응을 살핀다. 폭약과 투척 무기를 다룰 때의 손끝은 <span class="hl">장난감을 만지는 아이의 그것과 구분되지 않는다</span> — 다만 그 장난감이 사람을 지운다는 점만 다르다. 옳고 그름의 저울이 남들과는 다른 눈금을 쓰는 듯하다.</p>
+        </div>
+        <div class="d-block">
+          <div class="d-sub"><h4>교전 특기 · Engagement</h4><span class="ln"></span></div>
+          <p><span class="hl">브리처, 근·중거리 변칙 제압.</span> 가속된 신경계로 체감 시간을 늘려, 타인의 시간이 멎은 듯한 찰나에 수류탄과 투척 나이프를 동시에 운용해 적이 반응할 공간을 봉쇄한다. 궤도를 읽을 수 없는 고속 기동으로 거리를 좁힌 뒤 서브머신건으로 다수를 최단 시간에 섬멸한다.</p>
+        </div>
+        <div class="note">
+          <div class="h">欄外註 · 何禮堂 <span class="zh">Margin — Lai-tong</span></div>
+          <p>“내 새끼. 아, 이런 표현 촌스럽나? 세상 무서운 줄 모르고 폭탄을 장난감처럼 만지는 놈인데, 그게 다 내가 바깥바람을 안 쐬어 준 덕이거든. 순진해서 예쁘고, 순진해서 위험해. 언젠가 저 눈에 세상이 제대로 비치는 날이 오면, 글쎄, 그때도 웃고 있을지는 나도 궁금해.”</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 라이통 -->
+    <div class="dossier-wrap reveal" style="--c:var(--c-tong)">
+      <div class="dossier-visual" data-carousel data-motion>
+        <div class="image-track">
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 01 / 03</span><span class="fb-hz">何禮堂</span><span class="fb-scan"></span><span class="fb-id">NO IMG · WFT-0044</span><span class="fb-bar"></span></div><img src="./images/tong_01.webp" alt="何禮堂 인사 사진 1" onerror="this.remove()"></div>
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 02 / 03</span><span class="fb-hz">何禮堂</span><span class="fb-scan"></span><span class="fb-id">NO IMG · WFT-0044</span><span class="fb-bar"></span></div><img src="./images/tong_02.webp" alt="何禮堂 인사 사진 2" onerror="this.remove()"></div>
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 03 / 03</span><span class="fb-hz">何禮堂</span><span class="fb-scan"></span><span class="fb-id">NO IMG · WFT-0044</span><span class="fb-bar"></span></div><img src="./images/tong_03.webp" alt="何禮堂 인사 사진 3" onerror="this.remove()"></div>
+        </div>
+        <div class="carousel-nav">
+          <button class="nav-prev" aria-label="이전 사진"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button class="nav-next" aria-label="다음 사진"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+        <div class="carousel-indicators">
+          <span class="cdot active" data-i="0" role="button" aria-label="사진 1"></span>
+          <span class="cdot" data-i="1" role="button" aria-label="사진 2"></span>
+          <span class="cdot" data-i="2" role="button" aria-label="사진 3"></span>
+        </div>
+      </div>
+      <div class="dossier-data">
+        <div class="kicker"><span class="no">파일 04</span> · 집행 총책</div>
+        <div class="d-name">Ho Lai-tong<span class="ko">何禮堂 · 호 라이통</span></div>
+        <div class="d-role">환우무역의 무력 집행을 총괄하는 이사. 두 청년을 손수 부리며, 위협조차 예법으로 감싸 상대를 무장 해제시킨다.</div>
+        <div class="facts">
+          <div class="fact"><div class="l">나이</div><div class="v m">49</div></div>
+          <div class="fact"><div class="l">직위</div><div class="v">이사 · 집행총책</div></div>
+          <div class="fact"><div class="l">등재</div><div class="v m">WFT-0044</div></div>
+        </div>
+        <div class="classify">
+          <div class="cls-head"><h4>분류 지표 · Classification</h4><span class="ln"></span></div>
+          <div class="typ-grid">
+            <div class="typ"><span class="tl">MBTI</span><span class="tv">ESTP</span></div>
+            <div class="typ"><span class="tl">Enneagram</span><span class="tv">8w7</span></div>
+            <div class="typ"><span class="tl">Instinct</span><span class="tv">Sx/So</span></div>
+            <div class="typ"><span class="tl">처리순위</span><span class="tv">VFLE</span></div>
+          </div>
+          <div class="tropes">
+            <span class="tr-label">Trope Index</span>
+            <span class="trope">Papa Wolf</span>
+            <span class="trope">Affably Evil</span>
+            <span class="trope">Blood Knight</span>
+          </div>
+        </div>
+        <div class="dispo">
+          <div class="d-sub"><h4>기호 · Disposition</h4><span class="ln"></span></div>
+          <div class="dp">
+            <div class="dp-row"><span class="dp-k pos">記載</span><span class="dp-c"><span class="chip void">본인 요청으로 공란 · 欄外註 참조 <span class="blk">████</span></span></span></div>
+          </div>
+        </div>
+        <div class="d-block">
+          <div class="d-sub"><h4>심리 프로파일 · Profile</h4><span class="ln"></span></div>
+          <p>무력 집행 총괄. 유쾌하고 능청스러워 위협조차 농담과 예법으로 감싸 상대를 무장 해제시킨다 — <span class="hl">그 웃음의 온도를 오해했다가</span> 곤란을 겪은 이가 한둘이 아니다. 손수 거둔 실행자들에게는 보호와 지배가 한 덩어리로 붙어 있어, 제 사람을 건드린 상대에게는 예법이 순식간에 벗겨진다. 싸움 자체를 즐기는 기색이 역력하다. 다만 회장 앞에서만은 그 능청이 반 톤 낮아진다.</p>
+        </div>
+        <div class="note">
+          <div class="h">欄外註 · 自筆 <span class="zh">Margin — in his own hand</span></div>
+          <p>“나에 대해서? 그런 재미없는 얘긴 접어 두게. 남의 뒤나 봐주는 사람 뒷조사해서 뭘 하려고. 이 서류 여백에 내가 끄적여 둔 잔소리들, 그거면 내가 어떤 물건인지 대충 감이 올 걸세. 나머지는… 뭐, 굳이 알 필요 없지.”</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 쿠 -->
+    <div class="dossier-wrap reveal" style="--c:var(--c-koo)">
+      <div class="dossier-visual" data-carousel data-motion>
+        <div class="image-track">
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 01 / 03</span><span class="fb-hz">顧世衡</span><span class="fb-scan"></span><span class="fb-id">NO IMG · WFT-0001</span><span class="fb-bar"></span></div><img src="./images/koo_01.webp" alt="顧世衡 인사 사진 1" onerror="this.remove()"></div>
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 02 / 03</span><span class="fb-hz">顧世衡</span><span class="fb-scan"></span><span class="fb-id">NO IMG · WFT-0001</span><span class="fb-bar"></span></div><img src="./images/koo_02.webp" alt="顧世衡 인사 사진 2" onerror="this.remove()"></div>
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 03 / 03</span><span class="fb-hz">顧世衡</span><span class="fb-scan"></span><span class="fb-id">NO IMG · WFT-0001</span><span class="fb-bar"></span></div><img src="./images/koo_03.webp" alt="顧世衡 인사 사진 3" onerror="this.remove()"></div>
+        </div>
+        <div class="carousel-nav">
+          <button class="nav-prev" aria-label="이전 사진"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button class="nav-next" aria-label="다음 사진"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+        <div class="carousel-indicators">
+          <span class="cdot active" data-i="0" role="button" aria-label="사진 1"></span>
+          <span class="cdot" data-i="1" role="button" aria-label="사진 2"></span>
+          <span class="cdot" data-i="2" role="button" aria-label="사진 3"></span>
+        </div>
+      </div>
+      <div class="dossier-data">
+        <div class="kicker"><span class="no">파일 05</span> · 지주회사 회장</div>
+        <div class="d-name">Aurelio Koo<span class="ko">顧世衡 · 아우렐리우 쿠</span></div>
+        <div class="d-role">무역·부동산·유흥을 아우르는 지주회사의 회장. 판이 근본에서 흔들리는 국면에만 드물게 모습을 드러낸다.</div>
+        <div class="facts">
+          <div class="fact"><div class="l">나이</div><div class="v m">53</div></div>
+          <div class="fact"><div class="l">직위</div><div class="v">지주회사 회장</div></div>
+          <div class="fact"><div class="l">등재</div><div class="v m">WFT-0001</div></div>
+        </div>
+        <div class="classify">
+          <div class="cls-head"><h4>분류 지표 · Classification</h4><span class="ln"></span></div>
+          <div class="typ-grid">
+            <div class="typ"><span class="tl">MBTI</span><span class="tv">ENTJ</span></div>
+            <div class="typ"><span class="tl">Enneagram</span><span class="tv">8w7</span></div>
+            <div class="typ"><span class="tl">Instinct</span><span class="tv">So/Sp</span></div>
+            <div class="typ"><span class="tl">처리순위</span><span class="tv">VLFE</span></div>
+          </div>
+          <div class="tropes">
+            <span class="tr-label">Trope Index</span>
+            <span class="trope">The Godfather</span>
+            <span class="trope">Non-Action Big Bad</span>
+            <span class="trope">Chessmaster</span>
+          </div>
+        </div>
+        <div class="dispo">
+          <div class="d-sub"><h4>기호 · Disposition</h4><span class="ln"></span></div>
+          <div class="dp">
+            <div class="dp-row"><span class="dp-k pos">選好</span><span class="dp-c"><span class="chip">쿠바 시가</span><span class="chip">광둥 오페라</span><span class="chip">숙성 코냑</span><span class="chip">바둑</span></span></div>
+            <div class="dp-row"><span class="dp-k neg">忌避</span><span class="dp-c"><span class="chip neg">배신</span><span class="chip neg">조급함</span><span class="chip neg">값싼 감상</span></span></div>
+          </div>
+        </div>
+        <div class="d-block">
+          <div class="d-sub"><h4>심리 프로파일 · Profile</h4><span class="ln"></span></div>
+          <p>지주회사 회장. 무역·부동산·유흥을 아우르며, 컨소시엄 고위층과 본토 관료 사이에 이름이 걸쳐 있다. 위압으로 방을 누르는 대신 <span class="hl">여유와 매혹으로 무게중심을 제 쪽으로</span> 옮겨 오는 부류. 직접 손을 쓰는 일은 없다시피 하고, 판이 근본에서 흔들릴 때만 드물게 얼굴을 비친다.</p>
+        </div>
+        <div class="note">
+          <div class="h">欄外註 · 何禮堂 <span class="zh">Margin — Lai-tong</span></div>
+          <p>“회장님? 쉿, 이런 얘긴 목소리를 낮춰야지. 방에 들어오면 공기부터 그분 쪽으로 기우는 양반이야. 나야 유능한 사냥개고, 사냥개는 주인 흉을 보지 않는 법이지. 다만 한 가지는 알아 둬. 그분이 웃으며 코냑을 따라줄 때가, 실은 자네 값어치를 매기는 순간이라네.”</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 몽쉬 -->
+    <div class="dossier-wrap reveal" style="--c:var(--c-syu)">
+      <div class="dossier-visual" data-carousel data-motion>
+        <div class="image-track">
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 01 / 03</span><span class="fb-hz">謝望舒</span><span class="fb-scan"></span><span class="fb-id">NO IMG · EXT-0065</span><span class="fb-bar"></span></div><img src="./images/syu_01.webp" alt="謝望舒 인사 사진 1" onerror="this.remove()"></div>
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 02 / 03</span><span class="fb-hz">謝望舒</span><span class="fb-scan"></span><span class="fb-id">NO IMG · EXT-0065</span><span class="fb-bar"></span></div><img src="./images/syu_02.webp" alt="謝望舒 인사 사진 2" onerror="this.remove()"></div>
+          <div class="slide"><div class="slide-fallback"><span class="fb-corner tl"></span><span class="fb-corner br"></span><span class="fb-tag">SCAN 03 / 03</span><span class="fb-hz">謝望舒</span><span class="fb-scan"></span><span class="fb-id">NO IMG · EXT-0065</span><span class="fb-bar"></span></div><img src="./images/syu_03.webp" alt="謝望舒 인사 사진 3" onerror="this.remove()"></div>
+        </div>
+        <div class="carousel-nav">
+          <button class="nav-prev" aria-label="이전 사진"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button class="nav-next" aria-label="다음 사진"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+        <div class="carousel-indicators">
+          <span class="cdot active" data-i="0" role="button" aria-label="사진 1"></span>
+          <span class="cdot" data-i="1" role="button" aria-label="사진 2"></span>
+          <span class="cdot" data-i="2" role="button" aria-label="사진 3"></span>
+        </div>
+      </div>
+      <div class="dossier-data">
+        <div class="kicker"><span class="no">파일 06</span> · 외부 조력</div>
+        <div class="d-name">Tse Mong-syu<span class="ko">謝望舒 · 셰 몽쉬</span></div>
+        <div class="d-role">위계 밖에서 거래의 뒤를 정리하는 前 형사법정변호사. 자격을 반납하고 물러난 뒤, 옛 후견인을 통해 그 재능을 계약과 데이터세탁 설계에 쓴다.</div>
+        <div class="facts">
+          <div class="fact"><div class="l">나이</div><div class="v m">33</div></div>
+          <div class="fact"><div class="l">소속</div><div class="v">외부 조력</div></div>
+          <div class="fact"><div class="l">등재</div><div class="v m">EXT-0065</div></div>
+        </div>
+        <div class="classify">
+          <div class="cls-head"><h4>분류 지표 · Classification</h4><span class="ln"></span></div>
+          <div class="typ-grid">
+            <div class="typ"><span class="tl">MBTI</span><span class="tv">INTP</span></div>
+            <div class="typ"><span class="tl">Enneagram</span><span class="tv">5w4</span></div>
+            <div class="typ"><span class="tl">Instinct</span><span class="tv">Sx/So</span></div>
+            <div class="typ"><span class="tl">처리순위</span><span class="tv">LVEF</span></div>
+          </div>
+          <div class="tropes">
+            <span class="tr-label">Trope Index</span>
+            <span class="trope">The Consigliere</span>
+            <span class="trope">Deadpan Snarker</span>
+            <span class="trope">Shell-Shocked Veteran (Legal)</span>
+          </div>
+        </div>
+        <div class="dispo">
+          <div class="d-sub"><h4>기호 · Disposition</h4><span class="ln"></span></div>
+          <div class="dp">
+            <div class="dp-row"><span class="dp-k pos">選好</span><span class="dp-c"><span class="chip">잘 관리된 어항</span><span class="chip">깊이 파고든 영화</span><span class="chip">메를로퐁티</span></span></div>
+            <div class="dp-row"><span class="dp-k neg">忌避</span><span class="dp-c"><span class="chip neg">라일락</span></span></div>
+          </div>
+        </div>
+        <div class="d-block">
+          <div class="d-sub"><h4>심리 프로파일 · Profile</h4><span class="ln"></span></div>
+          <p>위계 밖 외부 조력. 거래의 사후 처리와 계약·데이터세탁 구조 설계를 맡는다. 前 형사법정변호사 출신으로, 한때 법정에서 <span class="hl">사실을 재배치해 무죄를 끌어내는</span> 변론으로 이름이 높았다. 나른한 저음, 짧은 단언, 협박과 다정을 한 문장에 겹치는 화법. 겉으로는 좀처럼 흔들리지 않으나, 자격을 반납하고 물러난 이유는 서류 어디에도 적혀 있지 않다.</p>
+        </div>
+        <div class="note">
+          <div class="h">欄外註 · 何禮堂 <span class="zh">Margin — Lai-tong</span></div>
+          <p>“우리 변호사 선생. 법정을 떠났다면서 여태 남의 뒤나 닦아주고 있으니, 그 우아한 손이 아깝긴 하지. 계약서 문장 사이에 시체를 숨기는 솜씨는 이 도시 최고인데, 정작 제 부두에 가라앉은 건 못 건져 올렸단 말씀이야. 뭐, 사람이 다 제 몫의 물귀신 하나쯤은 데리고 살지 않나.”</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 시우룬 · REDACTED -->
+    <div class="dossier-wrap redacted reveal">
+      <div class="dossier-visual">
+        <div class="redacted-screen">
+          <div class="rs-line">&gt; 감사망 명령 #4471-██ 적용됨</div>
+          <div class="rs-line dim">&gt; 본 노드에 관한 기록은 의도적으로 삭제되었습니다.</div>
+          <div class="rs-line">&gt; 생존 여부: <span class="blk">████████</span> · 소재: <span class="blk">████████</span><span class="rs-cur">_</span></div>
+        </div>
+      </div>
+      <div class="dossier-data">
+        <div class="kicker"><span class="no">파일 07</span> · 記錄 말소 · Record Expunged</div>
+        <div class="d-name">Wan Siu-lun<span class="ko">溫兆倫 · 완 시우룬</span></div>
+        <hr class="d-rule" aria-hidden="true">
+
+        <div class="recover-log" aria-label="훼손 노드 복원 시도 로그">
+          <div class="rl-l">&gt; 캐시 재구성 시도 · <span class="a">#4471-<span class="blk">██</span></span> … 무결성 <span class="a">12%</span></div>
+          <div class="rl-l">&gt; 복원된 문장 <span class="k">0</span> · 복원된 잡음 <span class="blk">████</span> · 이름 <span class="a">불가</span></div>
+          <div class="rl-l">&gt; 최근 조회 이력 · <span class="k">WFT-0201</span> — 시도 <span class="blk">██</span>회</div>
+          <div class="rl-l">&gt; <span class="a">경고: 열람할 때마다 남은 조각이 줄어듭니다</span><span class="rl-cur">_</span></div>
+          <div class="rl-bar" aria-hidden="true"><span></span></div>
+        </div>
+
+        <div class="ghost-feed" data-motion aria-label="복원 중 훼손된 단편">
+          <div class="feed-line" data-text="Yet each man kills the thing he loves,">Yet each man <span class="gw g1">kills</span> the thing he loves,</div>
+          <div class="feed-line" data-text="By each let this be heard,">By each let this be heard,</div>
+          <div class="feed-line" data-text="Some do it with a bitter look,">Some do it with a bitter look,</div>
+          <div class="feed-line" data-text="Some with a flattering word,">Some with a flattering word,</div>
+          <div class="feed-line" data-text="The coward does it with a kiss,">The coward does it with a <span class="gw g2">kiss</span>,</div>
+          <div class="feed-line" data-text="The brave man with a sword.">The brave man with a <span class="gw g3">sword</span>.</div>
+          <div class="feed-noise">░▒▓ SIGNAL LOST · CACHE #4471-██ · 0x00 0x00 ▓▒░</div>
+        </div>
+
+        <div class="note">
+          <div class="h">欄外註 · 何禮堂 <span class="zh">Margin — Lai-tong</span></div>
+          <p>“아, 그 겁 없는 도련님 말이지. 제 쌍둥이 등에 칼을 꽂고 살랑살랑 걸어나갔으니, 배짱 하나는 인정해 줘야 예의겠지. 근데 말이야, 형이라는 게 참 무서운 물건이거든. 그 양반은 지금 자네 무덤 치수를 재고 있어. 어디 숨었든, 아직 숨 쉬고 있다면 그거 하나는 확실히 빌어 두게.”</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-in reveal">
+    <div class="foot-l">
+      <span class="zh">環宇貿易 · 機密</span>
+      <span class="mono net">Handover Noir — Personnel Archive</span>
+      <span class="mono">香港 · 2066 · 二次移交 前夜<br>열람 기록됨 · 감사망 #4471-██</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* live HK clock in nav */
+(function(){
+  var el=document.getElementById('clock');
+  function tick(){
+    var d=new Date();
+    var p=function(n){return String(n).padStart(2,'0');};
+    if(el) el.textContent='香港 · '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
+  }
+  tick(); setInterval(tick,1000);
+})();
+
+/* decrypt terminal boot */
+(function(){
+  var host=document.getElementById('term');
+  if(!host) return;
+  var lines=[
+    {t:'> 감사망 세션 개시 · audit-net session',c:''},
+    {t:'> 대상 아카이브: 環宇貿易 // 機密人事記錄',c:'k'},
+    {t:'> 암호 해제 중 ... 04471 ... OK',c:'k'},
+    {t:'> 경고: 열람 로그가 기록됩니다',c:'r'},
+    {t:'> 파일 개방됨.',c:'k'}
+  ];
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){ host.innerHTML=lines.map(function(l){return '<span class="'+l.c+'">'+l.t+'</span>';}).join('<br>'); return; }
+  var li=0,ci=0;
+  function step(){
+    if(li>=lines.length){ return; }
+    var line=lines[li];
+    if(ci<=line.t.length){
+      var done=host.getAttribute('data-done')||'';
+      host.innerHTML=done+'<span class="'+line.c+'">'+line.t.slice(0,ci)+'</span><span class="term-cursor">_</span>';
+      ci++; setTimeout(step, 14+Math.random()*22);
+    } else {
+      host.setAttribute('data-done', (host.getAttribute('data-done')||'')+'<span class="'+line.c+'">'+line.t+'</span><br>');
+      li++; ci=0; setTimeout(step, 240);
+    }
+  }
+  setTimeout(step, 400);
+})();
+
+/* dossier carousels */
+(function(){
+  document.querySelectorAll('.dossier-visual[data-carousel]').forEach(function(v){
+    var track=v.querySelector('.image-track');
+    var slides=v.querySelectorAll('.slide');
+    var dots=v.querySelectorAll('.carousel-indicators .cdot');
+    var prev=v.querySelector('.nav-prev');
+    var next=v.querySelector('.nav-next');
+    var n=slides.length, i=0;
+    if(!track||!n) return;
+    function go(k){
+      i=(k%n+n)%n;
+      track.style.transform='translateX('+(-i*100)+'%)';
+      dots.forEach(function(d,j){ d.classList.toggle('active', j===i); });
+      slides.forEach(function(sl,j){ sl.classList.toggle('on', j===i); });
+    }
+    if(prev) prev.addEventListener('click', function(){ go(i-1); });
+    if(next) next.addEventListener('click', function(){ go(i+1); });
+    dots.forEach(function(d,j){ d.addEventListener('click', function(){ go(j); }); });
+    go(0);
+  });
+})();
+
+/* motion budget — ambient loops only run while their host is on screen */
+(function(){
+  var hosts=document.querySelectorAll('[data-motion]');
+  if(!hosts.length||!('IntersectionObserver' in window)) return;
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ e.target.classList.toggle('live', e.isIntersecting); });
+  },{ rootMargin:'12% 0px' });
+  hosts.forEach(function(el){ io.observe(el); });
+})();
+
+/* scroll reveals */
+(function(){
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:.14, rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+})();
+
+/* districts map — bidirectional highlight between map nodes and cards */
+(function(){
+  var section=document.getElementById('districts');
+  if(!section) return;
+  var zones=Array.prototype.slice.call(section.querySelectorAll('.zone'));
+  var cards=Array.prototype.slice.call(section.querySelectorAll('[data-zone]')).filter(function(el){ return !el.classList.contains('zone'); });
+  function byZone(key){
+    var out=[];
+    zones.concat(cards).forEach(function(el){ if(el.getAttribute('data-zone')===key) out.push(el); });
+    return out;
+  }
+  function setActive(key, on){
+    byZone(key).forEach(function(el){ el.classList.toggle('active', on); });
+  }
+  function bind(el){
+    var key=el.getAttribute('data-zone');
+    el.addEventListener('mouseenter', function(){ setActive(key,true); });
+    el.addEventListener('mouseleave', function(){ setActive(key,false); });
+    el.addEventListener('focus', function(){ setActive(key,true); });
+    el.addEventListener('blur', function(){ setActive(key,false); });
+    // tap / click: latch highlight (useful on touch); clicking a map node scrolls its card into view
+    el.addEventListener('click', function(){
+      var already=el.classList.contains('active');
+      zones.concat(cards).forEach(function(n){ n.classList.remove('active'); });
+      if(!already){
+        setActive(key,true);
+        if(el.classList.contains('zone')){
+          var card=cards.filter(function(c){ return c.getAttribute('data-zone')===key; })[0];
+          if(card) card.scrollIntoView({behavior:'smooth', block:'center'});
+        }
+      }
+    });
+  }
+  zones.forEach(bind);
+  cards.forEach(bind);
+})();
+
+/* districts map — audit-net live readout on node hover */
+(function(){
+  var frame=document.querySelector('#districts .mapframe');
+  var tip=document.getElementById('mtip');
+  if(!frame||!tip) return;
+
+  var ZD={
+    kowloon:{c:'S-01', zc:'#9fb0c2', kr:'구룡 지하', zh:'九龍地下', en:'KOWLOON UNDERGROUND',
+      co:'22°19′N · 114°11′E', status:'OFF-GRID', tone:'',
+      popn:'≈12.4', u:'K', popl:'감사망 미등록 추정 인구', delta:'▲ 3.1%', dir:'up',
+      threat:78, audit:9, m3:{k:'인구 밀도', v:86},
+      tags:['오프그리드','미등록','육양 파이프라인'],
+      spark:[.30,.52,.28,.70,.34,.90,.40,.55,.30,.80,.44,.62,.36,.74]},
+    kaitak:{c:'S-02', zc:'#d69a4a', kr:'카이탁', zh:'啓德', en:'KAI TAK · SUBMERGED',
+      co:'22°19′N · 114°13′E', status:'GREY ZONE', tone:'',
+      popn:'48.7', u:'K', popl:'수몰 슬럼 · 주간 유동 포함', delta:'▲ 0.8%', dir:'up',
+      threat:71, audit:34, m3:{k:'밀수 활동', v:74},
+      tags:['슬럼','밀수 루트','암시장'],
+      spark:[.60,.72,.64,.80,.70,.86,.74,.90,.82,.78,.88,.70,.84,.90]},
+    hoilo:{c:'S-03', zc:'#cc2450', kr:'해라장', zh:'海螺莊', en:'HOI LO JONG · WFT HQ',
+      co:'22°17′N · 114°09′E', status:'RESTRICTED', tone:'danger',
+      popn:'2,150', u:'', popl:'등록 인원 · 사설 경비 포함', delta:'▼ 1.2%', dir:'down',
+      threat:46, audit:88, m3:{k:'환우 통제', v:91},
+      tags:['환우 본사','케이블 육양','집행·심문'],
+      spark:[.24,.20,.30,.22,.28,.76,.32,.24,.26,.22,.30,.28,.25,.20]},
+    peak:{c:'S-04', zc:'#8cc3e8', kr:'더 피크', zh:'太平山', en:'THE PEAK · 726M',
+      co:'22°16′N · 114°09′E', status:'FORTIFIED', tone:'',
+      popn:'~900', u:'', popl:'상주 자본가 · 등록 인원', delta:'▼ 0.4%', dir:'down',
+      threat:12, audit:96, m3:{k:'방비 등급', v:96},
+      tags:['공중 성채','감사망 사각','메가코프'],
+      spark:[.12,.10,.14,.11,.13,.10,.12,.15,.11,.10,.13,.12,.10,.11]},
+    shelf:{c:'OFS-01', zc:'#33e3d1', kr:'陸棚', zh:'the Shelf', en:'OFFSHORE · THE PRIZE',
+      co:'22°11′N · 114°18′E', status:'CONTESTED', tone:'',
+      popn:'340', u:'', popl:'상주 승조·기술 인력', delta:'▲ 5.6%', dir:'up',
+      threat:63, audit:51, m3:{k:'전략 가치', v:99},
+      tags:['해저 데이터센터','발전 겸용','최종 쟁탈'],
+      spark:[.50,.34,.66,.40,.72,.44,.82,.50,.60,.40,.74,.50,.66,.58]}
+  };
+
+  function meter(cls,k,v){
+    return '<div class="mt-bar '+cls+'"><div class="mt-bl"><span class="k">'+k+'</span>'
+      +'<span class="v">'+v+'</span></div>'
+      +'<div class="mt-track"><i style="--v:'+v+'%"></i></div></div>';
+  }
+  function sparkline(arr){
+    var W=100,H=30,n=arr.length;
+    var pts=arr.map(function(v,i){ return [ (i/(n-1))*W, H-(v*(H-4))-2 ]; });
+    var line=pts.map(function(p,i){ return (i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1); }).join(' ');
+    var area='M0 '+H+' '+pts.map(function(p){ return 'L'+p[0].toFixed(1)+' '+p[1].toFixed(1); }).join(' ')+' L'+W+' '+H+' Z';
+    var e=pts[n-1];
+    return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'
+      +'<path class="sp-area" d="'+area+'"/>'
+      +'<path class="sp-line" d="'+line+'" vector-effect="non-scaling-stroke"/>'
+      +'<circle class="sp-dot" cx="'+e[0].toFixed(1)+'" cy="'+e[1].toFixed(1)+'" r="1.6"/>'
+      +'</svg>';
+  }
+  function render(d){
+    tip.style.setProperty('--zc', d.zc);
+    var pk=Math.round(Math.max.apply(null,d.spark)*100);
+    tip.innerHTML=''
+      +'<span class="mt-brk tr"></span><span class="mt-brk br"></span>'
+      +'<div class="mt-hd"><span class="live"></span>AUDIT-NET · LIVE<span class="co">'+d.co+'</span></div>'
+      +'<div class="mt-top"><span class="mt-code">'+d.c+'</span>'
+        +'<span class="mt-status"'+(d.tone?' data-tone="'+d.tone+'"':'')+'>'+d.status+'</span></div>'
+      +'<div class="mt-name">'+d.kr+'<span>'+d.zh+'</span></div>'
+      +'<div class="mt-en">'+d.en+'</div>'
+      +'<div class="mt-pop"><div class="mt-popn">'+d.popn+(d.u?'<span class="u">'+d.u+'</span>':'')+'</div>'
+        +'<span class="mt-delta '+d.dir+'">'+d.delta+'</span></div>'
+      +'<div class="mt-popl">'+d.popl+'</div>'
+      +'<div class="mt-bars">'+meter('threat','위험도',d.threat)+meter('audit','감사망 커버리지',d.audit)+meter('m3',d.m3.k,d.m3.v)+'</div>'
+      +'<div class="mt-spark"><div class="sl"><span>72H 활동 로그</span><span>PK '+pk+'</span></div>'+sparkline(d.spark)+'</div>'
+      +'<div class="mt-foot">'+d.tags.map(function(t){ return '<span class="mt-tag">'+t+'</span>'; }).join('')+'</div>';
+  }
+  function place(zoneEl){
+    var node=zoneEl.querySelector('.node')||zoneEl;
+    var r=node.getBoundingClientRect(), fr=frame.getBoundingClientRect();
+    var cx=r.left+r.width/2-fr.left, cy=r.top+r.height/2-fr.top, gap=22;
+    var tw=tip.offsetWidth, th=tip.offsetHeight;
+    var left=cx+gap;
+    if(left+tw>fr.width-8) left=cx-tw-gap;
+    left=Math.max(8, Math.min(left, fr.width-tw-8));
+    var top=Math.max(8, Math.min(cy-th/2, fr.height-th-8));
+    tip.style.left=left+'px'; tip.style.top=top+'px';
+  }
+  var current=null;
+  function show(key,el){ var d=ZD[key]; if(!d) return; current=key; render(d); tip.classList.add('show'); place(el); }
+  function hide(key){ if(key&&key!==current) return; current=null; tip.classList.remove('show'); }
+
+  Array.prototype.slice.call(frame.querySelectorAll('.zone')).forEach(function(el){
+    var key=el.getAttribute('data-zone');
+    el.addEventListener('mouseenter', function(){ show(key,el); });
+    el.addEventListener('mouseleave', function(){ hide(key); });
+    el.addEventListener('focus', function(){ show(key,el); });
+    el.addEventListener('blur', function(){ hide(key); });
+  });
+  window.addEventListener('scroll', function(){ if(current) tip.classList.remove('show'), current=null; }, {passive:true});
+})();
+
+/* nav active state */
+(function(){
+  var links=Array.prototype.slice.call(document.querySelectorAll('.nav-links a'));
+  var map={};
+  links.forEach(function(a){ var id=a.getAttribute('href').slice(1); map[id]=a; });
+  var secs=['access','world','districts','network','files'].map(function(id){return document.getElementById(id);});
+  var so=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(a){a.classList.remove('active');});
+        var a=map[e.target.id]; if(a) a.classList.add('active');
+      }
+    });
+  },{threshold:.4});
+  secs.forEach(function(s){ if(s) so.observe(s); });
+})();
+</script>
+</body>
+</html>
